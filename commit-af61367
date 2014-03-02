@@ -1,0 +1,3622 @@
+commit af6136700d8087ca2d3f3b6b90ecd09f9abd4817
+Author: Danny Schreiber <danny@ravenartmedia.com>
+Date:   Sat Mar 1 22:45:40 2014 -0800
+
+    added routing  and structuremap config
+
+diff --git a/ModestoPower.Mvc/App_Packages/TaskHelpers.Sources.0.1/TaskHelpers.cs b/ModestoPower.Mvc/App_Packages/TaskHelpers.Sources.0.1/TaskHelpers.cs
+new file mode 100644
+index 0000000..5120947
+--- /dev/null
++++ b/ModestoPower.Mvc/App_Packages/TaskHelpers.Sources.0.1/TaskHelpers.cs
+@@ -0,0 +1,396 @@
++﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
++
++using System.Collections.Generic;
++using System.Diagnostics.CodeAnalysis;
++using System.Diagnostics.Contracts;
++
++namespace System.Threading.Tasks
++{
++    /// <summary>
++    /// Helpers for safely using Task libraries. 
++    /// </summary>
++    internal static class TaskHelpers
++    {
++        private static readonly Task _defaultCompleted = FromResult<AsyncVoid>(default(AsyncVoid));
++
++        private static readonly Task<object> _completedTaskReturningNull = FromResult<object>(null);
++
++        /// <summary>
++        /// Returns a canceled Task. The task is completed, IsCanceled = True, IsFaulted = False.
++        /// </summary>
++        internal static Task Canceled()
++        {
++            return CancelCache<AsyncVoid>.Canceled;
++        }
++
++        /// <summary>
++        /// Returns a canceled Task of the given type. The task is completed, IsCanceled = True, IsFaulted = False.
++        /// </summary>
++        internal static Task<TResult> Canceled<TResult>()
++        {
++            return CancelCache<TResult>.Canceled;
++        }
++
++        /// <summary>
++        /// Returns a completed task that has no result. 
++        /// </summary>        
++        internal static Task Completed()
++        {
++            return _defaultCompleted;
++        }
++
++        /// <summary>
++        /// Returns an error task. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        internal static Task FromError(Exception exception)
++        {
++            return FromError<AsyncVoid>(exception);
++        }
++
++        /// <summary>
++        /// Returns an error task of the given type. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        /// <typeparam name="TResult"></typeparam>
++        internal static Task<TResult> FromError<TResult>(Exception exception)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++            tcs.SetException(exception);
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Returns an error task of the given type. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        internal static Task FromErrors(IEnumerable<Exception> exceptions)
++        {
++            return FromErrors<AsyncVoid>(exceptions);
++        }
++
++        /// <summary>
++        /// Returns an error task of the given type. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        internal static Task<TResult> FromErrors<TResult>(IEnumerable<Exception> exceptions)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++            tcs.SetException(exceptions);
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Returns a successful completed task with the given result.  
++        /// </summary>        
++        internal static Task<TResult> FromResult<TResult>(TResult result)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++            tcs.SetResult(result);
++            return tcs.Task;
++        }
++
++        internal static Task<object> NullResult()
++        {
++            return _completedTaskReturningNull;
++        }
++
++        /// <summary>
++        /// Return a task that runs all the tasks inside the iterator sequentially. It stops as soon
++        /// as one of the tasks fails or cancels, or after all the tasks have run succesfully.
++        /// </summary>
++        /// <param name="asyncIterator">collection of tasks to wait on</param>
++        /// <param name="cancellationToken">cancellation token</param>
++        /// <param name="disposeEnumerator">whether or not to dispose the enumerator we get from <paramref name="asyncIterator"/>.
++        /// Only set to <c>false</c> if you can guarantee that <paramref name="asyncIterator"/>'s enumerator does not have any resources it needs to dispose.</param>
++        /// <returns>a task that signals completed when all the incoming tasks are finished.</returns>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The exception is propagated in a Task.")]
++        internal static Task Iterate(IEnumerable<Task> asyncIterator, CancellationToken cancellationToken = default(CancellationToken), bool disposeEnumerator = true)
++        {
++            Contract.Assert(asyncIterator != null);
++
++            IEnumerator<Task> enumerator = null;
++            try
++            {
++                enumerator = asyncIterator.GetEnumerator();
++                Task task = IterateImpl(enumerator, cancellationToken);
++                return (disposeEnumerator && enumerator != null) ? task.Finally(enumerator.Dispose, runSynchronously: true) : task;
++            }
++            catch (Exception ex)
++            {
++                return TaskHelpers.FromError(ex);
++            }
++        }
++
++        /// <summary>
++        /// Provides the implementation of the Iterate method.
++        /// Contains special logic to help speed up common cases.
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The exception is propagated in a Task.")]
++        internal static Task IterateImpl(IEnumerator<Task> enumerator, CancellationToken cancellationToken)
++        {
++            try
++            {
++                while (true)
++                {
++                    // short-circuit: iteration canceled
++                    if (cancellationToken.IsCancellationRequested)
++                    {
++                        return TaskHelpers.Canceled();
++                    }
++
++                    // short-circuit: iteration complete
++                    if (!enumerator.MoveNext())
++                    {
++                        return TaskHelpers.Completed();
++                    }
++
++                    // fast case: Task completed synchronously & successfully
++                    Task currentTask = enumerator.Current;
++                    if (currentTask.Status == TaskStatus.RanToCompletion)
++                    {
++                        continue;
++                    }
++
++                    // fast case: Task completed synchronously & unsuccessfully
++                    if (currentTask.IsCanceled || currentTask.IsFaulted)
++                    {
++                        return currentTask;
++                    }
++
++                    // slow case: Task isn't yet complete
++                    return IterateImplIncompleteTask(enumerator, currentTask, cancellationToken);
++                }
++            }
++            catch (Exception ex)
++            {
++                return TaskHelpers.FromError(ex);
++            }
++        }
++
++        /// <summary>
++        /// Fallback for IterateImpl when the antecedent Task isn't yet complete.
++        /// </summary>
++        internal static Task IterateImplIncompleteTask(IEnumerator<Task> enumerator, Task currentTask, CancellationToken cancellationToken)
++        {
++            // There's a race condition here, the antecedent Task could complete between
++            // the check in Iterate and the call to Then below. If this happens, we could
++            // end up growing the stack indefinitely. But the chances of (a) even having
++            // enough Tasks in the enumerator in the first place and of (b) *every* one
++            // of them hitting this race condition are so extremely remote that it's not
++            // worth worrying about.
++            return currentTask.Then(() => IterateImpl(enumerator, cancellationToken));
++        }
++
++        /// <summary>
++        /// Replacement for Task.Factory.StartNew when the code can run synchronously. 
++        /// We run the code immediately and avoid the thread switch. 
++        /// This is used to help synchronous code implement task interfaces.
++        /// </summary>
++        /// <param name="action">action to run synchronouslyt</param>
++        /// <param name="token">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
++        /// <returns>a task who result is the result from Func()</returns>
++        /// <remarks>
++        /// Avoid calling Task.Factory.StartNew.         
++        /// This avoids gotchas with StartNew:
++        /// - ensures cancellation token is checked (StartNew doesn't check cancellation tokens).
++        /// - Keeps on the same thread. 
++        /// - Avoids switching synchronization contexts.
++        /// Also take in a lambda so that we can wrap in a try catch and honor task failure semantics.        
++        /// </remarks>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        public static Task RunSynchronously(Action action, CancellationToken token = default(CancellationToken))
++        {
++            if (token.IsCancellationRequested)
++            {
++                return Canceled();
++            }
++
++            try
++            {
++                action();
++                return Completed();
++            }
++            catch (Exception e)
++            {
++                return FromError(e);
++            }
++        }
++
++        /// <summary>
++        /// Replacement for Task.Factory.StartNew when the code can run synchronously. 
++        /// We run the code immediately and avoid the thread switch. 
++        /// This is used to help synchronous code implement task interfaces.
++        /// </summary>
++        /// <typeparam name="TResult">type of result that task will return.</typeparam>
++        /// <param name="func">function to run synchronously and produce result</param>
++        /// <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
++        /// <returns>a task who result is the result from Func()</returns>
++        /// <remarks>
++        /// Avoid calling Task.Factory.StartNew.         
++        /// This avoids gotchas with StartNew:
++        /// - ensures cancellation token is checked (StartNew doesn't check cancellation tokens).
++        /// - Keeps on the same thread. 
++        /// - Avoids switching synchronization contexts.
++        /// Also take in a lambda so that we can wrap in a try catch and honor task failure semantics.        
++        /// </remarks>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task<TResult> RunSynchronously<TResult>(Func<TResult> func, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            if (cancellationToken.IsCancellationRequested)
++            {
++                return Canceled<TResult>();
++            }
++
++            try
++            {
++                return FromResult(func());
++            }
++            catch (Exception e)
++            {
++                return FromError<TResult>(e);
++            }
++        }
++
++        /// <summary>
++        /// Overload of RunSynchronously that avoids a call to Unwrap(). 
++        /// This overload is useful when func() starts doing some synchronous work and then hits IO and 
++        /// needs to create a task to finish the work. 
++        /// </summary>
++        /// <typeparam name="TResult">type of result that Task will return</typeparam>
++        /// <param name="func">function that returns a task</param>
++        /// <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
++        /// <returns>a task, created by running func().</returns>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task<TResult> RunSynchronously<TResult>(Func<Task<TResult>> func, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            if (cancellationToken.IsCancellationRequested)
++            {
++                return Canceled<TResult>();
++            }
++
++            try
++            {
++                return func();
++            }
++            catch (Exception e)
++            {
++                return FromError<TResult>(e);
++            }
++        }
++
++        /// <summary>
++        /// Update the completion source if the task failed (cancelled or faulted). No change to completion source if the task succeeded. 
++        /// </summary>
++        /// <typeparam name="TResult">result type of completion source</typeparam>
++        /// <param name="tcs">completion source to update</param>
++        /// <param name="source">task to update from.</param>
++        /// <returns>true on success</returns>
++        internal static bool SetIfTaskFailed<TResult>(this TaskCompletionSource<TResult> tcs, Task source)
++        {
++            switch (source.Status)
++            {
++                case TaskStatus.Canceled:
++                case TaskStatus.Faulted:
++                    return tcs.TrySetFromTask(source);
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Set a completion source from the given Task.
++        /// </summary>
++        /// <typeparam name="TResult">result type for completion source.</typeparam>
++        /// <param name="tcs">completion source to set</param>
++        /// <param name="source">Task to get values from.</param>
++        /// <returns>true if this successfully sets the completion source.</returns>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "This is a known safe usage of Task.Result, since it only occurs when we know the task's state to be completed.")]
++        internal static bool TrySetFromTask<TResult>(this TaskCompletionSource<TResult> tcs, Task source)
++        {
++            if (source.Status == TaskStatus.Canceled)
++            {
++                return tcs.TrySetCanceled();
++            }
++
++            if (source.Status == TaskStatus.Faulted)
++            {
++                return tcs.TrySetException(source.Exception.InnerExceptions);
++            }
++
++            if (source.Status == TaskStatus.RanToCompletion)
++            {
++                Task<TResult> taskOfResult = source as Task<TResult>;
++                return tcs.TrySetResult(taskOfResult == null ? default(TResult) : taskOfResult.Result);
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Set a completion source from the given Task. If the task ran to completion and the result type doesn't match
++        /// the type of the completion source, then a default value will be used. This is useful for converting Task into
++        /// Task{AsyncVoid}, but it can also accidentally be used to introduce data loss (by passing the wrong
++        /// task type), so please execute this method with care.
++        /// </summary>
++        /// <typeparam name="TResult">result type for completion source.</typeparam>
++        /// <param name="tcs">completion source to set</param>
++        /// <param name="source">Task to get values from.</param>
++        /// <returns>true if this successfully sets the completion source.</returns>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "This is a known safe usage of Task.Result, since it only occurs when we know the task's state to be completed.")]
++        internal static bool TrySetFromTask<TResult>(this TaskCompletionSource<Task<TResult>> tcs, Task source)
++        {
++            if (source.Status == TaskStatus.Canceled)
++            {
++                return tcs.TrySetCanceled();
++            }
++
++            if (source.Status == TaskStatus.Faulted)
++            {
++                return tcs.TrySetException(source.Exception.InnerExceptions);
++            }
++
++            if (source.Status == TaskStatus.RanToCompletion)
++            {
++                // Sometimes the source task is Task<Task<TResult>>, and sometimes it's Task<TResult>.
++                // The latter usually happens when we're in the middle of a sync-block postback where
++                // the continuation is a function which returns Task<TResult> rather than just TResult,
++                // but the originating task was itself just Task<TResult>. An example of this can be
++                // found in TaskExtensions.CatchImpl().
++                Task<Task<TResult>> taskOfTaskOfResult = source as Task<Task<TResult>>;
++                if (taskOfTaskOfResult != null)
++                {
++                    return tcs.TrySetResult(taskOfTaskOfResult.Result);
++                }
++
++                Task<TResult> taskOfResult = source as Task<TResult>;
++                if (taskOfResult != null)
++                {
++                    return tcs.TrySetResult(taskOfResult);
++                }
++
++                return tcs.TrySetResult(TaskHelpers.FromResult(default(TResult)));
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Used as the T in a "conversion" of a Task into a Task{T}
++        /// </summary>
++        private struct AsyncVoid
++        {
++        }
++
++        /// <summary>
++        /// This class is a convenient cache for per-type cancelled tasks
++        /// </summary>
++        private static class CancelCache<TResult>
++        {
++            public static readonly Task<TResult> Canceled = GetCancelledTask();
++
++            private static Task<TResult> GetCancelledTask()
++            {
++                TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++                tcs.SetCanceled();
++                return tcs.Task;
++            }
++        }
++    }
++}
+diff --git a/ModestoPower.Mvc/App_Packages/TaskHelpers.Sources.0.1/TaskHelpersExtensions.cs b/ModestoPower.Mvc/App_Packages/TaskHelpers.Sources.0.1/TaskHelpersExtensions.cs
+new file mode 100644
+index 0000000..30f72ac
+--- /dev/null
++++ b/ModestoPower.Mvc/App_Packages/TaskHelpers.Sources.0.1/TaskHelpersExtensions.cs
+@@ -0,0 +1,943 @@
++﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
++
++using System.Diagnostics.CodeAnalysis;
++using System.Diagnostics.Contracts;
++using System.Linq.Expressions;
++using System.Reflection;
++
++namespace System.Threading.Tasks
++{
++    internal static class TaskHelpersExtensions
++    {
++        private static Task<AsyncVoid> _defaultCompleted = TaskHelpers.FromResult<AsyncVoid>(default(AsyncVoid));
++        private static readonly Action<Task> _rethrowWithNoStackLossDelegate = GetRethrowWithNoStackLossDelegate();
++
++        /// <summary>
++        /// Calls the given continuation, after the given task completes, if it ends in a faulted state.
++        /// Will not be called if the task did not fault (meaning, it will not be called if the task ran
++        /// to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
++        /// async methods. Note that this method allows you to return a Task, so that you can either return
++        /// a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
++        /// that the exception should be propagated). In C#, you cannot normally use await within a catch
++        /// block, so returning a real async task should never be done from Catch().
++        /// </summary>
++        internal static Task Catch(this Task task, Func<CatchInfo, CatchInfo.CatchResult> continuation, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            // Fast path for successful tasks, to prevent an extra TCS allocation
++            if (task.Status == TaskStatus.RanToCompletion)
++            {
++                return task;
++            }
++
++            return task.CatchImpl(() => continuation(new CatchInfo(task)).Task.ToTask<AsyncVoid>(), cancellationToken);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task completes, if it ends in a faulted state.
++        /// Will not be called if the task did not fault (meaning, it will not be called if the task ran
++        /// to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
++        /// async methods. Note that this method allows you to return a Task, so that you can either return
++        /// a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
++        /// that the exception should be propagated). In C#, you cannot normally use await within a catch
++        /// block, so returning a real async task should never be done from Catch().
++        /// </summary>
++        internal static Task<TResult> Catch<TResult>(this Task<TResult> task, Func<CatchInfo<TResult>, CatchInfo<TResult>.CatchResult> continuation, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            // Fast path for successful tasks, to prevent an extra TCS allocation
++            if (task.Status == TaskStatus.RanToCompletion)
++            {
++                return task;
++            }
++            return task.CatchImpl(() => continuation(new CatchInfo<TResult>(task)).Task, cancellationToken);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "CatchInfo", Justification = "This is the name of a class.")]
++        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "TaskHelpersExtensions", Justification = "This is the name of a class.")]
++        private static Task<TResult> CatchImpl<TResult>(this Task task, Func<Task<TResult>> continuation, CancellationToken cancellationToken)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    try
++                    {
++                        Task<TResult> resultTask = continuation();
++                        if (resultTask == null)
++                        {
++                            // Not a resource because this is an internal class, and this is a guard clause that's intended
++                            // to be thrown by us to us, never escaping out to end users.
++                            throw new InvalidOperationException("You must set the Task property of the CatchInfo returned from the TaskHelpersExtensions.Catch continuation.");
++                        }
++
++                        return resultTask;
++                    }
++                    catch (Exception ex)
++                    {
++                        return TaskHelpers.FromError<TResult>(ex);
++                    }
++                }
++                if (task.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    return TaskHelpers.Canceled<TResult>();
++                }
++
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++                    tcs.TrySetFromTask(task);
++                    return tcs.Task;
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return CatchImplContinuation(task, continuation);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "TaskHelpersExtensions", Justification = "This is the name of a class.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TResult> CatchImplContinuation<TResult>(Task task, Func<Task<TResult>> continuation)
++        {
++            SynchronizationContext syncContext = SynchronizationContext.Current;
++
++            TaskCompletionSource<Task<TResult>> tcs = new TaskCompletionSource<Task<TResult>>();
++
++            // this runs only if the inner task did not fault
++            task.ContinueWith(innerTask => tcs.TrySetFromTask(innerTask), TaskContinuationOptions.NotOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
++
++            // this runs only if the inner task faulted
++            task.ContinueWith(innerTask =>
++            {
++                if (syncContext != null)
++                {
++                    syncContext.Post(state =>
++                    {
++                        try
++                        {
++                            Task<TResult> resultTask = continuation();
++                            if (resultTask == null)
++                            {
++                                throw new InvalidOperationException("You cannot return null from the TaskHelpersExtensions.Catch continuation. You must return a valid task or throw an exception.");
++                            }
++
++                            tcs.TrySetResult(resultTask);
++                        }
++                        catch (Exception ex)
++                        {
++                            tcs.TrySetException(ex);
++                        }
++                    }, state: null);
++                }
++                else
++                {
++                    try
++                    {
++                        Task<TResult> resultTask = continuation();
++                        if (resultTask == null)
++                        {
++                            throw new InvalidOperationException("You cannot return null from the TaskHelpersExtensions.Catch continuation. You must return a valid task or throw an exception.");
++                        }
++
++                        tcs.TrySetResult(resultTask);
++                    }
++                    catch (Exception ex)
++                    {
++                        tcs.TrySetException(ex);
++                    }
++                }
++            }, TaskContinuationOptions.OnlyOnFaulted);
++
++            return tcs.Task.FastUnwrap();
++        }
++
++        /// <summary>
++        /// Upon completion of the task, copies its result into the given task completion source, regardless of the
++        /// completion state. This causes the original task to be fully observed, and the task that is returned by
++        /// this method will always successfully run to completion, regardless of the original task state.
++        /// Since this method consumes a task with no return value, you must provide the return value to be used
++        /// when the inner task ran to successful completion.
++        /// </summary>
++        internal static Task CopyResultToCompletionSource<TResult>(this Task task, TaskCompletionSource<TResult> tcs, TResult completionResult)
++        {
++            return task.CopyResultToCompletionSourceImpl(tcs, innerTask => completionResult);
++        }
++
++        /// <summary>
++        /// Upon completion of the task, copies its result into the given task completion source, regardless of the
++        /// completion state. This causes the original task to be fully observed, and the task that is returned by
++        /// this method will always successfully run to completion, regardless of the original task state.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task CopyResultToCompletionSource<TResult>(this Task<TResult> task, TaskCompletionSource<TResult> tcs)
++        {
++            return task.CopyResultToCompletionSourceImpl(tcs, innerTask => innerTask.Result);
++        }
++
++        private static Task CopyResultToCompletionSourceImpl<TTask, TResult>(this TTask task, TaskCompletionSource<TResult> tcs, Func<TTask, TResult> resultThunk)
++            where TTask : Task
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                switch (task.Status)
++                {
++                    case TaskStatus.Canceled:
++                    case TaskStatus.Faulted:
++                        TaskHelpers.TrySetFromTask(tcs, task);
++                        break;
++
++                    case TaskStatus.RanToCompletion:
++                        tcs.TrySetResult(resultThunk(task));
++                        break;
++                }
++
++                return TaskHelpers.Completed();
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return CopyResultToCompletionSourceImplContinuation(task, tcs, resultThunk);
++        }
++
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task CopyResultToCompletionSourceImplContinuation<TTask, TResult>(TTask task, TaskCompletionSource<TResult> tcs, Func<TTask, TResult> resultThunk)
++            where TTask : Task
++        {
++            return task.ContinueWith(innerTask =>
++            {
++                switch (innerTask.Status)
++                {
++                    case TaskStatus.Canceled:
++                    case TaskStatus.Faulted:
++                        TaskHelpers.TrySetFromTask(tcs, innerTask);
++                        break;
++
++                    case TaskStatus.RanToCompletion:
++                        tcs.TrySetResult(resultThunk(task));
++                        break;
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++        }
++
++        /// <summary>
++        /// Cast Task to Task of object
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<object> CastToObject(this Task task)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<object>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled)
++                {
++                    return TaskHelpers.Canceled<object>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    return TaskHelpers.FromResult<object>((object)null);
++                }
++            }
++
++            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
++
++            // schedule a synchronous task to cast: no need to worry about sync context or try/catch
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.SetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled)
++                {
++                    tcs.SetCanceled();
++                }
++                else
++                {
++                    tcs.SetResult((object)null);
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Cast Task of T to Task of object
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<object> CastToObject<T>(this Task<T> task)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<object>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled)
++                {
++                    return TaskHelpers.Canceled<object>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    return TaskHelpers.FromResult<object>((object)task.Result);
++                }
++            }
++
++            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
++
++            // schedule a synchronous task to cast: no need to worry about sync context or try/catch
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.SetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled)
++                {
++                    tcs.SetCanceled();
++                }
++                else
++                {
++                    tcs.SetResult((object)innerTask.Result);
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Cast Task of object to Task of T
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TOuterResult> CastFromObject<TOuterResult>(this Task<object> task)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<TOuterResult>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled)
++                {
++                    return TaskHelpers.Canceled<TOuterResult>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    try
++                    {
++                        return TaskHelpers.FromResult<TOuterResult>((TOuterResult)task.Result);
++                    }
++                    catch (Exception exception)
++                    {
++                        return TaskHelpers.FromError<TOuterResult>(exception);
++                    }
++                }
++            }
++
++            TaskCompletionSource<TOuterResult> tcs = new TaskCompletionSource<TOuterResult>();
++
++            // schedule a synchronous task to cast: no need to worry about sync context or try/catch
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.SetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled)
++                {
++                    tcs.SetCanceled();
++                }
++                else
++                {
++                    try
++                    {
++                        tcs.SetResult((TOuterResult)innerTask.Result);
++                    }
++                    catch (Exception exception)
++                    {
++                        tcs.SetException(exception);
++                    }
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
++        /// execution context when the antecedent task is already completed.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4000:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task FastUnwrap(this Task<Task> task)
++        {
++            Task innerTask = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
++            return innerTask ?? task.Unwrap();
++        }
++
++        /// <summary>
++        /// A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
++        /// execution context when the antecedent task is already completed.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4000:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TResult> FastUnwrap<TResult>(this Task<Task<TResult>> task)
++        {
++            Task<TResult> innerTask = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
++            return innerTask ?? task.Unwrap();
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, regardless of the state
++        /// the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task Finally(this Task task, Action continuation, bool runSynchronously = false)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                try
++                {
++                    continuation();
++                    return task;
++                }
++                catch (Exception ex)
++                {
++                    MarkExceptionsObserved(task);
++                    return TaskHelpers.FromError(ex);
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return FinallyImplContinuation<AsyncVoid>(task, continuation, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, regardless of the state
++        /// the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task<TResult> Finally<TResult>(this Task<TResult> task, Action continuation, bool runSynchronously = false)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                try
++                {
++                    continuation();
++                    return task;
++                }
++                catch (Exception ex)
++                {
++                    MarkExceptionsObserved(task);
++                    return TaskHelpers.FromError<TResult>(ex);
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return FinallyImplContinuation<TResult>(task, continuation, runSynchronously);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TResult> FinallyImplContinuation<TResult>(Task task, Action continuation, bool runSynchronously = false)
++        {
++            SynchronizationContext syncContext = SynchronizationContext.Current;
++
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++
++            task.ContinueWith(innerTask =>
++            {
++                try
++                {
++                    if (syncContext != null)
++                    {
++                        syncContext.Post(state =>
++                        {
++                            try
++                            {
++                                continuation();
++                                tcs.TrySetFromTask(innerTask);
++                            }
++                            catch (Exception ex)
++                            {
++                                MarkExceptionsObserved(innerTask);
++                                tcs.SetException(ex);
++                            }
++                        }, state: null);
++                    }
++                    else
++                    {
++                        continuation();
++                        tcs.TrySetFromTask(innerTask);
++                    }
++                }
++                catch (Exception ex)
++                {
++                    MarkExceptionsObserved(innerTask);
++                    tcs.TrySetException(ex);
++                }
++            }, runSynchronously ? TaskContinuationOptions.ExecuteSynchronously : TaskContinuationOptions.None);
++
++            return tcs.Task;
++        }
++
++        [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "This general exception is not intended to be seen by the user")]
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This general exception is not intended to be seen by the user")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Action<Task> GetRethrowWithNoStackLossDelegate()
++        {
++            MethodInfo getAwaiterMethod = typeof(Task).GetMethod("GetAwaiter", Type.EmptyTypes);
++            if (getAwaiterMethod != null)
++            {
++                // .NET 4.5 - dump the same code the 'await' keyword would have dumped
++                // >> task.GetAwaiter().GetResult()
++                // No-ops if the task completed successfully, else throws the originating exception complete with the correct call stack.
++                var taskParameter = Expression.Parameter(typeof(Task));
++                var getAwaiterCall = Expression.Call(taskParameter, getAwaiterMethod);
++                var getResultCall = Expression.Call(getAwaiterCall, "GetResult", Type.EmptyTypes);
++                var lambda = Expression.Lambda<Action<Task>>(getResultCall, taskParameter);
++                return lambda.Compile();
++            }
++            else
++            {
++                Func<Exception, Exception> prepForRemoting = null;
++
++                try
++                {
++                    if (AppDomain.CurrentDomain.IsFullyTrusted)
++                    {
++                        // .NET 4 - do the same thing Lazy<T> does by calling Exception.PrepForRemoting
++                        // This is an internal method in mscorlib.dll, so pass a test Exception to it to make sure we can call it.
++                        var exceptionParameter = Expression.Parameter(typeof(Exception));
++                        var prepForRemotingCall = Expression.Call(exceptionParameter, "PrepForRemoting", Type.EmptyTypes);
++                        var lambda = Expression.Lambda<Func<Exception, Exception>>(prepForRemotingCall, exceptionParameter);
++                        var func = lambda.Compile();
++                        func(new Exception()); // make sure the method call succeeds before assigning the 'prepForRemoting' local variable
++                        prepForRemoting = func;
++                    }
++                }
++                catch
++                {
++                } // If delegate creation fails (medium trust) we will simply throw the base exception.
++
++                return task =>
++                {
++                    try
++                    {
++                        task.Wait();
++                    }
++                    catch (AggregateException ex)
++                    {
++                        Exception baseException = ex.GetBaseException();
++                        if (prepForRemoting != null)
++                        {
++                            baseException = prepForRemoting(baseException);
++                        }
++                        throw baseException;
++                    }
++                };
++            }
++        }
++
++        /// <summary>
++        /// Marks a Task as "exception observed". The Task is required to have been completed first.
++        /// </summary>
++        /// <remarks>
++        /// Useful for 'finally' clauses, as if the 'finally' action throws we'll propagate the new
++        /// exception and lose track of the inner exception.
++        /// </remarks>
++        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "unused", Justification = "We only call the property getter for its side effect; we don't care about the value.")]
++        private static void MarkExceptionsObserved(this Task task)
++        {
++            Contract.Assert(task.IsCompleted);
++
++            Exception unused = task.Exception;
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task Then(this Task task, Action continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => ToAsyncVoidTask(continuation), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task<TOuterResult> Then<TOuterResult>(this Task task, Func<TOuterResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => TaskHelpers.FromResult(continuation()), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task Then(this Task task, Func<Task> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.Then(() => continuation().Then(() => default(AsyncVoid)),
++                             cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task<TOuterResult> Then<TOuterResult>(this Task task, Func<Task<TOuterResult>> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => continuation(), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task Then<TInnerResult>(this Task<TInnerResult> task, Action<TInnerResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => ToAsyncVoidTask(() => continuation(t.Result)), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TOuterResult> Then<TInnerResult, TOuterResult>(this Task<TInnerResult> task, Func<TInnerResult, TOuterResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => TaskHelpers.FromResult(continuation(t.Result)), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task Then<TInnerResult>(this Task<TInnerResult> task, Func<TInnerResult, Task> continuation, CancellationToken token = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => continuation(t.Result).ToTask<AsyncVoid>(), token, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TOuterResult> Then<TInnerResult, TOuterResult>(this Task<TInnerResult> task, Func<TInnerResult, Task<TOuterResult>> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => continuation(t.Result), cancellationToken, runSynchronously);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        private static Task<TOuterResult> ThenImpl<TTask, TOuterResult>(this TTask task, Func<TTask, Task<TOuterResult>> continuation, CancellationToken cancellationToken, bool runSynchronously)
++            where TTask : Task
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<TOuterResult>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    return TaskHelpers.Canceled<TOuterResult>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    try
++                    {
++                        return continuation(task);
++                    }
++                    catch (Exception ex)
++                    {
++                        return TaskHelpers.FromError<TOuterResult>(ex);
++                    }
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return ThenImplContinuation(task, continuation, cancellationToken, runSynchronously);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TOuterResult> ThenImplContinuation<TOuterResult, TTask>(TTask task, Func<TTask, Task<TOuterResult>> continuation, CancellationToken cancellationToken, bool runSynchronously = false)
++            where TTask : Task
++        {
++            SynchronizationContext syncContext = SynchronizationContext.Current;
++
++            TaskCompletionSource<Task<TOuterResult>> tcs = new TaskCompletionSource<Task<TOuterResult>>();
++
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.TrySetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    tcs.TrySetCanceled();
++                }
++                else
++                {
++                    if (syncContext != null)
++                    {
++                        syncContext.Post(state =>
++                        {
++                            try
++                            {
++                                tcs.TrySetResult(continuation(task));
++                            }
++                            catch (Exception ex)
++                            {
++                                tcs.TrySetException(ex);
++                            }
++                        }, state: null);
++                    }
++                    else
++                    {
++                        tcs.TrySetResult(continuation(task));
++                    }
++                }
++            }, runSynchronously ? TaskContinuationOptions.ExecuteSynchronously : TaskContinuationOptions.None);
++
++            return tcs.Task.FastUnwrap();
++        }
++
++        /// <summary>
++        /// Throws the first faulting exception for a task which is faulted. It attempts to preserve the original
++        /// stack trace when throwing the exception (which should always work in 4.5, and should also work in 4.0
++        /// when running in full trust). Note: It is the caller's responsibility not to pass incomplete tasks to
++        /// this method, because it does degenerate into a call to the equivalent of .Wait() on the task when it
++        /// hasn't yet completed.
++        /// </summary>
++        internal static void ThrowIfFaulted(this Task task)
++        {
++            _rethrowWithNoStackLossDelegate(task);
++        }
++
++        /// <summary>
++        /// Adapts any action into a Task (returning AsyncVoid, so that it's usable with Task{T} extension methods).
++        /// </summary>
++        private static Task<AsyncVoid> ToAsyncVoidTask(Action action)
++        {
++            return TaskHelpers.RunSynchronously<AsyncVoid>(() =>
++            {
++                action();
++                return _defaultCompleted;
++            });
++        }
++
++        /// <summary>
++        /// Changes the return value of a task to the given result, if the task ends in the RanToCompletion state.
++        /// This potentially imposes an extra ContinueWith to convert a non-completed task, so use this with caution.
++        /// </summary>
++        internal static Task<TResult> ToTask<TResult>(this Task task, CancellationToken cancellationToken = default(CancellationToken), TResult result = default(TResult))
++        {
++            if (task == null)
++            {
++                return null;
++            }
++
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<TResult>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    return TaskHelpers.Canceled<TResult>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    return TaskHelpers.FromResult(result);
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return ToTaskContinuation(task, result);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TResult> ToTaskContinuation<TResult>(Task task, TResult result)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++
++            task.ContinueWith(innerTask =>
++            {
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    tcs.TrySetResult(result);
++                }
++                else
++                {
++                    tcs.TrySetFromTask(innerTask);
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;          
++        }
++
++        /// <summary>
++        /// Attempts to get the result value for the given task. If the task ran to completion, then
++        /// it will return true and set the result value; otherwise, it will return false.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static bool TryGetResult<TResult>(this Task<TResult> task, out TResult result)
++        {
++            if (task.Status == TaskStatus.RanToCompletion)
++            {
++                result = task.Result;
++                return true;
++            }
++
++            result = default(TResult);
++            return false;
++        }
++
++        /// <summary>
++        /// Used as the T in a "conversion" of a Task into a Task{T}
++        /// </summary>
++        private struct AsyncVoid
++        {
++        }
++    }
++
++    internal abstract class CatchInfoBase<TTask>
++        where TTask : Task
++    {
++        private Exception _exception;
++        private TTask _task;
++
++        protected CatchInfoBase(TTask task)
++        {
++            Contract.Assert(task != null);
++            _task = task;
++            _exception = _task.Exception.GetBaseException();  // Observe the exception early, to prevent tasks tearing down the app domain
++        }
++
++        /// <summary>
++        /// The exception that was thrown to cause the Catch block to execute.
++        /// </summary>
++        public Exception Exception
++        {
++            get { return _exception; }
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that re-throws the original exception.
++        /// </summary>
++        public CatchResult Throw()
++        {
++            return new CatchResult { Task = _task };
++        }
++
++        /// <summary>
++        /// Represents a result to be returned from a Catch handler.
++        /// </summary>
++        internal struct CatchResult
++        {
++            /// <summary>
++            /// Gets or sets the task to be returned to the caller.
++            /// </summary>
++            internal TTask Task { get; set; }
++        }
++    }
++
++    internal class CatchInfo : CatchInfoBase<Task>
++    {
++        private static CatchResult _completed = new CatchResult { Task = TaskHelpers.Completed() };
++
++        public CatchInfo(Task task)
++            : base(task)
++        {
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that returns a completed (non-faulted) task.
++        /// </summary>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Handled()
++        {
++            return _completed;
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
++        /// </summary>
++        /// <param name="task">The task to return.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Task(Task task)
++        {
++            return new CatchResult { Task = task };
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that throws the given exception.
++        /// </summary>
++        /// <param name="ex">The exception to throw.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Throw(Exception ex)
++        {
++            return new CatchResult { Task = TaskHelpers.FromError<object>(ex) };
++        }
++    }
++
++    internal class CatchInfo<T> : CatchInfoBase<Task<T>>
++    {
++        public CatchInfo(Task<T> task)
++            : base(task)
++        {
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that returns a completed (non-faulted) task.
++        /// </summary>
++        /// <param name="returnValue">The return value of the task.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Handled(T returnValue)
++        {
++            return new CatchResult { Task = TaskHelpers.FromResult(returnValue) };
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
++        /// </summary>
++        /// <param name="task">The task to return.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Task(Task<T> task)
++        {
++            return new CatchResult { Task = task };
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that throws the given exception.
++        /// </summary>
++        /// <param name="ex">The exception to throw.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Throw(Exception ex)
++        {
++            return new CatchResult { Task = TaskHelpers.FromError<T>(ex) };
++        }
++    }
++}
+diff --git a/ModestoPower.Mvc/App_Start/GenericModelBinder.cs b/ModestoPower.Mvc/App_Start/GenericModelBinder.cs
+new file mode 100644
+index 0000000..d7f75d7
+--- /dev/null
++++ b/ModestoPower.Mvc/App_Start/GenericModelBinder.cs
+@@ -0,0 +1,17 @@
++﻿using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Web;
++using System.Web.Mvc;
++using StructureMap;
++
++namespace ModestoPower.Mvc.App_Start
++{
++    public class GenericModelBinder : DefaultModelBinder
++    {
++        protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Type modelType)
++        {
++            return ObjectFactory.GetInstance(modelType);
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/ModestoPower.Mvc/App_Start/HyphenatedRouteHandler.cs b/ModestoPower.Mvc/App_Start/HyphenatedRouteHandler.cs
+new file mode 100644
+index 0000000..37f535a
+--- /dev/null
++++ b/ModestoPower.Mvc/App_Start/HyphenatedRouteHandler.cs
+@@ -0,0 +1,21 @@
++﻿using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++using System.Web.Mvc;
++using System.Web;
++using System.Web.Routing;
++
++namespace ModestoPower.Mvc.App_Start
++{
++    public class HyphenatedRouteHandler : MvcRouteHandler
++    {
++        protected override IHttpHandler GetHttpHandler(RequestContext requestContext)
++        {
++            requestContext.RouteData.Values["controller"] = requestContext.RouteData.Values["controller"].ToString().Replace("-", "_");
++            requestContext.RouteData.Values["action"] = requestContext.RouteData.Values["action"].ToString().Replace("-", "");
++            return base.GetHttpHandler(requestContext);
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/ModestoPower.Mvc/BootStrapper.cs b/ModestoPower.Mvc/BootStrapper.cs
+new file mode 100644
+index 0000000..46d15c3
+--- /dev/null
++++ b/ModestoPower.Mvc/BootStrapper.cs
+@@ -0,0 +1,164 @@
++﻿using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Web;
++using RAM.Infrastructure.Authentication;
++using RAM.Core.Domain.User;
++using RAM.Services.Implementations;
++using RAM.Services.Interfaces;
++using StructureMap;
++using RAM.Core.Domain.Blog;
++using RAM.Core.Domain.Project;
++using RAM.Core.Domain.Banner;
++using RAM.Core.Domain.Subscriber;
++using StructureMap.Configuration.DSL;
++using RAM.Infrastructure.Configuration;
++using RAM.Infrastructure.Logging;
++using RAM.Infrastructure.Email;
++using RAM.Controllers.ActionArguments;
++using RAM.Infrastructure.UnitOfWork;
++using RAM.Repository.NHibernate;
++using RAM.Services.Cache;
++using System.Web.Security;
++using RAM.Web.Security;
++using RAM.Repository.NHibernate.Repositories;
++
++namespace ModestoPower.Mvc
++{
++    public class BootStrapper
++    {
++        public static void ConfigureStructureMap()
++        {
++            ObjectFactory.Initialize(x => { x.AddRegistry<ApplicationSettingsRegistry>(); });
++            ApplicationSettingsFactory.
++                InitializeApplicationSettingsFactory
++                                  (ObjectFactory.GetInstance<IApplicationSettings>());
++
++            ObjectFactory.Initialize(x => { x.AddRegistry<ModelRegistry>(); });
++        }
++
++        public class ModelRegistry : Registry
++        {
++            public ModelRegistry()
++            {
++                if (ApplicationSettingsFactory.
++                    GetApplicationSettings().
++                    PersistenceStrategy.Equals(RAM.Infrastructure.Domain.PersistenceStrategy.NHibernate.ToString()))
++                {
++                    //Repositories
++                    For<IUserRepository>().Use<UserRepository>();
++                    For<IBlogRepository>().Use<BlogRepository>();
++                    For<IBlogTagRepository>().Use<BlogTagRepository>();
++                    For<ISubscriberRepository>().Use<SubscriberRepository>();
++                    For<IProjectRepository>().Use<ProjectRepository>();
++                    For<IProjectImageRepository>().Use<ProjectImageRepository>();
++                    For<IBannerRepository>().Use<BannerRepository>();
++                    For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
++
++                    For<IUnitOfWork>().Use<NHUnitOfWork>();
++
++                    For<ICacheStorage>().Use<CouchbaseCacheAdapter>();
++                }
++
++                //For<MembershipProvider>().Use<AlpineMembershipProvider>();
++
++                //For<RoleProvider>().Use<AlpineRoleProvider>();
++
++                //Models
++                For<IUser>().Use<User>();
++                For<IBlog>().Use<Blog>();
++                For<ISubscriber>().Use<Subscriber>();
++                For<IProject>().Use<Project>();
++                For<IProjectImage>().Use<ProjectImage>();
++                For<IBanner>().Use<Banner>();
++                For<IBlogCategory>().Use<BlogCategory>();
++
++                //Services
++                For<IUserService>().Use<UserService>();
++                For<IBannerService>().Use<BannerService>();
++                For<ISubscriberService>().Use<SubscriberService>();
++                For<IBlogService>().Use<BlogService>();
++                For<IProjectService>().Use<ProjectService>();
++                For<IBlogCategoryService>().Use<BlogCategoryService>();
++
++                // Logger
++                For<ILogger>().Use
++                          <Log4NetAdapter>();
++                // Email Service                 
++                For<IEmailService>().Use
++                        <SMTPService>();
++                //Authentication
++                For<IExternalAuthenticationService>().Use<JanrainAuthenticationService>();
++                For<IFormsAuthentication>().Use<AspFormsAuthentication>();
++                For<ILocalAuthenticationService>().Use<HRRMarketingAuthenticationService>();
++                //Controller Helpers
++                For<IActionArguments>().Use<HttpRequestActionArguments>();
++            }
++        }
++
++        public class ApplicationSettingsRegistry : Registry
++        {
++            public ApplicationSettingsRegistry()
++            {
++                // Application Settings                 
++                For<IApplicationSettings>().Use
++                         <WebConfigApplicationSettings>();
++            }
++        }
++
++        public static IContainer ConfigureStructureMapWebAPI()
++        {
++            ObjectFactory.Initialize(x => { x.AddRegistry<ApplicationSettingsRegistry>(); });
++            ApplicationSettingsFactory.
++                InitializeApplicationSettingsFactory
++                                  (ObjectFactory.GetInstance<IApplicationSettings>());
++            if (ApplicationSettingsFactory.
++                    GetApplicationSettings().
++                    PersistenceStrategy.Equals(RAM.Infrastructure.Domain.PersistenceStrategy.NHibernate.ToString()))
++            {
++                var container = new Container(x =>
++                {
++                    x.For<IUserService>().Use<UserService>();
++                    x.For<IBannerService>().Use<BannerService>();
++                    x.For<IBlogService>().Use<BlogService>();
++                    x.For<IProjectService>().Use<ProjectService>();
++                    x.For<ISubscriberService>().Use<SubscriberService>();
++                    x.For<IBlogCategoryService>().Use<BlogCategoryService>();
++
++                    x.For<IUserRepository>().Use<UserRepository>();
++                    x.For<IBannerRepository>().Use<BannerRepository>();
++                    x.For<IBlogTagRepository>().Use<BlogTagRepository>();
++                    x.For<IBlogRepository>().Use<BlogRepository>();
++                    x.For<ISubscriberRepository>().Use<SubscriberRepository>();
++                    x.For<IProjectRepository>().Use<ProjectRepository>();
++                    x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
++                    x.For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
++
++                    x.For<IUnitOfWork>().Use<NHUnitOfWork>();
++
++                    x.For<ICacheStorage>().Use<CouchbaseCacheAdapter>();
++
++                    x.For<IUser>().Use<User>();
++                    x.For<IBanner>().Use<Banner>();
++                    x.For<IBlog>().Use<Blog>();
++                    x.For<ISubscriber>().Use<Subscriber>();
++                    x.For<IProject>().Use<Project>();
++                    x.For<IProjectImage>().Use<ProjectImage>();
++                    x.For<IBlogCategory>().Use<BlogCategory>();
++
++                    x.For<ILogger>().Use<Log4NetAdapter>();
++
++                    x.For<IEmailService>().Use<SMTPService>();
++
++                    x.For<IExternalAuthenticationService>().Use<JanrainAuthenticationService>();
++                    x.For<IFormsAuthentication>().Use<AspFormsAuthentication>();
++                    x.For<ILocalAuthenticationService>().Use<HRRMarketingAuthenticationService>();
++
++                    x.For<IActionArguments>().Use<HttpRequestActionArguments>();
++                });
++                return container;
++            }
++            return null;
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/ModestoPower.Mvc/Global.asax.cs b/ModestoPower.Mvc/Global.asax.cs
+index f011daa..58001bb 100644
+--- a/ModestoPower.Mvc/Global.asax.cs
++++ b/ModestoPower.Mvc/Global.asax.cs
+@@ -2,9 +2,22 @@
+ using System.Collections.Generic;
+ using System.Linq;
+ using System.Web;
++using System.Web.Http;
+ using System.Web.Mvc;
+ using System.Web.Optimization;
+ using System.Web.Routing;
++using RAM.Infrastructure.Configuration;
++using RAM.Infrastructure.Logging;
++using RAM.Infrastructure.Email;
++using RAM.Controllers;
++using RAM.Controllers.Controllers;
++using StructureMap;
++using RAM.Core.Domain.User;
++using RAM.Repository.NHibernate.Repositories;
++using RAM.Infrastructure.UnitOfWork;
++using RAM.Repository.NHibernate;
++using RAM.Services.Cache;
++
+ 
+ namespace ModestoPower.Mvc
+ {
+@@ -12,10 +25,34 @@ namespace ModestoPower.Mvc
+     {
+         protected void Application_Start()
+         {
++            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
++
++
++            GlobalConfiguration.Configuration.DependencyResolver = new WebApiContrib.IoC.StructureMap.StructureMapResolver(BootStrapper.ConfigureStructureMapWebAPI());
++
+             AreaRegistration.RegisterAllAreas();
++
++            //WebApiConfig.Register(GlobalConfiguration.Configuration);
+             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+             RouteConfig.RegisterRoutes(RouteTable.Routes);
+             BundleConfig.RegisterBundles(BundleTable.Bundles);
++            //AuthConfig.RegisterAuth();
++
++            BootStrapper.ConfigureStructureMap();
++
++
++            RAM.Services.AutoMapperBootStrapper.ConfigureAutoMapper();
++            RAM.Controllers.AutoMapperBootStrapper.ConfigureAutoMapper();
++
++            LoggingFactory.InitializeLogFactory(ObjectFactory.GetInstance<ILogger>());
++
++            EmailServiceFactory.InitializeEmailServiceFactory
++                                  (ObjectFactory.GetInstance<IEmailService>());
++
++            ControllerBuilder.Current.SetControllerFactory(new IOCControllerFactory());
++
++            LoggingFactory.GetLogger().Log("Application Started");
++            ModelBinders.Binders.DefaultBinder = new App_Start.GenericModelBinder();
+         }
+     }
+ }
+diff --git a/ModestoPower.Mvc/ModestoPower.Mvc.csproj b/ModestoPower.Mvc/ModestoPower.Mvc.csproj
+index 092563b..4b97632 100644
+--- a/ModestoPower.Mvc/ModestoPower.Mvc.csproj
++++ b/ModestoPower.Mvc/ModestoPower.Mvc.csproj
+@@ -39,11 +39,16 @@
+     <WarningLevel>4</WarningLevel>
+   </PropertyGroup>
+   <ItemGroup>
+-    <Reference Include="IdeaSeed.Core">
+-      <HintPath>..\References\IdeaSeed.Core.dll</HintPath>
++    <Reference Include="Couchbase, Version=1.1.6.0, Culture=neutral, PublicKeyToken=05e9c6b5a9ec94c2, processorArchitecture=MSIL">
++      <SpecificVersion>False</SpecificVersion>
++      <HintPath>..\References\Couchbase.dll</HintPath>
++    </Reference>
++    <Reference Include="Couchbase.AspNet">
++      <HintPath>..\References\Couchbase.AspNet.dll</HintPath>
+     </Reference>
+-    <Reference Include="IdeaSeed.Web">
+-      <HintPath>..\References\IdeaSeed.Web.dll</HintPath>
++    <Reference Include="Enyim.Caching, Version=2.12.0.0, Culture=neutral, PublicKeyToken=05e9c6b5a9ec94c2, processorArchitecture=MSIL">
++      <SpecificVersion>False</SpecificVersion>
++      <HintPath>..\References\Enyim.Caching.dll</HintPath>
+     </Reference>
+     <Reference Include="Microsoft.CSharp" />
+     <Reference Include="Microsoft.Practices.ServiceLocation">
+@@ -122,6 +127,12 @@
+     <Reference Include="WebActivator">
+       <HintPath>..\packages\WebActivator.1.5.3\lib\net40\WebActivator.dll</HintPath>
+     </Reference>
++    <Reference Include="WebApiContrib">
++      <HintPath>..\packages\WebApiContrib.0.9.14.0\lib\net40\WebApiContrib.dll</HintPath>
++    </Reference>
++    <Reference Include="WebApiContrib.IoC.StructureMap">
++      <HintPath>..\packages\WebApiContrib.IoC.StructureMap.0.9.5.0\lib\net40\WebApiContrib.IoC.StructureMap.dll</HintPath>
++    </Reference>
+     <Reference Include="WebGrease">
+       <Private>True</Private>
+       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+@@ -144,10 +155,15 @@
+     <Folder Include="Views\Tutorials\" />
+   </ItemGroup>
+   <ItemGroup>
++    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
++    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
+     <Compile Include="App_Start\BundleConfig.cs" />
+     <Compile Include="App_Start\FilterConfig.cs" />
++    <Compile Include="App_Start\GenericModelBinder.cs" />
++    <Compile Include="App_Start\HyphenatedRouteHandler.cs" />
+     <Compile Include="App_Start\RouteConfig.cs" />
+     <Compile Include="App_Start\StructuremapMvc.cs" />
++    <Compile Include="BootStrapper.cs" />
+     <Compile Include="DependencyResolution\IoC.cs" />
+     <Compile Include="DependencyResolution\StructureMapDependencyResolver.cs" />
+     <Compile Include="DependencyResolution\StructureMapDependencyScope.cs" />
+diff --git a/ModestoPower.Mvc/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/ModestoPower.Mvc/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index 83f03cc..b186968 100644
+Binary files a/ModestoPower.Mvc/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/ModestoPower.Mvc/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csproj.FileListAbsolute.txt b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csproj.FileListAbsolute.txt
+index 1b470d4..13d6334 100644
+--- a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csproj.FileListAbsolute.txt
++++ b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csproj.FileListAbsolute.txt
+@@ -71,3 +71,6 @@ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Couchbase.xml
+ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Enyim.Caching.pdb
+ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Enyim.Caching.xml
+ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Iesi.Collections.xml
++C:\Projects\ModestoPower\ModestoPower.Mvc\bin\WebApiContrib.dll
++C:\Projects\ModestoPower\ModestoPower.Mvc\bin\WebApiContrib.IoC.StructureMap.dll
++C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Couchbase.AspNet.dll
+diff --git a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csprojResolveAssemblyReference.cache b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csprojResolveAssemblyReference.cache
+index f11f7ab..a20b102 100644
+Binary files a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csprojResolveAssemblyReference.cache and b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.csprojResolveAssemblyReference.cache differ
+diff --git a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.dll b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.dll
+index 54cca60..609f39b 100644
+Binary files a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.dll and b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.dll differ
+diff --git a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.pdb b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.pdb
+index b9357b6..737f287 100644
+Binary files a/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.pdb and b/ModestoPower.Mvc/obj/Debug/ModestoPower.Mvc.pdb differ
+diff --git a/ModestoPower.Mvc/packages.config b/ModestoPower.Mvc/packages.config
+index 8172be2..15fec02 100644
+--- a/ModestoPower.Mvc/packages.config
++++ b/ModestoPower.Mvc/packages.config
+@@ -19,6 +19,9 @@
+   <package id="Respond" version="1.2.0" targetFramework="net45" />
+   <package id="structuremap" version="2.6.4.1" targetFramework="net45" />
+   <package id="StructureMap.MVC4" version="2.6.4.3" targetFramework="net45" />
++  <package id="TaskHelpers.Sources" version="0.1" targetFramework="net45" />
+   <package id="WebActivator" version="1.5.3" targetFramework="net45" />
++  <package id="WebApiContrib" version="0.9.14.0" targetFramework="net45" />
++  <package id="WebApiContrib.IoC.StructureMap" version="0.9.5.0" targetFramework="net45" />
+   <package id="WebGrease" version="1.5.2" targetFramework="net45" />
+ </packages>
+\ No newline at end of file
+diff --git a/ModestoPower.v12.suo b/ModestoPower.v12.suo
+index 06716c8..0a94d67 100644
+Binary files a/ModestoPower.v12.suo and b/ModestoPower.v12.suo differ
+diff --git a/RAM.Controllers/RAM.Controllers.csproj b/RAM.Controllers/RAM.Controllers.csproj
+index be6eaf2..42ea99d 100644
+--- a/RAM.Controllers/RAM.Controllers.csproj
++++ b/RAM.Controllers/RAM.Controllers.csproj
+@@ -7,7 +7,7 @@
+     <ProjectGuid>{683B1C5C-E955-472D-9CDE-4BA64CAC19F8}</ProjectGuid>
+     <OutputType>Library</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>RAM.Controllers</RootNamespace>
++    <RootNamespace>ModestoPower.Controllers</RootNamespace>
+     <AssemblyName>RAM.Controllers</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+@@ -51,9 +51,9 @@
+       <Private>True</Private>
+       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+     </Reference>
+-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
++    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+       <SpecificVersion>False</SpecificVersion>
+-      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
++      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
+     </Reference>
+     <Reference Include="StructureMap">
+       <HintPath>..\packages\structuremap.2.6.4.1\lib\net40\StructureMap.dll</HintPath>
+diff --git a/RAM.Controllers/bin/Debug/RAM.Controllers.dll b/RAM.Controllers/bin/Debug/RAM.Controllers.dll
+index 36cacf5..427daf3 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Controllers.dll and b/RAM.Controllers/bin/Debug/RAM.Controllers.dll differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Controllers.pdb b/RAM.Controllers/bin/Debug/RAM.Controllers.pdb
+index e6e1c75..dd72a88 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Controllers.pdb and b/RAM.Controllers/bin/Debug/RAM.Controllers.pdb differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Core.dll b/RAM.Controllers/bin/Debug/RAM.Core.dll
+index f48e511..d7562c1 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Core.dll and b/RAM.Controllers/bin/Debug/RAM.Core.dll differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Core.pdb b/RAM.Controllers/bin/Debug/RAM.Core.pdb
+index 69f214b..b282e39 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Core.pdb and b/RAM.Controllers/bin/Debug/RAM.Core.pdb differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Infrastructure.dll b/RAM.Controllers/bin/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Infrastructure.dll and b/RAM.Controllers/bin/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Infrastructure.pdb b/RAM.Controllers/bin/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Infrastructure.pdb and b/RAM.Controllers/bin/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.dll b/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.dll
+index bec4c5c..2ea4bbe 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.dll and b/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.dll differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.pdb b/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.pdb
+index ac81781..7826aa2 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.pdb and b/RAM.Controllers/bin/Debug/RAM.Repository.NHibernate.pdb differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Services.dll b/RAM.Controllers/bin/Debug/RAM.Services.dll
+index 0fa89b1..01c6bca 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Services.dll and b/RAM.Controllers/bin/Debug/RAM.Services.dll differ
+diff --git a/RAM.Controllers/bin/Debug/RAM.Services.pdb b/RAM.Controllers/bin/Debug/RAM.Services.pdb
+index a45871f..152df8a 100644
+Binary files a/RAM.Controllers/bin/Debug/RAM.Services.pdb and b/RAM.Controllers/bin/Debug/RAM.Services.pdb differ
+diff --git a/RAM.Controllers/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/RAM.Controllers/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index f917317..ea7219f 100644
+Binary files a/RAM.Controllers/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/RAM.Controllers/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/RAM.Controllers/obj/Debug/RAM.Controllers.csproj.FileListAbsolute.txt b/RAM.Controllers/obj/Debug/RAM.Controllers.csproj.FileListAbsolute.txt
+index c354dbf..b9ee207 100644
+--- a/RAM.Controllers/obj/Debug/RAM.Controllers.csproj.FileListAbsolute.txt
++++ b/RAM.Controllers/obj/Debug/RAM.Controllers.csproj.FileListAbsolute.txt
+@@ -215,7 +215,6 @@ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\IdeaSeed.Core.pdb
+ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\IdeaSeed.Web.pdb
+ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
+ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\Microsoft.Practices.ServiceLocation.xml
+-C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\Newtonsoft.Json.xml
+ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\StructureMap.pdb
+ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\StructureMap.xml
+ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\System.Net.Http.Formatting.xml
+diff --git a/RAM.Controllers/obj/Debug/RAM.Controllers.csprojResolveAssemblyReference.cache b/RAM.Controllers/obj/Debug/RAM.Controllers.csprojResolveAssemblyReference.cache
+index 5cff5e3..dc5b043 100644
+Binary files a/RAM.Controllers/obj/Debug/RAM.Controllers.csprojResolveAssemblyReference.cache and b/RAM.Controllers/obj/Debug/RAM.Controllers.csprojResolveAssemblyReference.cache differ
+diff --git a/RAM.Controllers/obj/Debug/RAM.Controllers.dll b/RAM.Controllers/obj/Debug/RAM.Controllers.dll
+index 36cacf5..427daf3 100644
+Binary files a/RAM.Controllers/obj/Debug/RAM.Controllers.dll and b/RAM.Controllers/obj/Debug/RAM.Controllers.dll differ
+diff --git a/RAM.Controllers/obj/Debug/RAM.Controllers.pdb b/RAM.Controllers/obj/Debug/RAM.Controllers.pdb
+index e6e1c75..dd72a88 100644
+Binary files a/RAM.Controllers/obj/Debug/RAM.Controllers.pdb and b/RAM.Controllers/obj/Debug/RAM.Controllers.pdb differ
+diff --git a/RAM.Core/RAM.Core.csproj b/RAM.Core/RAM.Core.csproj
+index 20367ae..bd98b49 100644
+--- a/RAM.Core/RAM.Core.csproj
++++ b/RAM.Core/RAM.Core.csproj
+@@ -7,7 +7,7 @@
+     <ProjectGuid>{DD68DA58-33A4-4423-BF5E-9514AADA7383}</ProjectGuid>
+     <OutputType>Library</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>RAM.Core</RootNamespace>
++    <RootNamespace>ModestoPower.Core</RootNamespace>
+     <AssemblyName>RAM.Core</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+@@ -30,8 +30,9 @@
+     <WarningLevel>4</WarningLevel>
+   </PropertyGroup>
+   <ItemGroup>
+-    <Reference Include="Newtonsoft.Json">
+-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
++    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
++      <SpecificVersion>False</SpecificVersion>
++      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
+     </Reference>
+     <Reference Include="System" />
+     <Reference Include="System.Core" />
+diff --git a/RAM.Core/bin/Debug/Newtonsoft.Json.dll b/RAM.Core/bin/Debug/Newtonsoft.Json.dll
+index 81639f9..a957fda 100644
+Binary files a/RAM.Core/bin/Debug/Newtonsoft.Json.dll and b/RAM.Core/bin/Debug/Newtonsoft.Json.dll differ
+diff --git a/RAM.Core/bin/Debug/RAM.Core.dll b/RAM.Core/bin/Debug/RAM.Core.dll
+index f48e511..d7562c1 100644
+Binary files a/RAM.Core/bin/Debug/RAM.Core.dll and b/RAM.Core/bin/Debug/RAM.Core.dll differ
+diff --git a/RAM.Core/bin/Debug/RAM.Core.pdb b/RAM.Core/bin/Debug/RAM.Core.pdb
+index 69f214b..b282e39 100644
+Binary files a/RAM.Core/bin/Debug/RAM.Core.pdb and b/RAM.Core/bin/Debug/RAM.Core.pdb differ
+diff --git a/RAM.Core/bin/Debug/RAM.Infrastructure.dll b/RAM.Core/bin/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Core/bin/Debug/RAM.Infrastructure.dll and b/RAM.Core/bin/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Core/bin/Debug/RAM.Infrastructure.pdb b/RAM.Core/bin/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Core/bin/Debug/RAM.Infrastructure.pdb and b/RAM.Core/bin/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Core/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/RAM.Core/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index 5fc41a3..4ca9328 100644
+Binary files a/RAM.Core/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/RAM.Core/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/RAM.Core/obj/Debug/RAM.Core.csproj.FileListAbsolute.txt b/RAM.Core/obj/Debug/RAM.Core.csproj.FileListAbsolute.txt
+index 7c90b9f..dc9669d 100644
+--- a/RAM.Core/obj/Debug/RAM.Core.csproj.FileListAbsolute.txt
++++ b/RAM.Core/obj/Debug/RAM.Core.csproj.FileListAbsolute.txt
+@@ -50,7 +50,6 @@ C:\Projects\ModestoPower\RAM.Core\bin\Debug\Newtonsoft.Json.dll
+ C:\Projects\ModestoPower\RAM.Core\bin\Debug\RAM.Infrastructure.dll
+ C:\Projects\ModestoPower\RAM.Core\bin\Debug\log4net.dll
+ C:\Projects\ModestoPower\RAM.Core\bin\Debug\RAM.Infrastructure.pdb
+-C:\Projects\ModestoPower\RAM.Core\bin\Debug\Newtonsoft.Json.xml
+ C:\Projects\ModestoPower\RAM.Core\bin\Debug\log4net.xml
+ C:\Projects\ModestoPower\RAM.Core\obj\Debug\RAM.Core.csprojResolveAssemblyReference.cache
+ C:\Projects\ModestoPower\RAM.Core\obj\Debug\RAM.Core.dll
+diff --git a/RAM.Core/obj/Debug/RAM.Core.csprojResolveAssemblyReference.cache b/RAM.Core/obj/Debug/RAM.Core.csprojResolveAssemblyReference.cache
+index 51c6ddf..c709d2d 100644
+Binary files a/RAM.Core/obj/Debug/RAM.Core.csprojResolveAssemblyReference.cache and b/RAM.Core/obj/Debug/RAM.Core.csprojResolveAssemblyReference.cache differ
+diff --git a/RAM.Core/obj/Debug/RAM.Core.dll b/RAM.Core/obj/Debug/RAM.Core.dll
+index f48e511..d7562c1 100644
+Binary files a/RAM.Core/obj/Debug/RAM.Core.dll and b/RAM.Core/obj/Debug/RAM.Core.dll differ
+diff --git a/RAM.Core/obj/Debug/RAM.Core.pdb b/RAM.Core/obj/Debug/RAM.Core.pdb
+index 69f214b..b282e39 100644
+Binary files a/RAM.Core/obj/Debug/RAM.Core.pdb and b/RAM.Core/obj/Debug/RAM.Core.pdb differ
+diff --git a/RAM.Infrastructure/RAM.Infrastructure.csproj b/RAM.Infrastructure/RAM.Infrastructure.csproj
+index a98dd48..bd70957 100644
+--- a/RAM.Infrastructure/RAM.Infrastructure.csproj
++++ b/RAM.Infrastructure/RAM.Infrastructure.csproj
+@@ -7,7 +7,7 @@
+     <ProjectGuid>{318913D4-209C-454E-90C2-366AD973E701}</ProjectGuid>
+     <OutputType>Library</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>RAM.Infrastructure</RootNamespace>
++    <RootNamespace>ModestoPower.Infrastructure</RootNamespace>
+     <AssemblyName>RAM.Infrastructure</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+diff --git a/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.dll b/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.dll and b/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.pdb b/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.pdb and b/RAM.Infrastructure/bin/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Infrastructure/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/RAM.Infrastructure/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index ff8eb88..fb341f6 100644
+Binary files a/RAM.Infrastructure/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/RAM.Infrastructure/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csproj.FileListAbsolute.txt b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csproj.FileListAbsolute.txt
+index 1bb1356..2bee34a 100644
+--- a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csproj.FileListAbsolute.txt
++++ b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csproj.FileListAbsolute.txt
+@@ -34,3 +34,14 @@ C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\bin\Debug\log4net.xml
+ C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.dll
+ C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.pdb
+ C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.csprojResolveAssemblyReference.cache
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\RAM.Infrastructure.dll
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\RAM.Infrastructure.pdb
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Core.dll
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Web.dll
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\log4net.dll
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Core.pdb
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Web.pdb
++C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\log4net.xml
++C:\Projects\ModestoPower\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.csprojResolveAssemblyReference.cache
++C:\Projects\ModestoPower\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.dll
++C:\Projects\ModestoPower\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.pdb
+diff --git a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csprojResolveAssemblyReference.cache b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csprojResolveAssemblyReference.cache
+index acdb170..4b50304 100644
+Binary files a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csprojResolveAssemblyReference.cache and b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.csprojResolveAssemblyReference.cache differ
+diff --git a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.dll b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.dll and b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.pdb b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.pdb and b/RAM.Infrastructure/obj/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Repository.NHibernate/RAM.Repository.NHibernate.csproj b/RAM.Repository.NHibernate/RAM.Repository.NHibernate.csproj
+index 9a98d67..a022cc6 100644
+--- a/RAM.Repository.NHibernate/RAM.Repository.NHibernate.csproj
++++ b/RAM.Repository.NHibernate/RAM.Repository.NHibernate.csproj
+@@ -7,7 +7,7 @@
+     <ProjectGuid>{3B0F4C02-3F78-415D-AD1B-ABD5A3144BBC}</ProjectGuid>
+     <OutputType>Library</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>RAM.Repository.NHibernate</RootNamespace>
++    <RootNamespace>ModestoPower.Repository.NHibernate</RootNamespace>
+     <AssemblyName>RAM.Repository.NHibernate</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+@@ -39,8 +39,9 @@
+     <Reference Include="log4net">
+       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+     </Reference>
+-    <Reference Include="Newtonsoft.Json">
+-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
++    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
++      <SpecificVersion>False</SpecificVersion>
++      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
+     </Reference>
+     <Reference Include="NHibernate">
+       <HintPath>..\packages\NHibernate.3.3.2.4000\lib\Net35\NHibernate.dll</HintPath>
+diff --git a/RAM.Repository.NHibernate/bin/Debug/Newtonsoft.Json.dll b/RAM.Repository.NHibernate/bin/Debug/Newtonsoft.Json.dll
+index 81639f9..a957fda 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/Newtonsoft.Json.dll and b/RAM.Repository.NHibernate/bin/Debug/Newtonsoft.Json.dll differ
+diff --git a/RAM.Repository.NHibernate/bin/Debug/RAM.Core.dll b/RAM.Repository.NHibernate/bin/Debug/RAM.Core.dll
+index f48e511..d7562c1 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/RAM.Core.dll and b/RAM.Repository.NHibernate/bin/Debug/RAM.Core.dll differ
+diff --git a/RAM.Repository.NHibernate/bin/Debug/RAM.Core.pdb b/RAM.Repository.NHibernate/bin/Debug/RAM.Core.pdb
+index 69f214b..b282e39 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/RAM.Core.pdb and b/RAM.Repository.NHibernate/bin/Debug/RAM.Core.pdb differ
+diff --git a/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.dll b/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.dll and b/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.pdb b/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.pdb and b/RAM.Repository.NHibernate/bin/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.dll b/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.dll
+index bec4c5c..2ea4bbe 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.dll and b/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.dll differ
+diff --git a/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.pdb b/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.pdb
+index ac81781..7826aa2 100644
+Binary files a/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.pdb and b/RAM.Repository.NHibernate/bin/Debug/RAM.Repository.NHibernate.pdb differ
+diff --git a/RAM.Repository.NHibernate/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/RAM.Repository.NHibernate/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index a67d139..12ad496 100644
+Binary files a/RAM.Repository.NHibernate/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/RAM.Repository.NHibernate/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csproj.FileListAbsolute.txt b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csproj.FileListAbsolute.txt
+index 6c48b81..e65da7d 100644
+--- a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csproj.FileListAbsolute.txt
++++ b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csproj.FileListAbsolute.txt
+@@ -90,7 +90,6 @@ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\RAM.Infrastructure.
+ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\FluentNHibernate.xml
+ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\Iesi.Collections.xml
+ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\log4net.xml
+-C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\Newtonsoft.Json.xml
+ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\NHibernate.xml
+ C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache
+ C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.dll
+diff --git a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache
+index dba6949..c3efb2d 100644
+Binary files a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache and b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache differ
+diff --git a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.dll b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.dll
+index bec4c5c..2ea4bbe 100644
+Binary files a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.dll and b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.dll differ
+diff --git a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.pdb b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.pdb
+index ac81781..7826aa2 100644
+Binary files a/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.pdb and b/RAM.Repository.NHibernate/obj/Debug/RAM.Repository.NHibernate.pdb differ
+diff --git a/RAM.Services/RAM.Services.csproj b/RAM.Services/RAM.Services.csproj
+index 98c21eb..c77530b 100644
+--- a/RAM.Services/RAM.Services.csproj
++++ b/RAM.Services/RAM.Services.csproj
+@@ -7,7 +7,7 @@
+     <ProjectGuid>{6D850B93-7BE8-4684-B7DC-91C157040065}</ProjectGuid>
+     <OutputType>Library</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>RAM.Services</RootNamespace>
++    <RootNamespace>ModestoPower.Services</RootNamespace>
+     <AssemblyName>RAM.Services</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+@@ -41,6 +41,9 @@
+       <SpecificVersion>False</SpecificVersion>
+       <HintPath>..\References\Couchbase.dll</HintPath>
+     </Reference>
++    <Reference Include="Couchbase.AspNet">
++      <HintPath>..\References\Couchbase.AspNet.dll</HintPath>
++    </Reference>
+     <Reference Include="Enyim.Caching">
+       <HintPath>..\packages\CouchbaseNetClient.1.2.0\lib\net40\Enyim.Caching.dll</HintPath>
+     </Reference>
+@@ -57,8 +60,9 @@
+       <Private>True</Private>
+       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+     </Reference>
+-    <Reference Include="Newtonsoft.Json">
+-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
++    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
++      <SpecificVersion>False</SpecificVersion>
++      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
+     </Reference>
+     <Reference Include="StructureMap">
+       <HintPath>..\packages\structuremap.2.6.4.1\lib\net40\StructureMap.dll</HintPath>
+diff --git a/RAM.Services/bin/Debug/Couchbase.AspNet.dll b/RAM.Services/bin/Debug/Couchbase.AspNet.dll
+new file mode 100644
+index 0000000..538a611
+Binary files /dev/null and b/RAM.Services/bin/Debug/Couchbase.AspNet.dll differ
+diff --git a/RAM.Services/bin/Debug/Newtonsoft.Json.dll b/RAM.Services/bin/Debug/Newtonsoft.Json.dll
+index 81639f9..a957fda 100644
+Binary files a/RAM.Services/bin/Debug/Newtonsoft.Json.dll and b/RAM.Services/bin/Debug/Newtonsoft.Json.dll differ
+diff --git a/RAM.Services/bin/Debug/RAM.Core.dll b/RAM.Services/bin/Debug/RAM.Core.dll
+index f48e511..d7562c1 100644
+Binary files a/RAM.Services/bin/Debug/RAM.Core.dll and b/RAM.Services/bin/Debug/RAM.Core.dll differ
+diff --git a/RAM.Services/bin/Debug/RAM.Core.pdb b/RAM.Services/bin/Debug/RAM.Core.pdb
+index 69f214b..b282e39 100644
+Binary files a/RAM.Services/bin/Debug/RAM.Core.pdb and b/RAM.Services/bin/Debug/RAM.Core.pdb differ
+diff --git a/RAM.Services/bin/Debug/RAM.Infrastructure.dll b/RAM.Services/bin/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Services/bin/Debug/RAM.Infrastructure.dll and b/RAM.Services/bin/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Services/bin/Debug/RAM.Infrastructure.pdb b/RAM.Services/bin/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Services/bin/Debug/RAM.Infrastructure.pdb and b/RAM.Services/bin/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Services/bin/Debug/RAM.Services.dll b/RAM.Services/bin/Debug/RAM.Services.dll
+index 0fa89b1..01c6bca 100644
+Binary files a/RAM.Services/bin/Debug/RAM.Services.dll and b/RAM.Services/bin/Debug/RAM.Services.dll differ
+diff --git a/RAM.Services/bin/Debug/RAM.Services.pdb b/RAM.Services/bin/Debug/RAM.Services.pdb
+index a45871f..152df8a 100644
+Binary files a/RAM.Services/bin/Debug/RAM.Services.pdb and b/RAM.Services/bin/Debug/RAM.Services.pdb differ
+diff --git a/RAM.Services/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/RAM.Services/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index 1b01654..f6470d8 100644
+Binary files a/RAM.Services/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/RAM.Services/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/RAM.Services/obj/Debug/RAM.Services.csproj.FileListAbsolute.txt b/RAM.Services/obj/Debug/RAM.Services.csproj.FileListAbsolute.txt
+index a2bce51..9b05c2b 100644
+--- a/RAM.Services/obj/Debug/RAM.Services.csproj.FileListAbsolute.txt
++++ b/RAM.Services/obj/Debug/RAM.Services.csproj.FileListAbsolute.txt
+@@ -184,7 +184,6 @@ C:\Projects\ModestoPower\RAM.Services\bin\Debug\Hammock.pdb
+ C:\Projects\ModestoPower\RAM.Services\bin\Debug\Hammock.ClientProfile.pdb
+ C:\Projects\ModestoPower\RAM.Services\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
+ C:\Projects\ModestoPower\RAM.Services\bin\Debug\Microsoft.Practices.ServiceLocation.xml
+-C:\Projects\ModestoPower\RAM.Services\bin\Debug\Newtonsoft.Json.xml
+ C:\Projects\ModestoPower\RAM.Services\bin\Debug\StructureMap.pdb
+ C:\Projects\ModestoPower\RAM.Services\bin\Debug\StructureMap.xml
+ C:\Projects\ModestoPower\RAM.Services\bin\Debug\System.Net.Http.Formatting.xml
+@@ -194,3 +193,4 @@ C:\Projects\ModestoPower\RAM.Services\bin\Debug\log4net.xml
+ C:\Projects\ModestoPower\RAM.Services\obj\Debug\RAM.Services.csprojResolveAssemblyReference.cache
+ C:\Projects\ModestoPower\RAM.Services\obj\Debug\RAM.Services.dll
+ C:\Projects\ModestoPower\RAM.Services\obj\Debug\RAM.Services.pdb
++C:\Projects\ModestoPower\RAM.Services\bin\Debug\Couchbase.AspNet.dll
+diff --git a/RAM.Services/obj/Debug/RAM.Services.csprojResolveAssemblyReference.cache b/RAM.Services/obj/Debug/RAM.Services.csprojResolveAssemblyReference.cache
+index b964b85..de005d0 100644
+Binary files a/RAM.Services/obj/Debug/RAM.Services.csprojResolveAssemblyReference.cache and b/RAM.Services/obj/Debug/RAM.Services.csprojResolveAssemblyReference.cache differ
+diff --git a/RAM.Services/obj/Debug/RAM.Services.dll b/RAM.Services/obj/Debug/RAM.Services.dll
+index 0fa89b1..01c6bca 100644
+Binary files a/RAM.Services/obj/Debug/RAM.Services.dll and b/RAM.Services/obj/Debug/RAM.Services.dll differ
+diff --git a/RAM.Services/obj/Debug/RAM.Services.pdb b/RAM.Services/obj/Debug/RAM.Services.pdb
+index a45871f..152df8a 100644
+Binary files a/RAM.Services/obj/Debug/RAM.Services.pdb and b/RAM.Services/obj/Debug/RAM.Services.pdb differ
+diff --git a/RAM.Web/RAM.Web.csproj b/RAM.Web/RAM.Web.csproj
+index 28736ca..4e3829f 100644
+--- a/RAM.Web/RAM.Web.csproj
++++ b/RAM.Web/RAM.Web.csproj
+@@ -7,7 +7,7 @@
+     <ProjectGuid>{27E11447-F6D1-43D0-A95E-936C2FC0AB8F}</ProjectGuid>
+     <OutputType>Library</OutputType>
+     <AppDesignerFolder>Properties</AppDesignerFolder>
+-    <RootNamespace>RAM.Web</RootNamespace>
++    <RootNamespace>ModestoPower.Web</RootNamespace>
+     <AssemblyName>RAM.Web</AssemblyName>
+     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+     <FileAlignment>512</FileAlignment>
+@@ -43,8 +43,9 @@
+       <Private>True</Private>
+       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+     </Reference>
+-    <Reference Include="Newtonsoft.Json">
+-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
++    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
++      <SpecificVersion>False</SpecificVersion>
++      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
+     </Reference>
+     <Reference Include="StructureMap">
+       <HintPath>..\packages\structuremap.2.6.4.1\lib\net40\StructureMap.dll</HintPath>
+diff --git a/RAM.Web/bin/Debug/Newtonsoft.Json.dll b/RAM.Web/bin/Debug/Newtonsoft.Json.dll
+index 81639f9..a957fda 100644
+Binary files a/RAM.Web/bin/Debug/Newtonsoft.Json.dll and b/RAM.Web/bin/Debug/Newtonsoft.Json.dll differ
+diff --git a/RAM.Web/bin/Debug/RAM.Core.dll b/RAM.Web/bin/Debug/RAM.Core.dll
+index f48e511..d7562c1 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Core.dll and b/RAM.Web/bin/Debug/RAM.Core.dll differ
+diff --git a/RAM.Web/bin/Debug/RAM.Core.pdb b/RAM.Web/bin/Debug/RAM.Core.pdb
+index 69f214b..b282e39 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Core.pdb and b/RAM.Web/bin/Debug/RAM.Core.pdb differ
+diff --git a/RAM.Web/bin/Debug/RAM.Infrastructure.dll b/RAM.Web/bin/Debug/RAM.Infrastructure.dll
+index 6c734f2..793c12c 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Infrastructure.dll and b/RAM.Web/bin/Debug/RAM.Infrastructure.dll differ
+diff --git a/RAM.Web/bin/Debug/RAM.Infrastructure.pdb b/RAM.Web/bin/Debug/RAM.Infrastructure.pdb
+index 99a9d41..f9c3607 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Infrastructure.pdb and b/RAM.Web/bin/Debug/RAM.Infrastructure.pdb differ
+diff --git a/RAM.Web/bin/Debug/RAM.Services.dll b/RAM.Web/bin/Debug/RAM.Services.dll
+index 0fa89b1..01c6bca 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Services.dll and b/RAM.Web/bin/Debug/RAM.Services.dll differ
+diff --git a/RAM.Web/bin/Debug/RAM.Services.pdb b/RAM.Web/bin/Debug/RAM.Services.pdb
+index a45871f..152df8a 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Services.pdb and b/RAM.Web/bin/Debug/RAM.Services.pdb differ
+diff --git a/RAM.Web/bin/Debug/RAM.Web.dll b/RAM.Web/bin/Debug/RAM.Web.dll
+index a9a471d..5771853 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Web.dll and b/RAM.Web/bin/Debug/RAM.Web.dll differ
+diff --git a/RAM.Web/bin/Debug/RAM.Web.pdb b/RAM.Web/bin/Debug/RAM.Web.pdb
+index 91f5108..04f95df 100644
+Binary files a/RAM.Web/bin/Debug/RAM.Web.pdb and b/RAM.Web/bin/Debug/RAM.Web.pdb differ
+diff --git a/RAM.Web/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache b/RAM.Web/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+index 05f4884..f0efd26 100644
+Binary files a/RAM.Web/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache and b/RAM.Web/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache differ
+diff --git a/RAM.Web/obj/Debug/RAM.Web.csproj.FileListAbsolute.txt b/RAM.Web/obj/Debug/RAM.Web.csproj.FileListAbsolute.txt
+index 6ca15a1..6ec67d2 100644
+--- a/RAM.Web/obj/Debug/RAM.Web.csproj.FileListAbsolute.txt
++++ b/RAM.Web/obj/Debug/RAM.Web.csproj.FileListAbsolute.txt
+@@ -182,7 +182,6 @@ C:\Projects\ModestoPower\RAM.Web\bin\Debug\IdeaSeed.Core.pdb
+ C:\Projects\ModestoPower\RAM.Web\bin\Debug\IdeaSeed.Web.pdb
+ C:\Projects\ModestoPower\RAM.Web\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
+ C:\Projects\ModestoPower\RAM.Web\bin\Debug\Microsoft.Practices.ServiceLocation.xml
+-C:\Projects\ModestoPower\RAM.Web\bin\Debug\Newtonsoft.Json.xml
+ C:\Projects\ModestoPower\RAM.Web\bin\Debug\StructureMap.pdb
+ C:\Projects\ModestoPower\RAM.Web\bin\Debug\StructureMap.xml
+ C:\Projects\ModestoPower\RAM.Web\bin\Debug\System.Net.Http.Formatting.xml
+diff --git a/RAM.Web/obj/Debug/RAM.Web.csprojResolveAssemblyReference.cache b/RAM.Web/obj/Debug/RAM.Web.csprojResolveAssemblyReference.cache
+index 6bb046b..aabc12c 100644
+Binary files a/RAM.Web/obj/Debug/RAM.Web.csprojResolveAssemblyReference.cache and b/RAM.Web/obj/Debug/RAM.Web.csprojResolveAssemblyReference.cache differ
+diff --git a/RAM.Web/obj/Debug/RAM.Web.dll b/RAM.Web/obj/Debug/RAM.Web.dll
+index a9a471d..5771853 100644
+Binary files a/RAM.Web/obj/Debug/RAM.Web.dll and b/RAM.Web/obj/Debug/RAM.Web.dll differ
+diff --git a/RAM.Web/obj/Debug/RAM.Web.pdb b/RAM.Web/obj/Debug/RAM.Web.pdb
+index 91f5108..04f95df 100644
+Binary files a/RAM.Web/obj/Debug/RAM.Web.pdb and b/RAM.Web/obj/Debug/RAM.Web.pdb differ
+diff --git a/References/Newtonsoft.Json.dll b/References/Newtonsoft.Json.dll
+index 0a91cd7..a957fda 100644
+Binary files a/References/Newtonsoft.Json.dll and b/References/Newtonsoft.Json.dll differ
+diff --git a/packages/TaskHelpers.Sources.0.1/TaskHelpers.Sources.0.1.nupkg b/packages/TaskHelpers.Sources.0.1/TaskHelpers.Sources.0.1.nupkg
+new file mode 100644
+index 0000000..8b240af
+Binary files /dev/null and b/packages/TaskHelpers.Sources.0.1/TaskHelpers.Sources.0.1.nupkg differ
+diff --git a/packages/TaskHelpers.Sources.0.1/TaskHelpers.Sources.0.1.nuspec b/packages/TaskHelpers.Sources.0.1/TaskHelpers.Sources.0.1.nuspec
+new file mode 100644
+index 0000000..61f5ef1
+--- /dev/null
++++ b/packages/TaskHelpers.Sources.0.1/TaskHelpers.Sources.0.1.nuspec
+@@ -0,0 +1,16 @@
++<?xml version="1.0"?>
++<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
++  <metadata>
++    <id>TaskHelpers.Sources</id>
++    <version>0.1</version>
++    <title>TaskHelpers</title>
++    <authors>Microsoft</authors>
++    <owners>Microsoft</owners>
++    <licenseUrl>http://aspnetwebstack.codeplex.com/license</licenseUrl>
++    <projectUrl>http://aspnetwebstack.codeplex.com/</projectUrl>
++    <requireLicenseAcceptance>false</requireLicenseAcceptance>
++    <description>Internal classes to assist in using Task efficiently server-side.</description>
++    <releaseNotes>Packaged verbatim from aspnetwebstack git repo.</releaseNotes>
++    <copyright>Copyright 2012</copyright>
++  </metadata>
++</package>
+\ No newline at end of file
+diff --git a/packages/TaskHelpers.Sources.0.1/content/App_Packages/TaskHelpers.Sources.0.1/TaskHelpers.cs b/packages/TaskHelpers.Sources.0.1/content/App_Packages/TaskHelpers.Sources.0.1/TaskHelpers.cs
+new file mode 100644
+index 0000000..5120947
+--- /dev/null
++++ b/packages/TaskHelpers.Sources.0.1/content/App_Packages/TaskHelpers.Sources.0.1/TaskHelpers.cs
+@@ -0,0 +1,396 @@
++﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
++
++using System.Collections.Generic;
++using System.Diagnostics.CodeAnalysis;
++using System.Diagnostics.Contracts;
++
++namespace System.Threading.Tasks
++{
++    /// <summary>
++    /// Helpers for safely using Task libraries. 
++    /// </summary>
++    internal static class TaskHelpers
++    {
++        private static readonly Task _defaultCompleted = FromResult<AsyncVoid>(default(AsyncVoid));
++
++        private static readonly Task<object> _completedTaskReturningNull = FromResult<object>(null);
++
++        /// <summary>
++        /// Returns a canceled Task. The task is completed, IsCanceled = True, IsFaulted = False.
++        /// </summary>
++        internal static Task Canceled()
++        {
++            return CancelCache<AsyncVoid>.Canceled;
++        }
++
++        /// <summary>
++        /// Returns a canceled Task of the given type. The task is completed, IsCanceled = True, IsFaulted = False.
++        /// </summary>
++        internal static Task<TResult> Canceled<TResult>()
++        {
++            return CancelCache<TResult>.Canceled;
++        }
++
++        /// <summary>
++        /// Returns a completed task that has no result. 
++        /// </summary>        
++        internal static Task Completed()
++        {
++            return _defaultCompleted;
++        }
++
++        /// <summary>
++        /// Returns an error task. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        internal static Task FromError(Exception exception)
++        {
++            return FromError<AsyncVoid>(exception);
++        }
++
++        /// <summary>
++        /// Returns an error task of the given type. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        /// <typeparam name="TResult"></typeparam>
++        internal static Task<TResult> FromError<TResult>(Exception exception)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++            tcs.SetException(exception);
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Returns an error task of the given type. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        internal static Task FromErrors(IEnumerable<Exception> exceptions)
++        {
++            return FromErrors<AsyncVoid>(exceptions);
++        }
++
++        /// <summary>
++        /// Returns an error task of the given type. The task is Completed, IsCanceled = False, IsFaulted = True
++        /// </summary>
++        internal static Task<TResult> FromErrors<TResult>(IEnumerable<Exception> exceptions)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++            tcs.SetException(exceptions);
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Returns a successful completed task with the given result.  
++        /// </summary>        
++        internal static Task<TResult> FromResult<TResult>(TResult result)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++            tcs.SetResult(result);
++            return tcs.Task;
++        }
++
++        internal static Task<object> NullResult()
++        {
++            return _completedTaskReturningNull;
++        }
++
++        /// <summary>
++        /// Return a task that runs all the tasks inside the iterator sequentially. It stops as soon
++        /// as one of the tasks fails or cancels, or after all the tasks have run succesfully.
++        /// </summary>
++        /// <param name="asyncIterator">collection of tasks to wait on</param>
++        /// <param name="cancellationToken">cancellation token</param>
++        /// <param name="disposeEnumerator">whether or not to dispose the enumerator we get from <paramref name="asyncIterator"/>.
++        /// Only set to <c>false</c> if you can guarantee that <paramref name="asyncIterator"/>'s enumerator does not have any resources it needs to dispose.</param>
++        /// <returns>a task that signals completed when all the incoming tasks are finished.</returns>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The exception is propagated in a Task.")]
++        internal static Task Iterate(IEnumerable<Task> asyncIterator, CancellationToken cancellationToken = default(CancellationToken), bool disposeEnumerator = true)
++        {
++            Contract.Assert(asyncIterator != null);
++
++            IEnumerator<Task> enumerator = null;
++            try
++            {
++                enumerator = asyncIterator.GetEnumerator();
++                Task task = IterateImpl(enumerator, cancellationToken);
++                return (disposeEnumerator && enumerator != null) ? task.Finally(enumerator.Dispose, runSynchronously: true) : task;
++            }
++            catch (Exception ex)
++            {
++                return TaskHelpers.FromError(ex);
++            }
++        }
++
++        /// <summary>
++        /// Provides the implementation of the Iterate method.
++        /// Contains special logic to help speed up common cases.
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The exception is propagated in a Task.")]
++        internal static Task IterateImpl(IEnumerator<Task> enumerator, CancellationToken cancellationToken)
++        {
++            try
++            {
++                while (true)
++                {
++                    // short-circuit: iteration canceled
++                    if (cancellationToken.IsCancellationRequested)
++                    {
++                        return TaskHelpers.Canceled();
++                    }
++
++                    // short-circuit: iteration complete
++                    if (!enumerator.MoveNext())
++                    {
++                        return TaskHelpers.Completed();
++                    }
++
++                    // fast case: Task completed synchronously & successfully
++                    Task currentTask = enumerator.Current;
++                    if (currentTask.Status == TaskStatus.RanToCompletion)
++                    {
++                        continue;
++                    }
++
++                    // fast case: Task completed synchronously & unsuccessfully
++                    if (currentTask.IsCanceled || currentTask.IsFaulted)
++                    {
++                        return currentTask;
++                    }
++
++                    // slow case: Task isn't yet complete
++                    return IterateImplIncompleteTask(enumerator, currentTask, cancellationToken);
++                }
++            }
++            catch (Exception ex)
++            {
++                return TaskHelpers.FromError(ex);
++            }
++        }
++
++        /// <summary>
++        /// Fallback for IterateImpl when the antecedent Task isn't yet complete.
++        /// </summary>
++        internal static Task IterateImplIncompleteTask(IEnumerator<Task> enumerator, Task currentTask, CancellationToken cancellationToken)
++        {
++            // There's a race condition here, the antecedent Task could complete between
++            // the check in Iterate and the call to Then below. If this happens, we could
++            // end up growing the stack indefinitely. But the chances of (a) even having
++            // enough Tasks in the enumerator in the first place and of (b) *every* one
++            // of them hitting this race condition are so extremely remote that it's not
++            // worth worrying about.
++            return currentTask.Then(() => IterateImpl(enumerator, cancellationToken));
++        }
++
++        /// <summary>
++        /// Replacement for Task.Factory.StartNew when the code can run synchronously. 
++        /// We run the code immediately and avoid the thread switch. 
++        /// This is used to help synchronous code implement task interfaces.
++        /// </summary>
++        /// <param name="action">action to run synchronouslyt</param>
++        /// <param name="token">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
++        /// <returns>a task who result is the result from Func()</returns>
++        /// <remarks>
++        /// Avoid calling Task.Factory.StartNew.         
++        /// This avoids gotchas with StartNew:
++        /// - ensures cancellation token is checked (StartNew doesn't check cancellation tokens).
++        /// - Keeps on the same thread. 
++        /// - Avoids switching synchronization contexts.
++        /// Also take in a lambda so that we can wrap in a try catch and honor task failure semantics.        
++        /// </remarks>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        public static Task RunSynchronously(Action action, CancellationToken token = default(CancellationToken))
++        {
++            if (token.IsCancellationRequested)
++            {
++                return Canceled();
++            }
++
++            try
++            {
++                action();
++                return Completed();
++            }
++            catch (Exception e)
++            {
++                return FromError(e);
++            }
++        }
++
++        /// <summary>
++        /// Replacement for Task.Factory.StartNew when the code can run synchronously. 
++        /// We run the code immediately and avoid the thread switch. 
++        /// This is used to help synchronous code implement task interfaces.
++        /// </summary>
++        /// <typeparam name="TResult">type of result that task will return.</typeparam>
++        /// <param name="func">function to run synchronously and produce result</param>
++        /// <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
++        /// <returns>a task who result is the result from Func()</returns>
++        /// <remarks>
++        /// Avoid calling Task.Factory.StartNew.         
++        /// This avoids gotchas with StartNew:
++        /// - ensures cancellation token is checked (StartNew doesn't check cancellation tokens).
++        /// - Keeps on the same thread. 
++        /// - Avoids switching synchronization contexts.
++        /// Also take in a lambda so that we can wrap in a try catch and honor task failure semantics.        
++        /// </remarks>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task<TResult> RunSynchronously<TResult>(Func<TResult> func, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            if (cancellationToken.IsCancellationRequested)
++            {
++                return Canceled<TResult>();
++            }
++
++            try
++            {
++                return FromResult(func());
++            }
++            catch (Exception e)
++            {
++                return FromError<TResult>(e);
++            }
++        }
++
++        /// <summary>
++        /// Overload of RunSynchronously that avoids a call to Unwrap(). 
++        /// This overload is useful when func() starts doing some synchronous work and then hits IO and 
++        /// needs to create a task to finish the work. 
++        /// </summary>
++        /// <typeparam name="TResult">type of result that Task will return</typeparam>
++        /// <param name="func">function that returns a task</param>
++        /// <param name="cancellationToken">cancellation token. This is only checked before we run the task, and if cancelled, we immediately return a cancelled task.</param>
++        /// <returns>a task, created by running func().</returns>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task<TResult> RunSynchronously<TResult>(Func<Task<TResult>> func, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            if (cancellationToken.IsCancellationRequested)
++            {
++                return Canceled<TResult>();
++            }
++
++            try
++            {
++                return func();
++            }
++            catch (Exception e)
++            {
++                return FromError<TResult>(e);
++            }
++        }
++
++        /// <summary>
++        /// Update the completion source if the task failed (cancelled or faulted). No change to completion source if the task succeeded. 
++        /// </summary>
++        /// <typeparam name="TResult">result type of completion source</typeparam>
++        /// <param name="tcs">completion source to update</param>
++        /// <param name="source">task to update from.</param>
++        /// <returns>true on success</returns>
++        internal static bool SetIfTaskFailed<TResult>(this TaskCompletionSource<TResult> tcs, Task source)
++        {
++            switch (source.Status)
++            {
++                case TaskStatus.Canceled:
++                case TaskStatus.Faulted:
++                    return tcs.TrySetFromTask(source);
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Set a completion source from the given Task.
++        /// </summary>
++        /// <typeparam name="TResult">result type for completion source.</typeparam>
++        /// <param name="tcs">completion source to set</param>
++        /// <param name="source">Task to get values from.</param>
++        /// <returns>true if this successfully sets the completion source.</returns>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "This is a known safe usage of Task.Result, since it only occurs when we know the task's state to be completed.")]
++        internal static bool TrySetFromTask<TResult>(this TaskCompletionSource<TResult> tcs, Task source)
++        {
++            if (source.Status == TaskStatus.Canceled)
++            {
++                return tcs.TrySetCanceled();
++            }
++
++            if (source.Status == TaskStatus.Faulted)
++            {
++                return tcs.TrySetException(source.Exception.InnerExceptions);
++            }
++
++            if (source.Status == TaskStatus.RanToCompletion)
++            {
++                Task<TResult> taskOfResult = source as Task<TResult>;
++                return tcs.TrySetResult(taskOfResult == null ? default(TResult) : taskOfResult.Result);
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Set a completion source from the given Task. If the task ran to completion and the result type doesn't match
++        /// the type of the completion source, then a default value will be used. This is useful for converting Task into
++        /// Task{AsyncVoid}, but it can also accidentally be used to introduce data loss (by passing the wrong
++        /// task type), so please execute this method with care.
++        /// </summary>
++        /// <typeparam name="TResult">result type for completion source.</typeparam>
++        /// <param name="tcs">completion source to set</param>
++        /// <param name="source">Task to get values from.</param>
++        /// <returns>true if this successfully sets the completion source.</returns>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "This is a known safe usage of Task.Result, since it only occurs when we know the task's state to be completed.")]
++        internal static bool TrySetFromTask<TResult>(this TaskCompletionSource<Task<TResult>> tcs, Task source)
++        {
++            if (source.Status == TaskStatus.Canceled)
++            {
++                return tcs.TrySetCanceled();
++            }
++
++            if (source.Status == TaskStatus.Faulted)
++            {
++                return tcs.TrySetException(source.Exception.InnerExceptions);
++            }
++
++            if (source.Status == TaskStatus.RanToCompletion)
++            {
++                // Sometimes the source task is Task<Task<TResult>>, and sometimes it's Task<TResult>.
++                // The latter usually happens when we're in the middle of a sync-block postback where
++                // the continuation is a function which returns Task<TResult> rather than just TResult,
++                // but the originating task was itself just Task<TResult>. An example of this can be
++                // found in TaskExtensions.CatchImpl().
++                Task<Task<TResult>> taskOfTaskOfResult = source as Task<Task<TResult>>;
++                if (taskOfTaskOfResult != null)
++                {
++                    return tcs.TrySetResult(taskOfTaskOfResult.Result);
++                }
++
++                Task<TResult> taskOfResult = source as Task<TResult>;
++                if (taskOfResult != null)
++                {
++                    return tcs.TrySetResult(taskOfResult);
++                }
++
++                return tcs.TrySetResult(TaskHelpers.FromResult(default(TResult)));
++            }
++
++            return false;
++        }
++
++        /// <summary>
++        /// Used as the T in a "conversion" of a Task into a Task{T}
++        /// </summary>
++        private struct AsyncVoid
++        {
++        }
++
++        /// <summary>
++        /// This class is a convenient cache for per-type cancelled tasks
++        /// </summary>
++        private static class CancelCache<TResult>
++        {
++            public static readonly Task<TResult> Canceled = GetCancelledTask();
++
++            private static Task<TResult> GetCancelledTask()
++            {
++                TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++                tcs.SetCanceled();
++                return tcs.Task;
++            }
++        }
++    }
++}
+diff --git a/packages/TaskHelpers.Sources.0.1/content/App_Packages/TaskHelpers.Sources.0.1/TaskHelpersExtensions.cs b/packages/TaskHelpers.Sources.0.1/content/App_Packages/TaskHelpers.Sources.0.1/TaskHelpersExtensions.cs
+new file mode 100644
+index 0000000..30f72ac
+--- /dev/null
++++ b/packages/TaskHelpers.Sources.0.1/content/App_Packages/TaskHelpers.Sources.0.1/TaskHelpersExtensions.cs
+@@ -0,0 +1,943 @@
++﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
++
++using System.Diagnostics.CodeAnalysis;
++using System.Diagnostics.Contracts;
++using System.Linq.Expressions;
++using System.Reflection;
++
++namespace System.Threading.Tasks
++{
++    internal static class TaskHelpersExtensions
++    {
++        private static Task<AsyncVoid> _defaultCompleted = TaskHelpers.FromResult<AsyncVoid>(default(AsyncVoid));
++        private static readonly Action<Task> _rethrowWithNoStackLossDelegate = GetRethrowWithNoStackLossDelegate();
++
++        /// <summary>
++        /// Calls the given continuation, after the given task completes, if it ends in a faulted state.
++        /// Will not be called if the task did not fault (meaning, it will not be called if the task ran
++        /// to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
++        /// async methods. Note that this method allows you to return a Task, so that you can either return
++        /// a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
++        /// that the exception should be propagated). In C#, you cannot normally use await within a catch
++        /// block, so returning a real async task should never be done from Catch().
++        /// </summary>
++        internal static Task Catch(this Task task, Func<CatchInfo, CatchInfo.CatchResult> continuation, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            // Fast path for successful tasks, to prevent an extra TCS allocation
++            if (task.Status == TaskStatus.RanToCompletion)
++            {
++                return task;
++            }
++
++            return task.CatchImpl(() => continuation(new CatchInfo(task)).Task.ToTask<AsyncVoid>(), cancellationToken);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task completes, if it ends in a faulted state.
++        /// Will not be called if the task did not fault (meaning, it will not be called if the task ran
++        /// to completion or was canceled). Intended to roughly emulate C# 5's support for "try/catch" in
++        /// async methods. Note that this method allows you to return a Task, so that you can either return
++        /// a completed Task (indicating that you swallowed the exception) or a faulted task (indicating that
++        /// that the exception should be propagated). In C#, you cannot normally use await within a catch
++        /// block, so returning a real async task should never be done from Catch().
++        /// </summary>
++        internal static Task<TResult> Catch<TResult>(this Task<TResult> task, Func<CatchInfo<TResult>, CatchInfo<TResult>.CatchResult> continuation, CancellationToken cancellationToken = default(CancellationToken))
++        {
++            // Fast path for successful tasks, to prevent an extra TCS allocation
++            if (task.Status == TaskStatus.RanToCompletion)
++            {
++                return task;
++            }
++            return task.CatchImpl(() => continuation(new CatchInfo<TResult>(task)).Task, cancellationToken);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "CatchInfo", Justification = "This is the name of a class.")]
++        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "TaskHelpersExtensions", Justification = "This is the name of a class.")]
++        private static Task<TResult> CatchImpl<TResult>(this Task task, Func<Task<TResult>> continuation, CancellationToken cancellationToken)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    try
++                    {
++                        Task<TResult> resultTask = continuation();
++                        if (resultTask == null)
++                        {
++                            // Not a resource because this is an internal class, and this is a guard clause that's intended
++                            // to be thrown by us to us, never escaping out to end users.
++                            throw new InvalidOperationException("You must set the Task property of the CatchInfo returned from the TaskHelpersExtensions.Catch continuation.");
++                        }
++
++                        return resultTask;
++                    }
++                    catch (Exception ex)
++                    {
++                        return TaskHelpers.FromError<TResult>(ex);
++                    }
++                }
++                if (task.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    return TaskHelpers.Canceled<TResult>();
++                }
++
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++                    tcs.TrySetFromTask(task);
++                    return tcs.Task;
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return CatchImplContinuation(task, continuation);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "TaskHelpersExtensions", Justification = "This is the name of a class.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TResult> CatchImplContinuation<TResult>(Task task, Func<Task<TResult>> continuation)
++        {
++            SynchronizationContext syncContext = SynchronizationContext.Current;
++
++            TaskCompletionSource<Task<TResult>> tcs = new TaskCompletionSource<Task<TResult>>();
++
++            // this runs only if the inner task did not fault
++            task.ContinueWith(innerTask => tcs.TrySetFromTask(innerTask), TaskContinuationOptions.NotOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
++
++            // this runs only if the inner task faulted
++            task.ContinueWith(innerTask =>
++            {
++                if (syncContext != null)
++                {
++                    syncContext.Post(state =>
++                    {
++                        try
++                        {
++                            Task<TResult> resultTask = continuation();
++                            if (resultTask == null)
++                            {
++                                throw new InvalidOperationException("You cannot return null from the TaskHelpersExtensions.Catch continuation. You must return a valid task or throw an exception.");
++                            }
++
++                            tcs.TrySetResult(resultTask);
++                        }
++                        catch (Exception ex)
++                        {
++                            tcs.TrySetException(ex);
++                        }
++                    }, state: null);
++                }
++                else
++                {
++                    try
++                    {
++                        Task<TResult> resultTask = continuation();
++                        if (resultTask == null)
++                        {
++                            throw new InvalidOperationException("You cannot return null from the TaskHelpersExtensions.Catch continuation. You must return a valid task or throw an exception.");
++                        }
++
++                        tcs.TrySetResult(resultTask);
++                    }
++                    catch (Exception ex)
++                    {
++                        tcs.TrySetException(ex);
++                    }
++                }
++            }, TaskContinuationOptions.OnlyOnFaulted);
++
++            return tcs.Task.FastUnwrap();
++        }
++
++        /// <summary>
++        /// Upon completion of the task, copies its result into the given task completion source, regardless of the
++        /// completion state. This causes the original task to be fully observed, and the task that is returned by
++        /// this method will always successfully run to completion, regardless of the original task state.
++        /// Since this method consumes a task with no return value, you must provide the return value to be used
++        /// when the inner task ran to successful completion.
++        /// </summary>
++        internal static Task CopyResultToCompletionSource<TResult>(this Task task, TaskCompletionSource<TResult> tcs, TResult completionResult)
++        {
++            return task.CopyResultToCompletionSourceImpl(tcs, innerTask => completionResult);
++        }
++
++        /// <summary>
++        /// Upon completion of the task, copies its result into the given task completion source, regardless of the
++        /// completion state. This causes the original task to be fully observed, and the task that is returned by
++        /// this method will always successfully run to completion, regardless of the original task state.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task CopyResultToCompletionSource<TResult>(this Task<TResult> task, TaskCompletionSource<TResult> tcs)
++        {
++            return task.CopyResultToCompletionSourceImpl(tcs, innerTask => innerTask.Result);
++        }
++
++        private static Task CopyResultToCompletionSourceImpl<TTask, TResult>(this TTask task, TaskCompletionSource<TResult> tcs, Func<TTask, TResult> resultThunk)
++            where TTask : Task
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                switch (task.Status)
++                {
++                    case TaskStatus.Canceled:
++                    case TaskStatus.Faulted:
++                        TaskHelpers.TrySetFromTask(tcs, task);
++                        break;
++
++                    case TaskStatus.RanToCompletion:
++                        tcs.TrySetResult(resultThunk(task));
++                        break;
++                }
++
++                return TaskHelpers.Completed();
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return CopyResultToCompletionSourceImplContinuation(task, tcs, resultThunk);
++        }
++
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task CopyResultToCompletionSourceImplContinuation<TTask, TResult>(TTask task, TaskCompletionSource<TResult> tcs, Func<TTask, TResult> resultThunk)
++            where TTask : Task
++        {
++            return task.ContinueWith(innerTask =>
++            {
++                switch (innerTask.Status)
++                {
++                    case TaskStatus.Canceled:
++                    case TaskStatus.Faulted:
++                        TaskHelpers.TrySetFromTask(tcs, innerTask);
++                        break;
++
++                    case TaskStatus.RanToCompletion:
++                        tcs.TrySetResult(resultThunk(task));
++                        break;
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++        }
++
++        /// <summary>
++        /// Cast Task to Task of object
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<object> CastToObject(this Task task)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<object>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled)
++                {
++                    return TaskHelpers.Canceled<object>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    return TaskHelpers.FromResult<object>((object)null);
++                }
++            }
++
++            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
++
++            // schedule a synchronous task to cast: no need to worry about sync context or try/catch
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.SetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled)
++                {
++                    tcs.SetCanceled();
++                }
++                else
++                {
++                    tcs.SetResult((object)null);
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Cast Task of T to Task of object
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<object> CastToObject<T>(this Task<T> task)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<object>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled)
++                {
++                    return TaskHelpers.Canceled<object>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    return TaskHelpers.FromResult<object>((object)task.Result);
++                }
++            }
++
++            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
++
++            // schedule a synchronous task to cast: no need to worry about sync context or try/catch
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.SetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled)
++                {
++                    tcs.SetCanceled();
++                }
++                else
++                {
++                    tcs.SetResult((object)innerTask.Result);
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// Cast Task of object to Task of T
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TOuterResult> CastFromObject<TOuterResult>(this Task<object> task)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<TOuterResult>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled)
++                {
++                    return TaskHelpers.Canceled<TOuterResult>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    try
++                    {
++                        return TaskHelpers.FromResult<TOuterResult>((TOuterResult)task.Result);
++                    }
++                    catch (Exception exception)
++                    {
++                        return TaskHelpers.FromError<TOuterResult>(exception);
++                    }
++                }
++            }
++
++            TaskCompletionSource<TOuterResult> tcs = new TaskCompletionSource<TOuterResult>();
++
++            // schedule a synchronous task to cast: no need to worry about sync context or try/catch
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.SetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled)
++                {
++                    tcs.SetCanceled();
++                }
++                else
++                {
++                    try
++                    {
++                        tcs.SetResult((TOuterResult)innerTask.Result);
++                    }
++                    catch (Exception exception)
++                    {
++                        tcs.SetException(exception);
++                    }
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;
++        }
++
++        /// <summary>
++        /// A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
++        /// execution context when the antecedent task is already completed.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4000:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task FastUnwrap(this Task<Task> task)
++        {
++            Task innerTask = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
++            return innerTask ?? task.Unwrap();
++        }
++
++        /// <summary>
++        /// A version of task.Unwrap that is optimized to prevent unnecessarily capturing the
++        /// execution context when the antecedent task is already completed.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4000:DoNotUseProblematicTaskTypes", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TResult> FastUnwrap<TResult>(this Task<Task<TResult>> task)
++        {
++            Task<TResult> innerTask = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
++            return innerTask ?? task.Unwrap();
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, regardless of the state
++        /// the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task Finally(this Task task, Action continuation, bool runSynchronously = false)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                try
++                {
++                    continuation();
++                    return task;
++                }
++                catch (Exception ex)
++                {
++                    MarkExceptionsObserved(task);
++                    return TaskHelpers.FromError(ex);
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return FinallyImplContinuation<AsyncVoid>(task, continuation, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, regardless of the state
++        /// the task ended in. Intended to roughly emulate C# 5's support for "finally" in async methods.
++        /// </summary>
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        internal static Task<TResult> Finally<TResult>(this Task<TResult> task, Action continuation, bool runSynchronously = false)
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                try
++                {
++                    continuation();
++                    return task;
++                }
++                catch (Exception ex)
++                {
++                    MarkExceptionsObserved(task);
++                    return TaskHelpers.FromError<TResult>(ex);
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return FinallyImplContinuation<TResult>(task, continuation, runSynchronously);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TResult> FinallyImplContinuation<TResult>(Task task, Action continuation, bool runSynchronously = false)
++        {
++            SynchronizationContext syncContext = SynchronizationContext.Current;
++
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++
++            task.ContinueWith(innerTask =>
++            {
++                try
++                {
++                    if (syncContext != null)
++                    {
++                        syncContext.Post(state =>
++                        {
++                            try
++                            {
++                                continuation();
++                                tcs.TrySetFromTask(innerTask);
++                            }
++                            catch (Exception ex)
++                            {
++                                MarkExceptionsObserved(innerTask);
++                                tcs.SetException(ex);
++                            }
++                        }, state: null);
++                    }
++                    else
++                    {
++                        continuation();
++                        tcs.TrySetFromTask(innerTask);
++                    }
++                }
++                catch (Exception ex)
++                {
++                    MarkExceptionsObserved(innerTask);
++                    tcs.TrySetException(ex);
++                }
++            }, runSynchronously ? TaskContinuationOptions.ExecuteSynchronously : TaskContinuationOptions.None);
++
++            return tcs.Task;
++        }
++
++        [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "This general exception is not intended to be seen by the user")]
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This general exception is not intended to be seen by the user")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Action<Task> GetRethrowWithNoStackLossDelegate()
++        {
++            MethodInfo getAwaiterMethod = typeof(Task).GetMethod("GetAwaiter", Type.EmptyTypes);
++            if (getAwaiterMethod != null)
++            {
++                // .NET 4.5 - dump the same code the 'await' keyword would have dumped
++                // >> task.GetAwaiter().GetResult()
++                // No-ops if the task completed successfully, else throws the originating exception complete with the correct call stack.
++                var taskParameter = Expression.Parameter(typeof(Task));
++                var getAwaiterCall = Expression.Call(taskParameter, getAwaiterMethod);
++                var getResultCall = Expression.Call(getAwaiterCall, "GetResult", Type.EmptyTypes);
++                var lambda = Expression.Lambda<Action<Task>>(getResultCall, taskParameter);
++                return lambda.Compile();
++            }
++            else
++            {
++                Func<Exception, Exception> prepForRemoting = null;
++
++                try
++                {
++                    if (AppDomain.CurrentDomain.IsFullyTrusted)
++                    {
++                        // .NET 4 - do the same thing Lazy<T> does by calling Exception.PrepForRemoting
++                        // This is an internal method in mscorlib.dll, so pass a test Exception to it to make sure we can call it.
++                        var exceptionParameter = Expression.Parameter(typeof(Exception));
++                        var prepForRemotingCall = Expression.Call(exceptionParameter, "PrepForRemoting", Type.EmptyTypes);
++                        var lambda = Expression.Lambda<Func<Exception, Exception>>(prepForRemotingCall, exceptionParameter);
++                        var func = lambda.Compile();
++                        func(new Exception()); // make sure the method call succeeds before assigning the 'prepForRemoting' local variable
++                        prepForRemoting = func;
++                    }
++                }
++                catch
++                {
++                } // If delegate creation fails (medium trust) we will simply throw the base exception.
++
++                return task =>
++                {
++                    try
++                    {
++                        task.Wait();
++                    }
++                    catch (AggregateException ex)
++                    {
++                        Exception baseException = ex.GetBaseException();
++                        if (prepForRemoting != null)
++                        {
++                            baseException = prepForRemoting(baseException);
++                        }
++                        throw baseException;
++                    }
++                };
++            }
++        }
++
++        /// <summary>
++        /// Marks a Task as "exception observed". The Task is required to have been completed first.
++        /// </summary>
++        /// <remarks>
++        /// Useful for 'finally' clauses, as if the 'finally' action throws we'll propagate the new
++        /// exception and lose track of the inner exception.
++        /// </remarks>
++        [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "unused", Justification = "We only call the property getter for its side effect; we don't care about the value.")]
++        private static void MarkExceptionsObserved(this Task task)
++        {
++            Contract.Assert(task.IsCompleted);
++
++            Exception unused = task.Exception;
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task Then(this Task task, Action continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => ToAsyncVoidTask(continuation), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task<TOuterResult> Then<TOuterResult>(this Task task, Func<TOuterResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => TaskHelpers.FromResult(continuation()), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task Then(this Task task, Func<Task> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.Then(() => continuation().Then(() => default(AsyncVoid)),
++                             cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault).
++        /// </summary>
++        internal static Task<TOuterResult> Then<TOuterResult>(this Task task, Func<Task<TOuterResult>> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => continuation(), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task Then<TInnerResult>(this Task<TInnerResult> task, Action<TInnerResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => ToAsyncVoidTask(() => continuation(t.Result)), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TOuterResult> Then<TInnerResult, TOuterResult>(this Task<TInnerResult> task, Func<TInnerResult, TOuterResult> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => TaskHelpers.FromResult(continuation(t.Result)), cancellationToken, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task Then<TInnerResult>(this Task<TInnerResult> task, Func<TInnerResult, Task> continuation, CancellationToken token = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => continuation(t.Result).ToTask<AsyncVoid>(), token, runSynchronously);
++        }
++
++        /// <summary>
++        /// Calls the given continuation, after the given task has completed, if the task successfully ran
++        /// to completion (i.e., was not cancelled and did not fault). The continuation is provided with the
++        /// result of the task as its sole parameter.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static Task<TOuterResult> Then<TInnerResult, TOuterResult>(this Task<TInnerResult> task, Func<TInnerResult, Task<TOuterResult>> continuation, CancellationToken cancellationToken = default(CancellationToken), bool runSynchronously = false)
++        {
++            return task.ThenImpl(t => continuation(t.Result), cancellationToken, runSynchronously);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        private static Task<TOuterResult> ThenImpl<TTask, TOuterResult>(this TTask task, Func<TTask, Task<TOuterResult>> continuation, CancellationToken cancellationToken, bool runSynchronously)
++            where TTask : Task
++        {
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<TOuterResult>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    return TaskHelpers.Canceled<TOuterResult>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    try
++                    {
++                        return continuation(task);
++                    }
++                    catch (Exception ex)
++                    {
++                        return TaskHelpers.FromError<TOuterResult>(ex);
++                    }
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return ThenImplContinuation(task, continuation, cancellationToken, runSynchronously);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TOuterResult> ThenImplContinuation<TOuterResult, TTask>(TTask task, Func<TTask, Task<TOuterResult>> continuation, CancellationToken cancellationToken, bool runSynchronously = false)
++            where TTask : Task
++        {
++            SynchronizationContext syncContext = SynchronizationContext.Current;
++
++            TaskCompletionSource<Task<TOuterResult>> tcs = new TaskCompletionSource<Task<TOuterResult>>();
++
++            task.ContinueWith(innerTask =>
++            {
++                if (innerTask.IsFaulted)
++                {
++                    tcs.TrySetException(innerTask.Exception.InnerExceptions);
++                }
++                else if (innerTask.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    tcs.TrySetCanceled();
++                }
++                else
++                {
++                    if (syncContext != null)
++                    {
++                        syncContext.Post(state =>
++                        {
++                            try
++                            {
++                                tcs.TrySetResult(continuation(task));
++                            }
++                            catch (Exception ex)
++                            {
++                                tcs.TrySetException(ex);
++                            }
++                        }, state: null);
++                    }
++                    else
++                    {
++                        tcs.TrySetResult(continuation(task));
++                    }
++                }
++            }, runSynchronously ? TaskContinuationOptions.ExecuteSynchronously : TaskContinuationOptions.None);
++
++            return tcs.Task.FastUnwrap();
++        }
++
++        /// <summary>
++        /// Throws the first faulting exception for a task which is faulted. It attempts to preserve the original
++        /// stack trace when throwing the exception (which should always work in 4.5, and should also work in 4.0
++        /// when running in full trust). Note: It is the caller's responsibility not to pass incomplete tasks to
++        /// this method, because it does degenerate into a call to the equivalent of .Wait() on the task when it
++        /// hasn't yet completed.
++        /// </summary>
++        internal static void ThrowIfFaulted(this Task task)
++        {
++            _rethrowWithNoStackLossDelegate(task);
++        }
++
++        /// <summary>
++        /// Adapts any action into a Task (returning AsyncVoid, so that it's usable with Task{T} extension methods).
++        /// </summary>
++        private static Task<AsyncVoid> ToAsyncVoidTask(Action action)
++        {
++            return TaskHelpers.RunSynchronously<AsyncVoid>(() =>
++            {
++                action();
++                return _defaultCompleted;
++            });
++        }
++
++        /// <summary>
++        /// Changes the return value of a task to the given result, if the task ends in the RanToCompletion state.
++        /// This potentially imposes an extra ContinueWith to convert a non-completed task, so use this with caution.
++        /// </summary>
++        internal static Task<TResult> ToTask<TResult>(this Task task, CancellationToken cancellationToken = default(CancellationToken), TResult result = default(TResult))
++        {
++            if (task == null)
++            {
++                return null;
++            }
++
++            // Stay on the same thread if we can
++            if (task.IsCompleted)
++            {
++                if (task.IsFaulted)
++                {
++                    return TaskHelpers.FromErrors<TResult>(task.Exception.InnerExceptions);
++                }
++                if (task.IsCanceled || cancellationToken.IsCancellationRequested)
++                {
++                    return TaskHelpers.Canceled<TResult>();
++                }
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    return TaskHelpers.FromResult(result);
++                }
++            }
++
++            // Split into a continuation method so that we don't create a closure unnecessarily
++            return ToTaskContinuation(task, result);
++        }
++
++        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        private static Task<TResult> ToTaskContinuation<TResult>(Task task, TResult result)
++        {
++            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
++
++            task.ContinueWith(innerTask =>
++            {
++                if (task.Status == TaskStatus.RanToCompletion)
++                {
++                    tcs.TrySetResult(result);
++                }
++                else
++                {
++                    tcs.TrySetFromTask(innerTask);
++                }
++            }, TaskContinuationOptions.ExecuteSynchronously);
++
++            return tcs.Task;          
++        }
++
++        /// <summary>
++        /// Attempts to get the result value for the given task. If the task ran to completion, then
++        /// it will return true and set the result value; otherwise, it will return false.
++        /// </summary>
++        [SuppressMessage("Microsoft.WebAPI", "CR4001:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
++        internal static bool TryGetResult<TResult>(this Task<TResult> task, out TResult result)
++        {
++            if (task.Status == TaskStatus.RanToCompletion)
++            {
++                result = task.Result;
++                return true;
++            }
++
++            result = default(TResult);
++            return false;
++        }
++
++        /// <summary>
++        /// Used as the T in a "conversion" of a Task into a Task{T}
++        /// </summary>
++        private struct AsyncVoid
++        {
++        }
++    }
++
++    internal abstract class CatchInfoBase<TTask>
++        where TTask : Task
++    {
++        private Exception _exception;
++        private TTask _task;
++
++        protected CatchInfoBase(TTask task)
++        {
++            Contract.Assert(task != null);
++            _task = task;
++            _exception = _task.Exception.GetBaseException();  // Observe the exception early, to prevent tasks tearing down the app domain
++        }
++
++        /// <summary>
++        /// The exception that was thrown to cause the Catch block to execute.
++        /// </summary>
++        public Exception Exception
++        {
++            get { return _exception; }
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that re-throws the original exception.
++        /// </summary>
++        public CatchResult Throw()
++        {
++            return new CatchResult { Task = _task };
++        }
++
++        /// <summary>
++        /// Represents a result to be returned from a Catch handler.
++        /// </summary>
++        internal struct CatchResult
++        {
++            /// <summary>
++            /// Gets or sets the task to be returned to the caller.
++            /// </summary>
++            internal TTask Task { get; set; }
++        }
++    }
++
++    internal class CatchInfo : CatchInfoBase<Task>
++    {
++        private static CatchResult _completed = new CatchResult { Task = TaskHelpers.Completed() };
++
++        public CatchInfo(Task task)
++            : base(task)
++        {
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that returns a completed (non-faulted) task.
++        /// </summary>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Handled()
++        {
++            return _completed;
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
++        /// </summary>
++        /// <param name="task">The task to return.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Task(Task task)
++        {
++            return new CatchResult { Task = task };
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that throws the given exception.
++        /// </summary>
++        /// <param name="ex">The exception to throw.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Throw(Exception ex)
++        {
++            return new CatchResult { Task = TaskHelpers.FromError<object>(ex) };
++        }
++    }
++
++    internal class CatchInfo<T> : CatchInfoBase<Task<T>>
++    {
++        public CatchInfo(Task<T> task)
++            : base(task)
++        {
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that returns a completed (non-faulted) task.
++        /// </summary>
++        /// <param name="returnValue">The return value of the task.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Handled(T returnValue)
++        {
++            return new CatchResult { Task = TaskHelpers.FromResult(returnValue) };
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that executes the given task and returns it, in whatever state it finishes.
++        /// </summary>
++        /// <param name="task">The task to return.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Task(Task<T> task)
++        {
++            return new CatchResult { Task = task };
++        }
++
++        /// <summary>
++        /// Returns a CatchResult that throws the given exception.
++        /// </summary>
++        /// <param name="ex">The exception to throw.</param>
++        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "This would result in poor usability.")]
++        public CatchResult Throw(Exception ex)
++        {
++            return new CatchResult { Task = TaskHelpers.FromError<T>(ex) };
++        }
++    }
++}
+diff --git a/packages/WebAPIContrib.0.9.14.0/WebAPIContrib.0.9.14.0.nupkg b/packages/WebAPIContrib.0.9.14.0/WebAPIContrib.0.9.14.0.nupkg
+new file mode 100644
+index 0000000..3d6c358
+Binary files /dev/null and b/packages/WebAPIContrib.0.9.14.0/WebAPIContrib.0.9.14.0.nupkg differ
+diff --git a/packages/WebAPIContrib.0.9.14.0/WebAPIContrib.0.9.14.0.nuspec b/packages/WebAPIContrib.0.9.14.0/WebAPIContrib.0.9.14.0.nuspec
+new file mode 100644
+index 0000000..761a65e
+--- /dev/null
++++ b/packages/WebAPIContrib.0.9.14.0/WebAPIContrib.0.9.14.0.nuspec
+@@ -0,0 +1,23 @@
++<?xml version="1.0"?>
++<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
++  <metadata>
++    <id>WebAPIContrib</id>
++    <version>0.9.14.0</version>
++    <title>WebApiContrib</title>
++    <authors>WebApiContrib Contributors</authors>
++    <owners>WebApiContrib Contributors</owners>
++    <licenseUrl>https://raw.github.com/WebApiContrib/WebApiContrib/master/LICENSE.txt</licenseUrl>
++    <projectUrl>https://github.com/WebApiContrib/WebApiContrib</projectUrl>
++    <iconUrl>https://2.gravatar.com/avatar/f1ad1241dfb26dcb97abfeb8375a5971?s=128</iconUrl>
++    <requireLicenseAcceptance>false</requireLicenseAcceptance>
++    <description>Community Contributions for ASP.NET Web API</description>
++    <releaseNotes />
++    <copyright>Copyright © WebApiContrib 2012 - 2013</copyright>
++    <language />
++    <tags>webapi webapicontrib extensions</tags>
++    <dependencies>
++      <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20710.0" />
++      <dependency id="TaskHelpers.Sources" version="0.1" />
++    </dependencies>
++  </metadata>
++</package>
+\ No newline at end of file
+diff --git a/packages/WebAPIContrib.0.9.14.0/lib/net40/WebApiContrib.dll b/packages/WebAPIContrib.0.9.14.0/lib/net40/WebApiContrib.dll
+new file mode 100644
+index 0000000..00dda17
+Binary files /dev/null and b/packages/WebAPIContrib.0.9.14.0/lib/net40/WebApiContrib.dll differ
+diff --git a/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/WebApiContrib.IoC.StructureMap.0.9.5.0.nupkg b/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/WebApiContrib.IoC.StructureMap.0.9.5.0.nupkg
+new file mode 100644
+index 0000000..590bdae
+Binary files /dev/null and b/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/WebApiContrib.IoC.StructureMap.0.9.5.0.nupkg differ
+diff --git a/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/WebApiContrib.IoC.StructureMap.0.9.5.0.nuspec b/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/WebApiContrib.IoC.StructureMap.0.9.5.0.nuspec
+new file mode 100644
+index 0000000..baf4aca
+--- /dev/null
++++ b/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/WebApiContrib.IoC.StructureMap.0.9.5.0.nuspec
+@@ -0,0 +1,23 @@
++<?xml version="1.0"?>
++<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
++  <metadata>
++    <id>WebApiContrib.IoC.StructureMap</id>
++    <version>0.9.5.0</version>
++    <title>WebApiContrib.IoC.StructureMap</title>
++    <authors>WebApiContrib Contributors</authors>
++    <owners>WebApiContrib Contributors</owners>
++    <licenseUrl>https://raw.github.com/WebApiContrib/WebApiContrib.IoC.StructureMap/master/LICENSE.txt</licenseUrl>
++    <projectUrl>https://github.com/WebApiContrib/WebApiContrib.IoC.StructureMap</projectUrl>
++    <iconUrl>https://2.gravatar.com/avatar/f1ad1241dfb26dcb97abfeb8375a5971?s=128</iconUrl>
++    <requireLicenseAcceptance>false</requireLicenseAcceptance>
++    <description>The WebApiContrib.IoC.StructureMap library provides dependency injection helpers for ASP.NET Web API.</description>
++    <releaseNotes />
++    <copyright>Copyright © WebApiContrib 2012 - 2013</copyright>
++    <language />
++    <tags>webapi webapicontrib structuremap ioc</tags>
++    <dependencies>
++      <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20710.0" />
++      <dependency id="structuremap" version="2.6.4.1" />
++    </dependencies>
++  </metadata>
++</package>
+\ No newline at end of file
+diff --git a/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/lib/net40/WebApiContrib.IoC.StructureMap.dll b/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/lib/net40/WebApiContrib.IoC.StructureMap.dll
+new file mode 100644
+index 0000000..19bfe40
+Binary files /dev/null and b/packages/WebApiContrib.IoC.StructureMap.0.9.5.0/lib/net40/WebApiContrib.IoC.StructureMap.dll differ

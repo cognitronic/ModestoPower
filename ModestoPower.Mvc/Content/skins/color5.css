@@ -1,0 +1,28 @@
+
+a.btn,.progress-bar,.ny_nav,.ny_nav.grey li.active a:after, .ny_nav.grey li:hover a:after, .ny_nav.dark li.active a:after, .ny_nav.dark li:hover a:after, .ny_nav.white li.active a:after, .ny_nav.white li:hover a:after,
+.navmenu-default .navmenu-nav > .active > a, .navmenu-default .navmenu-nav > .active > a:hover, .navmenu-default .navmenu-nav > .active > a:focus,
+#ny_smallNav .nav a:hover,.navbar-default,.dropdown-menu li.active a, .dropdown-menu a:hover, .dropdown-menu a:focus, .dropdown-menu li.active a:hover, .dropdown-menu li.active a:focus
+,#home h1:after,.service-icon,.service-content li:before,.project:hover .project-content,.project.style4 .project-content,.slider-nav:after,
+.carousel-indicators li.active, .flex-control-paging li a.flex-active, .flex-control-paging li a:hover, .flex-control-paging li a:focus,
+.feature-icon,.shortcodes h1:after,.pricing-column a,#pricing .style2 .column-head:before,#pricing .style3 .pricing-column.pricing-orange a,
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus,
+.hiring-form,.hiring-form input, .hiring-form select,#getintouch button{
+	background-color:#FFB628 !important;
+}
+
+.service.style3 .service-icon,{
+	border-color:#FFB628;
+}
+
+.dropdown-submenu:hover>a:after,.panel-title > a {
+	border-left-color: #FFB628;
+}
+
+
+h3, h4,.counters h3,.progress-wrapper h6,.ny_nav.style2 li.active a, .ny_nav.style2 li a:hover, .ny_nav.style2 li.active a:focus,
+#home h5, #promo h5,.home-nav li,.home-nav li a,#services h4 span,#team h6,.record span,.portfolio-filter li:focus,.folio-body h6,.folio-feedback h2,
+.folio-sidebar a,.client-feedback h3,.star-list,.client-feedback h6 a,a.client-ref span,.column-head .price-tag,
+.pricing-column li,#pricing .style3 .pricing-column.pricing-orange .price-tag, #pricing .style3 .pricing-column.pricing-orange .pricing-info h3,
+.accordion-style2 .panel-title > a > i.hiring-form button,#contact h6 span,.social li:hover i,footer a, footer a:hover,.hiring-form button{
+	color:#FFB628;
+}
