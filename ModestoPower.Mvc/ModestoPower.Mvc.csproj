@@ -134,13 +134,20 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\About\" />
+    <Folder Include="Views\Blog\" />
+    <Folder Include="Views\Contact\" />
+    <Folder Include="Views\Gallery\" />
+    <Folder Include="Views\Instructors\" />
+    <Folder Include="Views\Programs\" />
+    <Folder Include="Views\Schedule\" />
+    <Folder Include="Views\Tutorials\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\StructuremapMvc.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DependencyResolution\IoC.cs" />
     <Compile Include="DependencyResolution\StructureMapDependencyResolver.cs" />
     <Compile Include="DependencyResolution\StructureMapDependencyScope.cs" />
