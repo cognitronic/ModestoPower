@@ -184,7 +184,6 @@ C:\Projects\ModestoPower\RAM.Services\bin\Debug\Hammock.pdb
 C:\Projects\ModestoPower\RAM.Services\bin\Debug\Hammock.ClientProfile.pdb
 C:\Projects\ModestoPower\RAM.Services\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
 C:\Projects\ModestoPower\RAM.Services\bin\Debug\Microsoft.Practices.ServiceLocation.xml
-C:\Projects\ModestoPower\RAM.Services\bin\Debug\Newtonsoft.Json.xml
 C:\Projects\ModestoPower\RAM.Services\bin\Debug\StructureMap.pdb
 C:\Projects\ModestoPower\RAM.Services\bin\Debug\StructureMap.xml
 C:\Projects\ModestoPower\RAM.Services\bin\Debug\System.Net.Http.Formatting.xml
@@ -194,3 +193,4 @@ C:\Projects\ModestoPower\RAM.Services\bin\Debug\log4net.xml
 C:\Projects\ModestoPower\RAM.Services\obj\Debug\RAM.Services.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Services\obj\Debug\RAM.Services.dll
 C:\Projects\ModestoPower\RAM.Services\obj\Debug\RAM.Services.pdb
+C:\Projects\ModestoPower\RAM.Services\bin\Debug\Couchbase.AspNet.dll

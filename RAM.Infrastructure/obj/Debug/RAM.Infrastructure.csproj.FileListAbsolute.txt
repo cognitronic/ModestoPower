@@ -34,3 +34,14 @@ C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\bin\Debug\log4net.xml
 C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.dll
 C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.pdb
 C:\Projects\AlkireConstruction\RAM\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.csprojResolveAssemblyReference.cache
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\RAM.Infrastructure.dll
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\RAM.Infrastructure.pdb
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Core.dll
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Web.dll
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\log4net.dll
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Core.pdb
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\IdeaSeed.Web.pdb
+C:\Projects\ModestoPower\RAM.Infrastructure\bin\Debug\log4net.xml
+C:\Projects\ModestoPower\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.csprojResolveAssemblyReference.cache
+C:\Projects\ModestoPower\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.dll
+C:\Projects\ModestoPower\RAM.Infrastructure\obj\Debug\RAM.Infrastructure.pdb

@@ -50,7 +50,6 @@ C:\Projects\ModestoPower\RAM.Core\bin\Debug\Newtonsoft.Json.dll
 C:\Projects\ModestoPower\RAM.Core\bin\Debug\RAM.Infrastructure.dll
 C:\Projects\ModestoPower\RAM.Core\bin\Debug\log4net.dll
 C:\Projects\ModestoPower\RAM.Core\bin\Debug\RAM.Infrastructure.pdb
-C:\Projects\ModestoPower\RAM.Core\bin\Debug\Newtonsoft.Json.xml
 C:\Projects\ModestoPower\RAM.Core\bin\Debug\log4net.xml
 C:\Projects\ModestoPower\RAM.Core\obj\Debug\RAM.Core.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Core\obj\Debug\RAM.Core.dll

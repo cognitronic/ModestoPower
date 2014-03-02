@@ -182,7 +182,6 @@ C:\Projects\ModestoPower\RAM.Web\bin\Debug\IdeaSeed.Core.pdb
 C:\Projects\ModestoPower\RAM.Web\bin\Debug\IdeaSeed.Web.pdb
 C:\Projects\ModestoPower\RAM.Web\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
 C:\Projects\ModestoPower\RAM.Web\bin\Debug\Microsoft.Practices.ServiceLocation.xml
-C:\Projects\ModestoPower\RAM.Web\bin\Debug\Newtonsoft.Json.xml
 C:\Projects\ModestoPower\RAM.Web\bin\Debug\StructureMap.pdb
 C:\Projects\ModestoPower\RAM.Web\bin\Debug\StructureMap.xml
 C:\Projects\ModestoPower\RAM.Web\bin\Debug\System.Net.Http.Formatting.xml

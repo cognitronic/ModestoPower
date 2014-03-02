@@ -71,3 +71,6 @@ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Couchbase.xml
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Enyim.Caching.pdb
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Enyim.Caching.xml
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Iesi.Collections.xml
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\WebApiContrib.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\WebApiContrib.IoC.StructureMap.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Couchbase.AspNet.dll

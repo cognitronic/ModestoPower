@@ -7,7 +7,7 @@
     <ProjectGuid>{318913D4-209C-454E-90C2-366AD973E701}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RAM.Infrastructure</RootNamespace>
+    <RootNamespace>ModestoPower.Infrastructure</RootNamespace>
     <AssemblyName>RAM.Infrastructure</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

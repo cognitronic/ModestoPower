@@ -39,11 +39,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IdeaSeed.Core">
-      <HintPath>..\References\IdeaSeed.Core.dll</HintPath>
+    <Reference Include="Couchbase, Version=1.1.6.0, Culture=neutral, PublicKeyToken=05e9c6b5a9ec94c2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Couchbase.dll</HintPath>
     </Reference>
-    <Reference Include="IdeaSeed.Web">
-      <HintPath>..\References\IdeaSeed.Web.dll</HintPath>
+    <Reference Include="Couchbase.AspNet">
+      <HintPath>..\References\Couchbase.AspNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching, Version=2.12.0.0, Culture=neutral, PublicKeyToken=05e9c6b5a9ec94c2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Enyim.Caching.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Practices.ServiceLocation">
@@ -122,6 +127,12 @@
     <Reference Include="WebActivator">
       <HintPath>..\packages\WebActivator.1.5.3\lib\net40\WebActivator.dll</HintPath>
     </Reference>
+    <Reference Include="WebApiContrib">
+      <HintPath>..\packages\WebApiContrib.0.9.14.0\lib\net40\WebApiContrib.dll</HintPath>
+    </Reference>
+    <Reference Include="WebApiContrib.IoC.StructureMap">
+      <HintPath>..\packages\WebApiContrib.IoC.StructureMap.0.9.5.0\lib\net40\WebApiContrib.IoC.StructureMap.dll</HintPath>
+    </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -144,10 +155,15 @@
     <Folder Include="Views\Tutorials\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
+    <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpersExtensions.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\GenericModelBinder.cs" />
+    <Compile Include="App_Start\HyphenatedRouteHandler.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\StructuremapMvc.cs" />
+    <Compile Include="BootStrapper.cs" />
     <Compile Include="DependencyResolution\IoC.cs" />
     <Compile Include="DependencyResolution\StructureMapDependencyResolver.cs" />
     <Compile Include="DependencyResolution\StructureMapDependencyScope.cs" />

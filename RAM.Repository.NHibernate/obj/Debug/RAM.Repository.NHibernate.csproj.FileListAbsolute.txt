@@ -90,7 +90,6 @@ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\RAM.Infrastructure.
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\FluentNHibernate.xml
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\Iesi.Collections.xml
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\log4net.xml
-C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\Newtonsoft.Json.xml
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\NHibernate.xml
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.dll
