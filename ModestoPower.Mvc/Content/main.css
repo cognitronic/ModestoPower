@@ -2723,8 +2723,6 @@ a.collapsed {
 	width: 225px;
 }
 #email {
-	width: 325px;
-	border-bottom: 1px solid #000;
 }
 .hiring-form button {
 	background: #fff;
@@ -3424,3 +3422,8 @@ footer .text-right {
 }
 
 
+.interested
+{
+    line-height: 35px;
+    padding: 25px 0px; 
+}
