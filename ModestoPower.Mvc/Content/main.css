@@ -2003,11 +2003,11 @@ body .modal {
 	height: 100%;
 	width: 100%;
 	background: #2e2c2c;
-	opacity: .95;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=95)";
-	filter: alpha(opacity==95);
-	-moz-opacity: 0.95;
-	-khtml-opacity: 0.95;
+	opacity: .75;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+	filter: alpha(opacity==75);
+	-moz-opacity: 0.75;
+	-khtml-opacity: 0.75;
 }
 #testimonial .testi-inner {
 	position: relative;
@@ -2030,7 +2030,7 @@ a.client-ref span {
 	color: #ff5628;
 }
 .testimonial-parallax {
-	background-image: url(../images/BG/testimonial.jpg);
+	background-image: url(../images/BG/testimonials_px.png);
 	background-repeat: repeat;
 }
 .clients {
