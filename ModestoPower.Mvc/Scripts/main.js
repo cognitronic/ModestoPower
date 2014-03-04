@@ -52,6 +52,7 @@
 
     $('.parallax-one').parallax("50%", 0.4);
     $('.parallax-two').parallax("50%", 0.4);
+    $('.parallax-customer').parallax("50%", 0.4);
     $('.hero-parallax').parallax("50%", 0.4);
     $('.testimonial-parallax').parallax("50%", 0.3);
     $('.facts-parallax').parallax("50%", 0.3);
