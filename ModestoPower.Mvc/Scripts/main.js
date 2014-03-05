@@ -155,9 +155,9 @@
     /*=================================
 	5-Natural Language Form
 	=================================*/
-    if ($('#hire-us').length) {
-        var hireusForm = new NLForm(document.getElementById('nl-form'));
-    }
+    //if ($('#hire-us').length) {
+    //    var hireusForm = new NLForm(document.getElementById('nl-form'));
+    //}
 
 
     /*=======================================
