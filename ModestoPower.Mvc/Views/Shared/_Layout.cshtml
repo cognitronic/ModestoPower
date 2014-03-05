@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Modesto Power</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
 </head>
 <body data-spy="scroll" data-target="#sticktop" data-offset="100">
@@ -112,11 +112,11 @@
         </div>
     </footer>
 
+    @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/angular")
     @Scripts.Render("~/bundles/mp")
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     @RenderSection("scripts", required: false)
     <script>
         $(window).load(function () {

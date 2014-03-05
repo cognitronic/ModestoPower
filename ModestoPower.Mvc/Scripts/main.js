@@ -180,16 +180,16 @@
 
 
 
-    var wTop = 0,
-        wHeight = $(document).height(),
-        navHeight = $('.navContent').height();
-    scrollAblepixels = wHeight - navHeight;
-    $(window).scroll(function () {
-        wTop = $(window).scrollTop();
-        if (wTop <= scrollAblepixels) {
-            $('.navContent').css('top', wTop + 'px');
-        }
-    });
+    //var wTop = 0,
+    //    wHeight = $(document).height(),
+    //    navHeight = $('.navContent').height();
+    //scrollAblepixels = wHeight - navHeight;
+    //$(window).scroll(function () {
+    //    wTop = $(window).scrollTop();
+    //    if (wTop <= scrollAblepixels) {
+    //        $('.navContent').css('top', wTop + 'px');
+    //    }
+    //});
 
 
     function EasyPeasyParallax() {
@@ -333,13 +333,13 @@
             branch_office = 'contact-map2',
             mapAddress = $('#contact-map').data('address'),
             mapType = $('#contact-map').data('maptype'),
-            zoomLvl = $('#contact-map').data('zoomlvl'),
+            zoomLvl = $('#contact-map').data('zoomlvl');
 
-        mapAddress2 = $('#contact-map2').data('address'),
-        mapType2 = $('#contact-map2').data('maptype'),
-        zoomLvl2 = $('#contact-map2').data('zoomlvl');
+        //mapAddress2 = $('#contact-map2').data('address'),
+        //mapType2 = $('#contact-map2').data('maptype'),
+        //zoomLvl2 = $('#contact-map2').data('zoomlvl');
         contactemaps(main_office, mapAddress, mapType, zoomLvl);
-        contactemaps(branch_office, mapAddress2, mapType2, zoomLvl2);
+        //contactemaps(branch_office, mapAddress2, mapType2, zoomLvl2);
 
     }
 
@@ -350,7 +350,7 @@
             draggable: false,
             zoom: zoom_lvl,
         });
-        var map_pin = "assets/img/basic/pin.png";
+        var map_pin = "/images/basic/pin.png";
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({
                 'address': address
@@ -440,12 +440,13 @@
 	11- Animations
 	=========================================*/
 	
-	
+
+    
 	
     if (testMobile === null) {
-		
-		$('.about-mockup').bind('inview', function (event, visible) {
-			if (visible === true) {
+        console.log(testMobile === null);
+        $('.about-mockup').bind('inview', function (event, visible) {
+            if (visible === true) {
 				$(this).addClass('fadeInUp animated').css('opacity','1');
 			}
 		});
@@ -499,7 +500,8 @@
 		});
 	
 	}else{
-		$('.stat,.about-mockup,.service,.team-visual,.member,.projects,.about-mockup-wide,.g-map,#getintouch .container,.feature').addClass('no-animation');
+        $('.stat,.about-mockup,.service,.team-visual,.member,.projects,.about-mockup-wide,.g-map,#getintouch .container,.feature').addClass('no-animation');
+        console.log('fuck');
 	}
 	
 	$('.stat').bind('inview', function (event, visible) {
