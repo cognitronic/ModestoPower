@@ -146,14 +146,10 @@
     <Folder Include="App_Data\" />
     <Folder Include="images\users\" />
     <Folder Include="Models\" />
-    <Folder Include="Views\About\" />
     <Folder Include="Views\Blog\" />
-    <Folder Include="Views\Contact\" />
     <Folder Include="Views\Gallery\" />
-    <Folder Include="Views\Instructors\" />
     <Folder Include="Views\Programs\" />
     <Folder Include="Views\Schedule\" />
-    <Folder Include="Views\Tutorials\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
@@ -208,6 +204,7 @@
     <Content Include="images\basic\eye.png" />
     <Content Include="images\basic\grid.png" />
     <Content Include="images\basic\heart.png" />
+    <Content Include="images\basic\IMG_0535.JPG" />
     <Content Include="images\basic\iphone-mockup.png" />
     <Content Include="images\basic\loading.GIF" />
     <Content Include="images\basic\loading2.GIF" />
@@ -697,6 +694,13 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Scripts\version.json" />
+    <Content Include="Views\About\Index.cshtml" />
+    <Content Include="Views\About\Community.cshtml" />
+    <Content Include="Views\About\History.cshtml" />
+    <Content Include="Views\Contact\Index.cshtml" />
+    <Content Include="Views\Instructors\Index.cshtml" />
+    <Content Include="Views\Instructors\_InstructorProfile.cshtml" />
+    <Content Include="Views\Tutorials\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Controllers\RAM.Controllers.csproj">
