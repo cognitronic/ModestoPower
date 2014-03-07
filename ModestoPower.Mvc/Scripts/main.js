@@ -278,7 +278,7 @@
 		$('.navbar-nav li').removeClass('active');
         $(this).parent().addClass('active');
         $('html, body').animate({
-            scrollTop: $($.attr(this, 'href')).offset().top - 20
+            scrollTop: $($.attr(this, 'href')).offset().top - 0
         }, 1500,'easeInOutExpo');
         return false;
     });
@@ -443,7 +443,6 @@
     
 	
     if (testMobile === null) {
-        console.log(testMobile === null);
         $('.about-mockup').bind('inview', function (event, visible) {
             if (visible === true) {
 				$(this).addClass('fadeInUp animated').css('opacity','1');

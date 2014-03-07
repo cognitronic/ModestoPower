@@ -45,7 +45,7 @@ ul {
 h3, h4 {
 	font-size: 33px;
 	line-height: 50px;
-	color: #ff5628;
+	color: #ed1c24;
 	font-weight: 300;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -59,13 +59,13 @@ p {
 	font-weight: 300;
 }
 a.btn {
-	background: #ff5628;
+	background: #ed1c24;
 	color: #fff;
 	text-decoration: none;
 	text-transform: uppercase;
 	font-weight: 900;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 16px;
+	font-size: 21px;
 	padding: 11px 32px;
 	position: relative;
 	border: none;
@@ -224,7 +224,7 @@ h2:after {
 .counters h3 {
 	font-size: 20px;
 	line-height: 25px;
-	color: #ff5628;
+	color: #ed1c24;
 	font-weight: bold;
 	text-transform: uppercase;
 	margin-bottom: 60px;
@@ -252,7 +252,7 @@ h2:after {
 .progress-wrapper h6 {
 	float: right;
 	font-size: 16px;
-	color: #ff5628;
+	color: #ed1c24;
 	line-height: 30px;
 	position: absolute;
 	right: 0;
@@ -269,7 +269,7 @@ h2:after {
 	color: #999999;
 }
 .progress-bar {
-	background: #ff5628;
+	background: #ed1c24;
 }
 /*==================
 2-Custom navigation
@@ -281,7 +281,7 @@ h2:after {
 	position: relative;
 }
 .ny_nav {
-	background: #ff5628;
+	background: #ed1c24;
 	height: 80px;
 	width: 100%;
 	padding-left: 30px;
@@ -359,7 +359,7 @@ h2:after {
 	content: '';
 }
 .ny_nav.grey li.active a:after, .ny_nav.grey li:hover a:after, .ny_nav.dark li.active a:after, .ny_nav.dark li:hover a:after, .ny_nav.white li.active a:after, .ny_nav.white li:hover a:after {
-	background: #ff5628;
+	background: #ed1c24;
 }
 .navContent {
 	position: relative;
@@ -382,10 +382,10 @@ h2:after {
 	border: none;
 }
 .navmenu-default .navmenu-nav > .active > a, .navmenu-default .navmenu-nav > .active > a:hover, .navmenu-default .navmenu-nav > .active > a:focus {
-	background: #ff5628;
+	background: #ed1c24;
 }
 #ny_smallNav .nav a:hover {
-	background: #ff5628;
+	background: #ed1c24;
 }
 .ny_nav.style2 .nav {
 	float: none;
@@ -411,7 +411,7 @@ h2:after {
 	display: none;
 }
 .ny_nav.style2 li.active a, .ny_nav.style2 li a:hover, .ny_nav.style2 li.active a:focus {
-	color: #ff5628;
+	color: #ed1c24;
 }
 .ny_nav li.dropdown:hover .dropdown-menu {
 	display: block;
@@ -589,7 +589,7 @@ a.navbar-brand img {
 	display: block;
 }
 .dropdown-menu li.active a, .dropdown-menu a:hover, .dropdown-menu a:focus, .dropdown-menu li.active a:hover, .dropdown-menu li.active a:focus {
-	background: #ff5628 !important;
+	background: #ed1c24 !important;
 	color: #fff;
 }
 #XV-lamp {
@@ -635,7 +635,7 @@ a.navbar-brand img {
 	margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-	border-left-color: #ff5628;
+	border-left-color: #ed1c24;
 }
 .dropdown-submenu.pull-left {
 	float: none;
@@ -743,7 +743,7 @@ a.navbar-brand img {
 #home h5, #promo h5, #customer h5 {
 	font-size: 44px;
 	line-height: 25px;
-	color: #ff5628;
+	color: #ed1c24;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-weight: 300;
 	margin-bottom: -22px;
@@ -769,7 +769,7 @@ a.navbar-brand img {
 	margin-left: -46px;
 	width: 92px;
 	height: 2px;
-	background: #ff5628;
+	background: #ed1c24;
 }
 #home .logo {
 	margin-bottom: 60px;
@@ -778,12 +778,12 @@ a.navbar-brand img {
 	display: inline-block;
 	font-size: 16px;
 	line-height: 25px;
-	color: #ff5628;
+	color: #ed1c24;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-weight: bold;
 }
 .home-nav li a {
-	color: #ff5628;
+	color: #ed1c24;
 	text-decoration: none;
 	margin-bottom: 60px;
 }
@@ -836,7 +836,7 @@ a.navbar-brand img {
    =========================== */
 #about {
 	position: relative;
-	padding-top: 90px;
+	padding-top: 45px;
 	background: #fff;
 	overflow: hidden;
 }
@@ -913,7 +913,7 @@ a.navbar-brand img {
 	margin-top: 16px;
 }
 #services h4 span {
-	color: #ff5628;
+	color: #ed1c24;
 }
 .service {
 	border: 1px solid #e1e1e1;
@@ -949,7 +949,7 @@ a.navbar-brand img {
 	height: 100px;
 	width: 100px;
 	border-radius: 50%;
-	background: #ff5628;
+	background: #ed1c24;
 	margin-left: auto;
 	margin-right: auto;
 	padding-top: 22px;
@@ -980,7 +980,7 @@ a.navbar-brand img {
 }
 .service.style3 .service-icon {
 	background: none;
-	border: 1px solid #ff5628;
+	border: 1px solid #ed1c24;
 }
 .service-icon span {
 	margin: 0 auto;
@@ -1019,7 +1019,7 @@ a.navbar-brand img {
 	margin-top: -1px;
 	width: 10px;
 	height: 2px;
-	background: #ff5628;
+	background: #ed1c24;
 }
 .service-content li:last-child {
 	border: none;
@@ -1097,7 +1097,7 @@ a.navbar-brand img {
 }
 #team h6 {
 	font-size: 16px;
-	color: #ff5628;
+	color: #ed1c24;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-transform: capitalize;
 	position: relative;
@@ -1230,7 +1230,7 @@ a.navbar-brand img {
 	margin-top: 35px;
 }
 .record span {
-	color: #ff5628;
+	color: #ed1c24;
 	font-size: 42px;
 	line-height: 65px;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1494,7 +1494,7 @@ a.visit {
 	height: 100%;
 }
 .project:hover .project-content {
-	background: #ff5628;
+	background: #ed1c24;
 }
 a.pop-project {
 	color: #000;
@@ -1536,7 +1536,7 @@ a.pop-project {
 	cursor: pointer;
 }
 .portfolio-filter li:focus {
-	color: #ff5628;
+	color: #ed1c24;
 }
 .portfolio-filter li {
 	font-size: 20px;
@@ -1610,7 +1610,7 @@ a.pop-project {
 	bottom: -50%;
 	padding: 0;
 	width: 100%;
-	background: #ff5628;
+	background: #ed1c24;
 	padding: 20px;
 	-webkit-transition: all 0.4s ease-in-out;
 	-moz-transition: all 0.4s ease-in-out;
@@ -1712,7 +1712,7 @@ ul.icons-list li {
 	font-size: 20px;
 	line-height: 25px;
 	font-weight: bold;
-	color: #ff5628;
+	color: #ed1c24;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-transform: uppercase;
 	padding-bottom: 5px;
@@ -1743,7 +1743,7 @@ ul.icons-list li {
 	font-size: 20px;
 	line-height: 25px;
 	font-weight: bold;
-	color: #ff5628;
+	color: #ed1c24;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-transform: uppercase;
 	padding-top: 50px;
@@ -1757,7 +1757,7 @@ ul.icons-list li {
 	font-size: 18px;
 	line-height: 22px;
 	font-weight: 300;
-	color: #ff5628;
+	color: #ed1c24;
 	text-decoration: none;
 }
 .folio-sidebar a span {
@@ -1802,7 +1802,7 @@ ul.icons-list li {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 20px;
 	line-height: 25px;
-	color: #ff5628;
+	color: #ed1c24;
 	font-weight: bold;
 	text-transform: uppercase;
 	margin-top: 10px;
@@ -1820,7 +1820,7 @@ ul.icons-list li {
 .star-list {
 	padding: 0;
 	text-align: center;
-	color: #ff5628;
+	color: #ed1c24;
 	font-size: 14px;
 }
 .star-list li {
@@ -1844,7 +1844,7 @@ ul.icons-list li {
 	text-transform: none;
 }
 .client-feedback h6 a {
-	color: #ff5628;
+	color: #ed1c24;
 }
 #ajax-page {
 	background: #fff;
@@ -1924,7 +1924,7 @@ ul.icons-list li {
 .slider-nav:after {
 	width: 70px;
 	height: 1px;
-	background: #ff5628;
+	background: #ed1c24;
 	content: '';
 	position: absolute;
 	left: 50%;
@@ -1944,7 +1944,7 @@ ul.icons-list li {
 	border: none;
 }
 .carousel-indicators li.active, .flex-control-paging li a.flex-active, .flex-control-paging li a:hover, .flex-control-paging li a:focus {
-	background: #ff5628;
+	background: #ed1c24;
 }
 #ajax-page .carousel-inner {
 	margin-bottom: 40px;
@@ -2028,7 +2028,7 @@ a.client-ref {
 	margin-bottom: 10px;
 }
 a.client-ref span {
-	color: #ff5628;
+	color: #ed1c24;
 }
 .testimonial-parallax {
 	background-image: url(../images/BG/testimonials_px.png);
@@ -2152,7 +2152,7 @@ a.client-ref span {
 .feature-icon {
 	height: 100px;
 	width: 100px;
-	background: #ff5628;
+	background: #ed1c24;
 	float: left;
 	padding-top: 24px;
 	border-radius: 50%;
@@ -2201,7 +2201,7 @@ a.client-ref span {
 }
 .shortcodes h1:after {
 	content: '';
-	background: #ff5628;
+	background: #ed1c24;
 	width: 70px;
 	height: 2px;
 	margin-left: -35px;
@@ -2244,7 +2244,7 @@ a.client-ref span {
 .column-head .price-tag {
 	font-size: 18px;
 	line-height: 29px;
-	color: #ff5628;
+	color: #ed1c24;
 }
 .pricing-info {
 	padding: 20px 16px 27px;
@@ -2298,7 +2298,7 @@ a.client-ref span {
 .pricing-column li {
 	font-size: 14px;
 	line-height: 40px;
-	color: #ff5628;
+	color: #ed1c24;
 	border-bottom: 1px dashed #cdcfcf;
 	display: block;
 }
@@ -2306,7 +2306,7 @@ a.client-ref span {
 	border: none;
 }
 .pricing-column a {
-	background: #ff5628;
+	background: #ed1c24;
 	color: #fff;
 	text-transform: capitalize;
 	margin-top: 25px;
@@ -2341,7 +2341,7 @@ a.client-ref span {
 	position: absolute;
 	height: 66px;
 	width: 2px;
-	background: #ff5628;
+	background: #ed1c24;
 	top: 50%;
 	left: 0;
 	margin-top: -33px;
@@ -2393,10 +2393,10 @@ a.client-ref span {
 	background: #ffa800;
 }
 #pricing .style3 .pricing-column.pricing-orange .price-tag, #pricing .style3 .pricing-column.pricing-orange .pricing-info h3 {
-	color: #ff5628;
+	color: #ed1c24;
 }
 #pricing .style3 .pricing-column.pricing-orange a {
-	background: #ff5628;
+	background: #ed1c24;
 }
 /* ========================
    16-Tabs-accordion
@@ -2410,7 +2410,7 @@ a.client-ref span {
 	line-height: 20px;
 	color: #000000;
 	font-weight: 400;
-	border-left: 4px solid #ff5628;
+	border-left: 4px solid #ed1c24;
 	padding-left: 15px;
 	padding-right: 40px;
 	position: relative;
@@ -2428,7 +2428,7 @@ a.client-ref span {
 .accordion-style2 .panel-title > a > i {
 	font-size: 22px;
 	float: left;
-	color: #ff5628;
+	color: #ed1c24;
 }
 .title-text {
 	padding-left: 30px;
@@ -2527,7 +2527,7 @@ a.collapsed {
 	padding-right: 0 !important;
 }
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-	background: #ff5628;
+	background: #ed1c24;
 	color: #fff;
 }
 .tab-pane h3 {
@@ -2704,13 +2704,13 @@ a.collapsed {
 	font-weight: 300;
 }
 .hiring-form {
-	background: #ff5628;
+	background: #ed1c24;
 	padding-top: 45px;
 	padding-bottom: 61px;
 	margin-top: 70px;
 }
 .hiring-form input, .hiring-form select {
-	background: #ff5628;
+	background: #ed1c24;
 	border: none;
 	color: #000;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -2728,7 +2728,7 @@ a.collapsed {
 .hiring-form button {
 	background: #fff;
 	padding: 0 54px;
-	color: #ff5628;
+	color: #ed1c24;
 	text-transform: uppercase;
 	font-weight: 900;
 	font-size: 16px;
@@ -2797,7 +2797,7 @@ a.collapsed {
 	-moz-transition: all 0.3s ease-in-out;
 	-o-transition: all 0.3s ease-in-out;
 	transition: all 0.3s ease-in-out;
-	background: #ff5628;
+	background: #ed1c24;
 	padding: 10px 54px;
 	color: #fff;
 	text-transform: uppercase;
@@ -2815,6 +2815,8 @@ a.collapsed {
 	position: relative;
 	background: #f6f6f6;
 	padding-bottom: 82px;
+	padding-top: 90px;
+	overflow: hidden;
 }
 #valid-issue {
 	margin-top: 15px;
@@ -2857,7 +2859,7 @@ a.collapsed {
 	margin: 0;
 }
 #contact h6 span {
-	color: #ff5628;
+	color: #ed1c24;
 	text-transform: capitalize;
 }
 .contact-info {
@@ -2903,7 +2905,7 @@ a.collapsed {
 	transition: all 0.3s ease-in-out;
 }
 .social li:hover i {
-	color: #ff5628
+	color: #ed1c24
 }
 /* ============================
    23-Footer
@@ -2925,7 +2927,7 @@ footer h5, footer h6 {
 	margin: 0;
 }
 footer a, footer a:hover {
-	color: #ff5628;
+	color: #ed1c24;
 	text-decoration: none;
 }
 footer h6 {

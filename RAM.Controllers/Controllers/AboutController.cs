@@ -30,7 +30,7 @@ namespace RAM.Controllers.Controllers
         public ActionResult Index()
         {
             var view = new HomeView();
-            view.Posts = _blogService.GetLatestPosts(2);
+            //view.Posts = _blogService.GetLatestPosts(2);
             view.NavView.SelectedMenuItem = "nav-about";
             return View(view);
 
