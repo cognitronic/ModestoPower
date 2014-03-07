@@ -74,3 +74,11 @@ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Iesi.Collections.xml
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\WebApiContrib.dll
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\WebApiContrib.IoC.StructureMap.dll
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Couchbase.AspNet.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\RAM.Repository.Mongo.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\RAM.Repository.Mongo.pdb
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Bson.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Driver.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Web.dll
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Bson.xml
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Driver.xml
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Web.pdb

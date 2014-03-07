@@ -1,0 +1,15 @@
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\RAM.Repository.Mongo.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\RAM.Repository.Mongo.pdb
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\MongoDB.Bson.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\MongoDB.Driver.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\MongoDB.Web.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\RAM.Infrastructure.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\log4net.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\RAM.Infrastructure.pdb
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\MongoDB.Bson.xml
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\MongoDB.Driver.xml
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\MongoDB.Web.pdb
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\log4net.xml
+C:\Projects\ModestoPower\RAM.Repository.Mongo\obj\Debug\RAM.Repository.Mongo.csprojResolveAssemblyReference.cache
+C:\Projects\ModestoPower\RAM.Repository.Mongo\obj\Debug\RAM.Repository.Mongo.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\obj\Debug\RAM.Repository.Mongo.pdb

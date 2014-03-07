@@ -196,3 +196,5 @@ C:\Projects\ModestoPower\RAM.Web\bin\Debug\Enyim.Caching.xml
 C:\Projects\ModestoPower\RAM.Web\obj\Debug\RAM.Web.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Web\obj\Debug\RAM.Web.dll
 C:\Projects\ModestoPower\RAM.Web\obj\Debug\RAM.Web.pdb
+C:\Projects\ModestoPower\RAM.Web\bin\Debug\MongoDB.Web.dll
+C:\Projects\ModestoPower\RAM.Web\bin\Debug\MongoDB.Web.pdb
