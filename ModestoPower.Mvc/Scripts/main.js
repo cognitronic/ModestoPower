@@ -275,11 +275,10 @@
 
 
     $(".ny_nav ul a[href^='#'],.home-nav a[href^='#'],.navmenu-nav a[href^='#'],.scroller").click(function () {
-        
 		$('.navbar-nav li').removeClass('active');
         $(this).parent().addClass('active');
         $('html, body').animate({
-            scrollTop: $($.attr(this, 'href')).offset().top - 0
+            scrollTop: $($.attr(this, 'href')).offset().top - 20
         }, 1500,'easeInOutExpo');
         return false;
     });

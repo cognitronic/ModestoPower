@@ -836,8 +836,9 @@ a.navbar-brand img {
    =========================== */
 #about {
 	position: relative;
-	/*padding-top: 45px;*/
-	background: #ffffff;
+	padding-top: 90px;
+	background: #fff;
+	overflow: hidden;
 }
 .about-mockup-wide{
 	opacity:0;
@@ -934,10 +935,10 @@ a.navbar-brand img {
 	min-height: 100px;
 }
 .service-visual {
-	background: #fff;
+	background: #ed1c24;
 	text-align: center;
 	border-bottom: 1px solid #e1e1e1;
-	padding: 25px;
+	padding: 10px;
 }
 .service.style2 .service-visual, .service.style3 .service-visual, .service.style4 .service-visual, .service.style5 .service-visual {
 	border: none;
@@ -3356,20 +3357,23 @@ footer .text-right {
 }
 
 .cube1, .cube2 {
-  background-color:#FF5628;
-  width: 10px;
-  height: 10px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  
-  -webkit-animation: cubemove 1.8s infinite ease-in-out;
-  animation: cubemove 1.8s infinite ease-in-out;
+    background-color: #ed1c24;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-animation: cubemove 1.8s infinite ease-in-out;
+    -moz-animation: cubemove 1.8s infinite ease-in-out;
+    -o-animation: cubemove 1.8s infinite ease-in-out;
+    animation: cubemove 1.8s infinite ease-in-out;
 }
 
 .cube2 {
-  -webkit-animation-delay: -0.9s;
-  animation-delay: -0.9s;
+    -webkit-animation-delay: -0.9s;
+    -moz-animation-delay: -0.9s;
+    -o-animation-delay: -0.9s;
+    animation-delay: -0.9s;
 }
 
 @-webkit-keyframes cubemove {
@@ -3428,22 +3432,16 @@ footer .text-right {
     padding-botton: 25px; 
 }
 
-.blogcard 
-{
-    background-color:#fff; 
+#blog {
+	position: relative;
+	padding-top: 90px;
+	background: #fff;
+	overflow: hidden;
 }
 
-.blogcard h2
-{
-    
-}
-
-.blogcard h5
-{
-    
-}
-
-.blogcard img
-{
-    
+#programs {
+    position: relative;
+	padding-top: 90px;
+	background: #fff;
+	overflow: hidden;
 }
