@@ -30,8 +30,27 @@ namespace RAM.Controllers.Controllers
         public ActionResult Index()
         {
             var view = new HomeView();
-            //view.Posts = _blogService.GetLatestPosts(2);
-            view.NavView.SelectedMenuItem = "nav-about";
+            return View(view);
+
+        }
+
+        public ActionResult OurHistory()
+        {
+            var view = new HomeView();
+            return View(view);
+
+        }
+
+        public ActionResult CommunityOutreach()
+        {
+            var view = new HomeView();
+            return View(view);
+
+        }
+
+        public ActionResult MembershipInfo()
+        {
+            var view = new HomeView();
             return View(view);
 
         }

@@ -38,7 +38,6 @@ namespace RAM.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-home";
-            view.Posts = _blogService.GetLatestPosts(2);
             //Session.Add("_blog" + DateTime.Now.Ticks.ToString() + "_test", view.NavView.SelectedMenuItem);
             return View(view);
 
@@ -56,7 +55,6 @@ namespace RAM.Controllers.Controllers
         {
             HomeView accountView = new HomeView();
             accountView.NavView.SelectedMenuItem = "nav-home";
-            accountView.Banners = _bannerService.GetAll().BannerList;
             return PartialView("_Banners",accountView);
 
         }
@@ -65,7 +63,6 @@ namespace RAM.Controllers.Controllers
         {
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-home";
-            view.Projects = _projectService.GetAll().ProjectList.Take(10).ToList();
             return PartialView("_Portfolio", view);
 
         }

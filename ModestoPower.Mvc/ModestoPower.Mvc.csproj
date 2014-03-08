@@ -711,12 +711,13 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Scripts\version.json" />
     <Content Include="Views\About\Index.cshtml" />
-    <Content Include="Views\About\Community.cshtml" />
-    <Content Include="Views\About\History.cshtml" />
+    <Content Include="Views\About\CommunityOutreach.cshtml" />
+    <Content Include="Views\About\OurHistory.cshtml" />
     <Content Include="Views\Contact\Index.cshtml" />
     <Content Include="Views\Instructors\Index.cshtml" />
     <Content Include="Views\Instructors\_InstructorProfile.cshtml" />
     <Content Include="Views\Tutorials\Index.cshtml" />
+    <Content Include="Views\About\MembershipInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Controllers\RAM.Controllers.csproj">
