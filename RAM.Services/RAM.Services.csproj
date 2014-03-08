@@ -154,6 +154,8 @@
     <Compile Include="Messaging\UserService\GetUserResponse.cs" />
     <Compile Include="Messaging\UserService\GetValidUserResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\MongoDBOutputCacheProvider.cs" />
+    <Compile Include="Providers\MongoDBSessionStateProvider.cs" />
     <Compile Include="ViewModels\UserView.cs" />
   </ItemGroup>
   <ItemGroup>

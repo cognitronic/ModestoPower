@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MongoDB.Web.Providers;
+using RAM.Services.Providers;
 
 namespace RAM.Services.Cache
 {
@@ -13,7 +13,10 @@ namespace RAM.Services.Cache
 
         static MongoDBCacheAdapter()
         {
-            _instance = new MongoDBOutputCacheProvider();
+            var map = new System.Collections.Specialized.NameValueCollection();
+            map.Add("database", "ASPNETDB");
+            map.Add("collection", "OutputCache");
+            _instance = new MongoDBOutputCacheProvider("mongodb://localhost", map);
         }
 
         public static MongoDBOutputCacheProvider Instance { get { return _instance; } }
@@ -29,10 +32,17 @@ namespace RAM.Services.Cache
 
         public T Get<T>(string key)
         {
-            T itemStored = (T)Instance.Get(key);
-            if (itemStored == null)
-                itemStored = default(T);
-            return itemStored;
+            try
+            {
+                T itemStored = (T)Instance.Get(key);
+                if (itemStored == null)
+                    itemStored = default(T);
+                return itemStored;
+            }
+            catch (NullReferenceException exc)
+            {
+                return default(T);
+            }
         }
     }
 }

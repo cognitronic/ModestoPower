@@ -117,18 +117,18 @@ namespace RAM.Services.Implementations
 
         public IList<IBlog> GetLatestPosts(int count)
         {
-            var list = new List<IBlog>();
-            if (_cache.Get<IList<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts) == null)
+            var list = _cache.Get<IList<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts);
+            if (list == null)
             {
                 list = _repository.FindAll()
                     .Where(o => o.IsActive = true)
                     .OrderByDescending(o => o.DatePosted).Take(count).ToList<IBlog>();
                 _cache.Store(RAM.Core.ResourceStrings.Cache_BlogPosts, list);
             }
-            else
-            {
-                list = _cache.Get<List<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts).Take(count).ToList();
-            }
+            //else
+            //{
+            //    list = _cache.Get<List<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts).Take(count).ToList();
+            //}
             return list;
         }
 

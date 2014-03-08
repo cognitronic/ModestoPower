@@ -39,6 +39,7 @@ namespace RAM.Controllers.Controllers
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-home";
             view.Posts = _blogService.GetLatestPosts(2);
+            //Session.Add("_blog" + DateTime.Now.Ticks.ToString() + "_test", view.NavView.SelectedMenuItem);
             return View(view);
 
         }

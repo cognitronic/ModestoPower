@@ -57,7 +57,7 @@ namespace ModestoPower.Mvc
 
                     For<IUnitOfWork>().Use<NHUnitOfWork>();
 
-                    For<ICacheStorage>().Use<CouchbaseCacheAdapter>();
+                    For<ICacheStorage>().Use<MongoDBCacheAdapter>();
                 }
 
                 //For<MembershipProvider>().Use<AlpineMembershipProvider>();
@@ -136,7 +136,7 @@ namespace ModestoPower.Mvc
 
                     x.For<IUnitOfWork>().Use<NHUnitOfWork>();
 
-                    x.For<ICacheStorage>().Use<CouchbaseCacheAdapter>();
+                    x.For<ICacheStorage>().Use<MongoDBCacheAdapter>();
 
                     x.For<IUser>().Use<User>();
                     x.For<IBanner>().Use<Banner>();
