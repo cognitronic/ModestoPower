@@ -1,0 +1,228 @@
+﻿@model RAM.Admin.Controllers.ViewModels.HomeView
+
+@{
+    ViewBag.Title = "BlogPost";
+}
+
+<div class="container">
+    <div class="row center-block">
+        <div class="col-lg-9">
+            <h2></h2>
+            <hr />
+            Is Active <input id="status" type="checkbox" /><br />
+            <b>Title:</b><br />
+            <input id="title" type="text" class="form-control input-lg required" placeholder="Enter Title" /><br />
+            <b>Category:</b><br />
+            <select name="category" id="category" class="form-control input-lg">
+                @foreach (var item in Model.BlogCategories)
+                {
+                    <option value="@item.ID">
+                        @item.Name
+                    </option>
+                }
+            </select><br />
+            <b>SEO Keywords:</b>(comma separated list)<br />
+            <input id="seoKeywords" type="text" class="form-control required input-lg" placeholder="Enter SEO Keywords" /><br />
+            <b>SEO Description:</b><br />
+            <textarea id="seoDescription" class="form-control" rows="6" placeholder="Enter SEO Description"></textarea><br />
+            @if(Model.SelectedBlog != null)
+            { 
+                <span><b>Click Picture To Manage:</b></span><br />
+            <a href="#blogModal" class="editBlogModal" data-toggle="modal" data-id="@Model.SelectedBlog.ID">
+                <img id="postimage" src="@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]@Model.SelectedBlog.ImagePath" alt="@Model.SelectedBlog.Title" class="img-thumbnail" style="height: 200px; width: 300px;" />
+            </a><br />
+             }
+            <br />
+            <b>Tags:</b><br />
+            <ul id="blogTags" class="form-control input-lg">
+                @if (Model.SelectedBlog != null && Model.SelectedBlog.Tags.Count > 0)
+                {
+                    foreach (var tag in Model.SelectedBlog.Tags)
+                    {
+                        <li>
+                            @tag.TagRef.Name
+                        </li>
+                    }
+                }
+            </ul><br />
+            <b>Post:</b><br />
+            <textarea id="post" class="form-control" rows="10" placeholder="Enter Post"></textarea><br />
+            <button class="savePost btn btn-success" role="button">Save Post</button>
+            <a href="/Blog" class="btn btn-info" role="button">Back To List</a>
+        </div>
+    </div>
+
+    <div id="blogModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 id="modalLabel">Add/Edit Blog Header Image</h3>
+                </div>
+                <div class="modal-body">
+                    <form action="~/Blog/SavePostImage" class="dropzone" id="dropzoneJsForm">
+                        <input name="blogID" type="hidden" id="hdnBlogID" />
+                        <input name="test" type="hidden" id="hdntest" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                    <button id="submit-all" type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //#region Tiny MCE
+        tinymce.init({
+            selector: "textarea#post",
+            browser_spellcheck: true,
+            importcss_append: true,
+            height: 500,
+            plugins: [
+            "advlist autolink lists link image charmap print preview anchor",
+            "searchreplace visualblocks code fullscreen",
+            "insertdatetime media table contextmenu paste textcolor "
+            ],
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | forecolor | formatselect fontsizeselect",
+            menu: {
+
+            }
+        });
+        //#endregion
+
+        //#region Load Post Values
+
+        var post = @Html.Raw(Json.Encode(Model.SelectedBlog));
+        var isNew = true;
+        if(post === null || post === 'undefined'){
+            console.log('new blog post');
+            $('.col-lg-9 h2').text('New Blog Post');
+        } else{
+            console.log(post.IsActive);
+            isNew = false;
+            $('.col-lg-9 h2').text(post.Title);
+            $("#status").prop('checked', post.IsActive);
+            $('#title').val(post.Title);
+            $('[name=category]').val(post.BlogCategoryID);
+            $('#seoKeywords').val(post.SEOKeywords);
+            $('#seoDescription').val(post.SEODescription);
+            $('#post').val(post.Post);
+        }
+
+
+        $("#blogTags").tagit({
+            allowSpaces: true,
+            placeholderText: 'Add Tags',
+            autocomplete: ({
+                source: function(request, response){
+                    $.ajax({
+                        url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Blog/GetTagsForAutoSelect',
+                        data: {format: "json", query: request.term},
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function(data){
+                            response($.map(data.Tags, function(item){
+                                return{
+                                    label: item.Name,
+                                    value: item.Name
+                                }
+                            }));
+                        },
+                        error: function(request, status, error){
+                            console.log(error);
+                            alert(error);
+                        }
+                    })
+                },
+                minLength: 2
+            })
+        });
+
+        //#endregion
+
+        //#region Save Post
+
+        $('.savePost').on('click', function(e){
+            e.preventDefault();
+            var taglist = $('#blogTags').tagit("assignedTags") + "";
+            var p = {
+                IsActive: $('#status').prop('checked'),
+                Title: $('#title').val(),
+                BlogCategoryID: $('#category').val(),
+                SEOKeywords: $('#seoKeywords').val(),
+                SEODescription: $('#seoDescription').val(),
+                Post: tinyMCE.activeEditor.getContent()
+            };
+            if(isNew){
+                p.ID = 0;
+            } else{
+                
+                p.ID = post.ID;
+            }
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Blog/SavePost',
+                type: 'POST',
+                data: JSON.stringify({ blog: p, tags: taglist }),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    console.log(data.Message);
+                    if(data.IsNew){
+                        $("#hdnBlogID").val(data.BlogID);
+                        $('#blogModal').modal('show');
+                    }else{
+                        window.location = data.ReturnUrl;
+                    }
+                }
+            });
+        });
+
+        //#endregion
+
+        //#region Dropzone js Blog Image
+
+        $(".editBlogModal").on('click', function (e) {
+            e.preventDefault();
+            console.log($(this).data('id'));
+            $("#hdnBlogID").val($(this).data('id'));
+        });
+
+        Dropzone.options.dropzoneJsForm = {
+
+            //prevents Dropzone from uploading dropped files immediately
+            autoProcessQueue: false,
+
+            init: function () {
+                var submitButton = document.querySelector("#submit-all");
+                var myDropzone = this; //closure
+
+                submitButton.addEventListener("click", function () {
+
+                    $("#hdntest").val("3");
+                    myDropzone.processQueue();
+                });
+
+                this.on("success", function(file, response){
+                    if(response.Status == "success"){
+                        console.log('Image changed!');
+                        $('#blogModal').modal('hide');
+                        window.location = response.ReturnUrl;
+                    }
+                });
+
+                this.on("complete", function(file){
+                    this.removeFile(file);
+                });
+            }
+        };
+
+        //#endregion
+
+    });
+</script>
+
