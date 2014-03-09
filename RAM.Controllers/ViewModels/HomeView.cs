@@ -14,6 +14,7 @@ namespace RAM.Controllers.ViewModels
         public HomeView()
         {
             NavView = new NavigationView();
+            UserView = new User.UserAccountView();
         }
         public NavigationView NavView { get; set; }
 
@@ -27,5 +28,7 @@ namespace RAM.Controllers.ViewModels
         public IBlog SelectedPost { get; set; }
 
         public IList<IBlogCategory> Categories { get; set; }
+
+        public User.UserAccountView UserView { get; set; }
     }
 }

@@ -13,3 +13,6 @@ C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\log4net.xml
 C:\Projects\ModestoPower\RAM.Repository.Mongo\obj\Debug\RAM.Repository.Mongo.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Repository.Mongo\obj\Debug\RAM.Repository.Mongo.dll
 C:\Projects\ModestoPower\RAM.Repository.Mongo\obj\Debug\RAM.Repository.Mongo.pdb
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\RAM.Core.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\Newtonsoft.Json.dll
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\RAM.Core.pdb

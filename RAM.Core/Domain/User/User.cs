@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using RAM.Infrastructure.Domain;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace RAM.Core.Domain.User
 {
@@ -88,6 +90,12 @@ namespace RAM.Core.Domain.User
         public virtual string Type { get; set; }
 
         #endregion
+
+        public ObjectId Id { get; set; }
+
+        public string email { get; set; }
+        public string firstname { get; set; }
+        public string lastname { get; set; }
 
         public User()
         {

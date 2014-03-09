@@ -23,6 +23,11 @@ namespace RAM.Services.Implementations
             _cache = cache;
         }
 
+        public User FindByID(int id)
+        {
+            return _repository.FindByID(0);
+        }
+
         #region IUserService Members
 
         //public GetAllUsersByTypeResponse GetAllUsers()

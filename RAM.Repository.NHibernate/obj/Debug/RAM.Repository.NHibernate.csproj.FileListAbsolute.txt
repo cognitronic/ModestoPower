@@ -94,3 +94,5 @@ C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\NHibernate.xml
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.dll
 C:\Projects\ModestoPower\RAM.Repository.NHibernate\obj\Debug\RAM.Repository.NHibernate.pdb
+C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\MongoDB.Bson.dll
+C:\Projects\ModestoPower\RAM.Repository.NHibernate\bin\Debug\MongoDB.Bson.xml
