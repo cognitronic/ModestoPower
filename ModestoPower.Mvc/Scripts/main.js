@@ -141,14 +141,143 @@
     /*=================================
 	4-Contact
 	=================================*/
+    $.fn.stContactForm = function () {
 
-    function IsEmail(email) {
-        var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        return regex.test(email);
-    }
+        var form = $(this).prop('tagName').toLowerCase() === 'form' ? $(this) : $(this).find('form'),
+		submit_btn = form.find('.submit');
+
+        form.submit(function (e) {
+            e.preventDefault();
+
+            if (!submit_btn.hasClass('loading')) {
+
+                // form not valid
+                if (!form.stFormValid()) {
+                    form.find('p.alert-message.warning.validation').slideDown(300);
+                    return false;
+                }
+                    // form valid
+                else {
+
+                    submit_btn.addClass('loading').attr('data-label', submit_btn.text());
+                    submit_btn.text(submit_btn.data('loading-label'));
+
+                    // ajax request
+                    $.ajax({
+                        type: 'POST',
+                        url: form.attr('action'),
+                        data: form.serialize(),
+                        success: function (data) {
+
+                            form.find('.alert-message.validation').hide();
+                            form.prepend(data.Message);
+                            form.find('.alert-message.success, .alert-message.phpvalidation').slideDown(300);
+                            submit_btn.removeClass('loading');
+                            submit_btn.text(submit_btn.attr('data-label'));
+
+                            // reset all inputs
+                            if (data.Status == 'success') {
+                                form.find('input, textarea').each(function () {
+                                    $(this).val('');
+                                });
+                            }
+
+                        },
+                        error: function () {
+                            form.find('.alert-message.validation').slideUp(300);
+                            form.find('.alert-message.request').slideDown(300);
+                            submit_btn.removeClass('loading');
+                            submit_btn.text(submit_btn.attr('data-label'));
+                        }
+                    });
+
+                }
+
+            }
+        });
+    };
 
 
-    
+    $.fn.stFormValid = function () {
+        function emailValid(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+
+        function phoneValid(phone) {
+            var re = new RegExp(/^\d{10}|\d{7}|\d{3}-\d{3}-\d{4}|\d{3}-\d{4}|\(\d{3}\)\d{3}-\d{4}$/);
+            console.log(phone);
+            console.log(re.test(phone));
+            return re.test(phone);
+        }
+
+        var form = $(this),
+		formValid = true;
+
+        form.find('input.required, textarea.required, select.required').each(function () {
+
+            var field = $(this),
+			value = field.val(),
+			placeholder = field.data('placeholder') ? field.data('placeholder') : false,
+			valid = false;
+
+            if (value.trim() !== '' && !(placeholder && value === placeholder)) {
+
+                // email field
+                if (field.hasClass('email')) {
+                    if (!emailValid(value)) {
+                        field.addClass('error');
+                    }
+                    else {
+                        field.removeClass('error');
+                        valid = true;
+                    }
+                }
+
+                // phone field
+                if (field.hasClass('tel')) {
+                    if (!phoneValid(value)) {
+                        field.addClass('error');
+                    }
+                    else {
+                        field.removeClass('error');
+                        valid = true;
+                    }
+                }
+
+                    // select field
+                else if (field.prop('tagName').toLowerCase() === 'select') {
+                    if (value === null) {
+                        field.addClass('error');
+                    }
+                    else {
+                        field.removeClass('error');
+                        valid = true;
+                    }
+                }
+
+                    // default field
+                else {
+                    field.removeClass('error');
+                    valid = true;
+                }
+
+            }
+            else {
+                field.addClass('error');
+            }
+            formValid = !valid ? false : formValid;
+
+        });
+
+        return formValid;
+
+    };
+
+
+    $('#contact-form').each(function () {
+        $(this).stContactForm();
+    });
 
 
 

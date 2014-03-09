@@ -3459,3 +3459,7 @@ footer .text-right {
 .memberinfoheader {
 	background-image: url(../images/BG/IMG_0851.png);
 }
+
+.default-form label{color:#282828}.default-form label>span{color:#df4e44}.default-form input,.default-form textarea,.default-form select{color:#555;background-color:#e5e5e5}.default-form input.error,.default-form textarea.error,.default-form select.error{color:#d40041;background-color:#ffdfe0}
+
+                                                                                                                                                 .alert-message{text-shadow:0 1px 0 rgba(255,255,255,0.4)}.alert-message.warning{color:#d40041;background-color:#ffdfe0; padding:10px;}.alert-message.warning .close-message{color:#d40041}.alert-message.success{color:#499143;background-color:#d4fbd3}.alert-message.success .close-message{color:#499143}.alert-message.info{color:#265E88;background-color:#E1EDF9}.alert-message.info .close-message{color:#265E88}.alert-message.notification{color:#C88435;background-color:#FFF4CF}.alert-message.notification
