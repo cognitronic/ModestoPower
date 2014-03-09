@@ -156,10 +156,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="images\users\" />
     <Folder Include="Models\" />
-    <Folder Include="Views\Blog\" />
-    <Folder Include="Views\Gallery\" />
-    <Folder Include="Views\Programs\" />
-    <Folder Include="Views\Schedule\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Packages\TaskHelpers.Sources.0.1\TaskHelpers.cs" />
@@ -718,6 +714,10 @@
     <Content Include="Views\Instructors\_InstructorProfile.cshtml" />
     <Content Include="Views\Tutorials\Index.cshtml" />
     <Content Include="Views\About\MembershipInfo.cshtml" />
+    <Content Include="Views\Programs\Index.cshtml" />
+    <Content Include="Views\Schedule\Index.cshtml" />
+    <Content Include="Views\Blog\Index.cshtml" />
+    <Content Include="Views\Gallery\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Controllers\RAM.Controllers.csproj">
