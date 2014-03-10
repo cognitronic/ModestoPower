@@ -42,6 +42,16 @@ namespace RAM.Repository.NHibernate.Repositories
             return SessionFactory.GetCurrentSession().Get<User>(ID);
         }
 
+        public User AuthenticateUser(string email, string password)
+        {
+            return null;
+        }
+
+        public User FindByEmail(string email)
+        {
+            return null;
+        }
+
         #endregion
     }
 }

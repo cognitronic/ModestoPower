@@ -28,6 +28,16 @@ namespace RAM.Services.Implementations
             return _repository.FindByID(0);
         }
 
+        public User FindByEmail(string email)
+        {
+            return _repository.FindByEmail(email);
+        }
+
+        public IList<User> FindAll()
+        {
+            return _repository.FindAll();
+        }
+
         #region IUserService Members
 
         //public GetAllUsersByTypeResponse GetAllUsers()
@@ -53,14 +63,14 @@ namespace RAM.Services.Implementations
         public GetValidUserResponse AuthenticateUser(string email, string password)
         {
             GetValidUserResponse response = new GetValidUserResponse();
-            var query = new Query();
-            query.Add(new Criterion("Email", email, CriteriaOperator.Equal));
-            query.Add(new Criterion("Password", password, CriteriaOperator.Equal));
-            var account = _repository.FindBy(query);
-            if (account != null && account.Count() > 0)
+            //var query = new Query();
+            //query.Add(new Criterion("Email", email, CriteriaOperator.Equal));
+            //query.Add(new Criterion("Password", password, CriteriaOperator.Equal));
+            var user = _repository.AuthenticateUser(email, password);
+            if (user != null && user.Id != null)
             {
                 response.IsAuthenticated = true;
-                response.SelectedUser = account.FirstOrDefault<IUser>();
+                response.SelectedUser = user;
             }
             return response;
         }
@@ -116,5 +126,7 @@ namespace RAM.Services.Implementations
         }
 
         #endregion
+
+
     }
 }

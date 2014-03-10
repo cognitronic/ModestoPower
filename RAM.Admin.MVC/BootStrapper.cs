@@ -46,40 +46,41 @@ namespace RAM.Admin.MVC
                 {
                     //Repositories
                     For<IUserRepository>().Use<UserRepository>();
-                    For<ITagRepository>().Use<TagRepository>();
-                    For<IBannerRepository>().Use<BannerRepository>();
-                    For<IBlogRepository>().Use<BlogRepository>();
-                    For<IBlogTagRepository>().Use<BlogTagRepository>();
-                    For<IProjectRepository>().Use<ProjectRepository>();
-                    For<IProjectImageRepository>().Use<ProjectImageRepository>();
-                    For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
-
-                    For<IUnitOfWork>().Use<NHUnitOfWork>();
-
-                    For<ICacheStorage>().Use<CouchbaseCacheAdapter>();
+                }
+                else
+                {
+                    For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                 }
 
-                //For<MembershipProvider>().Use<AlpineMembershipProvider>();
+                For<IBlogRepository>().Use<BlogRepository>();
+                For<IBlogTagRepository>().Use<BlogTagRepository>();
+               // For<ISubscriberRepository>().Use<SubscriberRepository>();
+                For<IProjectRepository>().Use<ProjectRepository>();
+                For<IProjectImageRepository>().Use<ProjectImageRepository>();
+                For<IBannerRepository>().Use<BannerRepository>();
+                For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
 
-                //For<RoleProvider>().Use<AlpineRoleProvider>();
+                For<IUnitOfWork>().Use<NHUnitOfWork>();
+
+                For<ICacheStorage>().Use<MongoDBCacheAdapter>();
 
                 //Models
                 For<IUser>().Use<User>();
-                For<ITag>().Use<Tag>();
-                For<IBlogTag>().Use<BlogTag>();
                 For<IBlog>().Use<Blog>();
-                For<IBanner>().Use<Banner>();
+               // For<ISubscriber>().Use<Subscriber>();
                 For<IProject>().Use<Project>();
                 For<IProjectImage>().Use<ProjectImage>();
+                For<IBanner>().Use<Banner>();
                 For<IBlogCategory>().Use<BlogCategory>();
 
                 //Services
                 For<IUserService>().Use<UserService>();
                 For<IBannerService>().Use<BannerService>();
+                For<ISubscriberService>().Use<SubscriberService>();
                 For<IBlogService>().Use<BlogService>();
                 For<IProjectService>().Use<ProjectService>();
                 For<IBlogCategoryService>().Use<BlogCategoryService>();
-                For<ITagService>().Use<TagService>();
+
                 // Logger
                 For<ILogger>().Use
                           <Log4NetAdapter>();
@@ -118,30 +119,73 @@ namespace RAM.Admin.MVC
                 var container = new Container(x =>
                 {
                     x.For<IUserService>().Use<UserService>();
-                    x.For<ITagService>().Use<TagService>();
                     x.For<IBannerService>().Use<BannerService>();
                     x.For<IBlogService>().Use<BlogService>();
                     x.For<IProjectService>().Use<ProjectService>();
+                    x.For<ISubscriberService>().Use<SubscriberService>();
                     x.For<IBlogCategoryService>().Use<BlogCategoryService>();
-                    
+
                     x.For<IUserRepository>().Use<UserRepository>();
-                    x.For<ITagRepository>().Use<TagRepository>();
                     x.For<IBannerRepository>().Use<BannerRepository>();
-                    x.For<IBlogRepository>().Use<BlogRepository>();
                     x.For<IBlogTagRepository>().Use<BlogTagRepository>();
+                    x.For<IBlogRepository>().Use<BlogRepository>();
+                    //x.For<ISubscriberRepository>().Use<SubscriberRepository>();
                     x.For<IProjectRepository>().Use<ProjectRepository>();
                     x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
                     x.For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
 
                     x.For<IUnitOfWork>().Use<NHUnitOfWork>();
 
-                    x.For<ICacheStorage>().Use<CouchbaseCacheAdapter>();
+                    x.For<ICacheStorage>().Use<MongoDBCacheAdapter>();
 
                     x.For<IUser>().Use<User>();
                     x.For<IBanner>().Use<Banner>();
-                    x.For<ITag>().Use<Tag>();
-                    x.For<IBlogTag>().Use<BlogTag>();
                     x.For<IBlog>().Use<Blog>();
+                   // x.For<ISubscriber>().Use<Subscriber>();
+                    x.For<IProject>().Use<Project>();
+                    x.For<IProjectImage>().Use<ProjectImage>();
+                    x.For<IBlogCategory>().Use<BlogCategory>();
+
+                    x.For<ILogger>().Use<Log4NetAdapter>();
+
+                    x.For<IEmailService>().Use<SMTPService>();
+
+                    x.For<IExternalAuthenticationService>().Use<JanrainAuthenticationService>();
+                    x.For<IFormsAuthentication>().Use<AspFormsAuthentication>();
+                    x.For<ILocalAuthenticationService>().Use<HRRMarketingAuthenticationService>();
+
+                    x.For<IActionArguments>().Use<HttpRequestActionArguments>();
+                });
+                return container;
+            }
+            else
+            {
+                var container = new Container(x =>
+                {
+                    x.For<IUserService>().Use<UserService>();
+                    x.For<IBannerService>().Use<BannerService>();
+                    x.For<IBlogService>().Use<BlogService>();
+                    x.For<IProjectService>().Use<ProjectService>();
+                    x.For<ISubscriberService>().Use<SubscriberService>();
+                    x.For<IBlogCategoryService>().Use<BlogCategoryService>();
+
+                    x.For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
+                    x.For<IBannerRepository>().Use<BannerRepository>();
+                    x.For<IBlogTagRepository>().Use<BlogTagRepository>();
+                    x.For<IBlogRepository>().Use<BlogRepository>();
+                   // x.For<ISubscriberRepository>().Use<SubscriberRepository>();
+                    x.For<IProjectRepository>().Use<ProjectRepository>();
+                    x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
+                    x.For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
+
+                    x.For<IUnitOfWork>().Use<NHUnitOfWork>();
+
+                    x.For<ICacheStorage>().Use<MongoDBCacheAdapter>();
+
+                    x.For<IUser>().Use<User>();
+                    x.For<IBanner>().Use<Banner>();
+                    x.For<IBlog>().Use<Blog>();
+                   // x.For<ISubscriber>().Use<Subscriber>();
                     x.For<IProject>().Use<Project>();
                     x.For<IProjectImage>().Use<ProjectImage>();
                     x.For<IBlogCategory>().Use<BlogCategory>();

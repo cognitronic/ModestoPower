@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAM.Web", "RAM.Web\RAM.Web.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAM.Repository.Mongo", "RAM.Repository.Mongo\RAM.Repository.Mongo.csproj", "{B91685B3-D723-4937-BFCA-37C39149756A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAM.Admin.Controllers", "RAM.Admin.Controllers\RAM.Admin.Controllers.csproj", "{05AFB575-1997-49D0-9510-1EB0E4442350}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAM.Admin.MVC", "RAM.Admin.MVC\RAM.Admin.MVC.csproj", "{5A984935-972D-485C-9A00-BFECFCF04525}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,14 @@ Global
 		{B91685B3-D723-4937-BFCA-37C39149756A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B91685B3-D723-4937-BFCA-37C39149756A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B91685B3-D723-4937-BFCA-37C39149756A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05AFB575-1997-49D0-9510-1EB0E4442350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05AFB575-1997-49D0-9510-1EB0E4442350}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05AFB575-1997-49D0-9510-1EB0E4442350}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05AFB575-1997-49D0-9510-1EB0E4442350}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A984935-972D-485C-9A00-BFECFCF04525}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A984935-972D-485C-9A00-BFECFCF04525}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A984935-972D-485C-9A00-BFECFCF04525}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A984935-972D-485C-9A00-BFECFCF04525}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,7 +18,7 @@ namespace RAM.Controllers.Controllers
     public class ContactController : BaseController
     {
         private readonly IBlogService _blogService;
-        private readonly IUserService _userService;
+        //private readonly IUserService _userService;
         public ContactController(ILocalAuthenticationService authenticationService,
             IUserService userService,
             IBlogService blogService,
@@ -28,7 +28,7 @@ namespace RAM.Controllers.Controllers
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
             _blogService = blogService;
-            _userService = userService;
+            //_userService = userService;
         }
 
 

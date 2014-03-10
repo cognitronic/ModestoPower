@@ -24,6 +24,22 @@ namespace RAM.Repository.Mongo.Repositories
             return userCollection.FindAs<User>(query).FirstOrDefault();
         }
 
+        public User FindByEmail(string email)
+        {
+            var query = Query.EQ("Email", email);
+            
+            return userCollection.FindAs<User>(query).FirstOrDefault();
+        }
+
+        public User AuthenticateUser(string email, string password)
+        {
+            var query = Query.And(
+                Query.EQ("Email", email),
+                Query.EQ("Password", password)
+                );
+            return userCollection.FindAs<User>(query).FirstOrDefault();
+        }
+
         public int Save(User entity)
         {
             throw new NotImplementedException();
@@ -46,7 +62,7 @@ namespace RAM.Repository.Mongo.Repositories
 
         public IList<User> FindAll()
         {
-            throw new NotImplementedException();
+            return userCollection.FindAllAs<User>().ToList();
         }
 
         public IList<User> FindAll(int index, int count)

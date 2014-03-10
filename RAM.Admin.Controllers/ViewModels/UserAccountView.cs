@@ -29,6 +29,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public string Type { get; set; }
         public int UserID { get; set; }
 
+
         [Required]
         [Display(Name = "Username (email address)")]
         public string Email { get; set; }

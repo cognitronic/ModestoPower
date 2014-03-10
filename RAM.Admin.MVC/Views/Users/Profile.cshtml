@@ -1,0 +1,97 @@
+﻿@using RAM.Core
+@model RAM.Admin.Controllers.ViewModels.HomeView
+
+
+@{
+    ViewBag.Title = "User Management";
+}
+
+<div class="container">
+    <div class="row center-block">
+        <div class="col-lg-9">
+            <h2></h2>
+            <hr />
+            Is Active <input id="status" type="checkbox" /><br />
+            <b>First Name:</b><br />
+            <input id="firstname" type="text" class="form-control input-lg required" placeholder="Enter First Name" /><br />
+            <b>Last Name:</b><br />
+            <input id="lastname" type="text" class="form-control input-lg required" placeholder="Enter Last Name" /><br />
+            <b>Email:</b><br />
+            <input id="email" type="email" class="form-control required input-lg" placeholder="Enter Email" /><br />
+            <b>Password:</b><br />
+            <input id="password" type="password" class="form-control required input-lg" placeholder="Enter Password" /><br />
+            
+            <button class="savePost btn btn-success" role="button">Save</button>
+            <a href="/Users" class="btn btn-info" role="button">Back To List</a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //#region Load Post Values
+
+        var user = @Html.Raw(Json.Encode(Model.SelectedUser));
+        var isNew = true;
+        if(user === null || user === 'undefined'){
+            console.log('new user');
+            $('.col-lg-9 h2').text('New User');
+        } else{
+            console.log(user.IsActive);
+            isNew = false;
+            $('.col-lg-9 h2').text(user.FirstName + " " +user.LastName);
+            $("#status").prop('checked', user.IsActive);
+            $('#firstname').val(user.FirstName);
+            $('#lastname').val(user.LastName);
+            $('#email').val(user.Email);
+        }
+
+
+        
+
+        //#endregion
+
+        //#region Save Post
+
+        @*$('.savePost').on('click', function(e){
+            e.preventDefault();
+            var taglist = $('#blogTags').tagit("assignedTags") + "";
+            var p = {
+                IsActive: $('#status').prop('checked'),
+                Title: $('#title').val(),
+                BlogCategoryID: $('#category').val(),
+                SEOKeywords: $('#seoKeywords').val(),
+                SEODescription: $('#seoDescription').val(),
+                Post: tinyMCE.activeEditor.getContent()
+            };
+            if(isNew){
+                p.ID = 0;
+            } else{
+
+                p.ID = post.ID;
+            }
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Blog/SavePost',
+                type: 'POST',
+                data: JSON.stringify({ blog: p, tags: taglist }),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    console.log(data.Message);
+                    if(data.IsNew){
+                        $("#hdnBlogID").val(data.BlogID);
+                        $('#blogModal').modal('show');
+                    }else{
+                        window.location = data.ReturnUrl;
+                    }
+                }
+            });
+        });*@
+
+        //#endregion
+
+       
+
+    });
+</script>
+

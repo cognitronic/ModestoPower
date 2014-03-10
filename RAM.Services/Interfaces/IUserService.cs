@@ -13,5 +13,10 @@ namespace RAM.Services.Interfaces
         GetUserResponse GetUser(GetUserRequest request);
         GetValidUserResponse AuthenticateUser(string email, string password);
         User FindByID(int id);
+
+        User FindByEmail(string email);
+        IList<User> FindAll();
+
+
     }
 }
