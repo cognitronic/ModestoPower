@@ -91,6 +91,7 @@ namespace RAM.Core.Domain.User
 
         #endregion
         [DataMember]
+        [MongoDB.Bson.Serialization.Attributes.BsonId]
         public ObjectId Id { get; set; }
         
 

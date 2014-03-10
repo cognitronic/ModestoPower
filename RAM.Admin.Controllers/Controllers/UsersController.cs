@@ -48,22 +48,35 @@ namespace RAM.Admin.Controllers.Controllers
 
         public ActionResult SaveUser(User user)
         {
-            user.LastUpdated = DateTime.Now;
-            user.ChangedBy = SecurityContextManager.Current.CurrentUser.Id;
-            if (user.Id == null || user.Id.ToString().Equals("000000000000000000000000"))
+            var u = new User();
+
+           
+            if (user.PasswordAnswer == null || user.PasswordAnswer.Equals("000000000000000000000000"))
             {
-                user.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;
-                user.DateCreated = DateTime.Now;
-                user.AccessLevel = 60;
-                user.IsActive = true;
-                user.LastLoginDate = DateTime.Now;
-                user.PasswordAnswer = user.Password;
-                user.PasswordQuestion = user.Password;
+                u.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;
+                u.DateCreated = DateTime.Now;
+                u.AccessLevel = 60;
+                u.IsActive = true;
+                u.LastLoginDate = DateTime.Now;
+                u.PasswordAnswer = user.Password;
+                u.PasswordQuestion = user.Password;
+                u.LastUpdated = DateTime.Now;
+                u.ChangedBy = SecurityContextManager.Current.CurrentUser.Id;
                 _userService.CreateNewUser(user);
             }
             else
             {
-                _userService.UpdateUser(user);
+                u.FirstName = user.FirstName;
+                u.LastName = user.LastName;
+                u.Email = user.Email;
+                if (!string.IsNullOrEmpty(user.Password))
+                {
+                    u.Password = user.Password;
+                }
+                u.LastUpdated = DateTime.Now;
+                u.ChangedBy = SecurityContextManager.Current.CurrentUser.Id;
+                u.Id = new MongoDB.Bson.ObjectId(user.PasswordAnswer);
+                _userService.UpdateUser(u);
             }
 
             return Json(new
@@ -71,6 +84,16 @@ namespace RAM.Admin.Controllers.Controllers
                 Message = "user saved!",
                 Status = "success",
                 UserID = user.Id
+            });
+        }
+
+        public ActionResult DeleteUser(string id)
+        {
+            _userService.DeleteUser(_userService.FindByEmail(id));
+            return Json(new
+            {
+                Message = "user deleted!",
+                Status = "success"
             });
         }
     }

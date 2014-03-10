@@ -56,6 +56,15 @@ namespace RAM.Services.Implementations
             return null;
         }
 
+        public User DeleteUser(User user)
+        {
+            if (user != null)
+            {
+                return _repository.Remove(user);
+            }
+            return null;
+        }
+
         #region IUserService Members
 
         //public GetAllUsersByTypeResponse GetAllUsers()

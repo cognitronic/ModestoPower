@@ -16,7 +16,7 @@ namespace RAM.Core.Domain.User
         string PasswordAnswer { get; set; }
         DateTime LastLoginDate { get; set; }
         int AccessLevel { get; set; }
-        ObjectId Id { get; set; }
+        //ObjectId Id { get; set; }
 
         ObjectId ChangedBy { get; set; }
         ObjectId EnteredBy { get; set; }

@@ -42,7 +42,8 @@ namespace RAM.Repository.Mongo.Repositories
 
         public User Save(User entity)
         {
-            throw new NotImplementedException();
+            userCollection.Save(entity);
+            return entity;
         }
 
         public User Add(User entity)
@@ -54,7 +55,9 @@ namespace RAM.Repository.Mongo.Repositories
 
         public User Remove(User entity)
         {
-            throw new NotImplementedException();
+            var query = Query<User>.EQ(e => e.Id, entity.Id);
+            userCollection.Remove(query);
+            return entity;
         }
 
         public User FindBy(User entity)
