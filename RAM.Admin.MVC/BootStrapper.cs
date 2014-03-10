@@ -45,20 +45,20 @@ namespace RAM.Admin.MVC
                     PersistenceStrategy.Equals(RAM.Infrastructure.Domain.PersistenceStrategy.NHibernate.ToString()))
                 {
                     //Repositories
-                    For<IUserRepository>().Use<UserRepository>();
+                    //For<IUserRepository>().Use<UserRepository>();
                 }
                 else
                 {
                     For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                 }
 
-                For<IBlogRepository>().Use<BlogRepository>();
-                For<IBlogTagRepository>().Use<BlogTagRepository>();
-               // For<ISubscriberRepository>().Use<SubscriberRepository>();
-                For<IProjectRepository>().Use<ProjectRepository>();
-                For<IProjectImageRepository>().Use<ProjectImageRepository>();
-                For<IBannerRepository>().Use<BannerRepository>();
-                For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
+               // For<IBlogRepository>().Use<BlogRepository>();
+               // For<IBlogTagRepository>().Use<BlogTagRepository>();
+               //// For<ISubscriberRepository>().Use<SubscriberRepository>();
+               // For<IProjectRepository>().Use<ProjectRepository>();
+               // For<IProjectImageRepository>().Use<ProjectImageRepository>();
+               // For<IBannerRepository>().Use<BannerRepository>();
+               // For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
 
                 For<IUnitOfWork>().Use<NHUnitOfWork>();
 
@@ -75,11 +75,11 @@ namespace RAM.Admin.MVC
 
                 //Services
                 For<IUserService>().Use<UserService>();
-                For<IBannerService>().Use<BannerService>();
-                For<ISubscriberService>().Use<SubscriberService>();
-                For<IBlogService>().Use<BlogService>();
-                For<IProjectService>().Use<ProjectService>();
-                For<IBlogCategoryService>().Use<BlogCategoryService>();
+                //For<IBannerService>().Use<BannerService>();
+                //For<ISubscriberService>().Use<SubscriberService>();
+                //For<IBlogService>().Use<BlogService>();
+                //For<IProjectService>().Use<ProjectService>();
+                //For<IBlogCategoryService>().Use<BlogCategoryService>();
 
                 // Logger
                 For<ILogger>().Use
@@ -119,20 +119,20 @@ namespace RAM.Admin.MVC
                 var container = new Container(x =>
                 {
                     x.For<IUserService>().Use<UserService>();
-                    x.For<IBannerService>().Use<BannerService>();
-                    x.For<IBlogService>().Use<BlogService>();
-                    x.For<IProjectService>().Use<ProjectService>();
-                    x.For<ISubscriberService>().Use<SubscriberService>();
-                    x.For<IBlogCategoryService>().Use<BlogCategoryService>();
+                    //x.For<IBannerService>().Use<BannerService>();
+                    //x.For<IBlogService>().Use<BlogService>();
+                    //x.For<IProjectService>().Use<ProjectService>();
+                    //x.For<ISubscriberService>().Use<SubscriberService>();
+                    //x.For<IBlogCategoryService>().Use<BlogCategoryService>();
 
                     x.For<IUserRepository>().Use<UserRepository>();
-                    x.For<IBannerRepository>().Use<BannerRepository>();
-                    x.For<IBlogTagRepository>().Use<BlogTagRepository>();
-                    x.For<IBlogRepository>().Use<BlogRepository>();
-                    //x.For<ISubscriberRepository>().Use<SubscriberRepository>();
-                    x.For<IProjectRepository>().Use<ProjectRepository>();
-                    x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
-                    x.For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
+                    //x.For<IBannerRepository>().Use<BannerRepository>();
+                    //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
+                    //x.For<IBlogRepository>().Use<BlogRepository>();
+                    ////x.For<ISubscriberRepository>().Use<SubscriberRepository>();
+                    //x.For<IProjectRepository>().Use<ProjectRepository>();
+                    //x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
+                    //x.For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
 
                     x.For<IUnitOfWork>().Use<NHUnitOfWork>();
 

@@ -80,7 +80,7 @@ namespace RAM.Admin.Controllers.Controllers
             var isNew = false;
             if (blog.ID == 0)
             {
-                b.EnteredBy = SecurityContextManager.Current.CurrentUser.ID;
+                //b.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;
                 b.DatePosted = DateTime.Now;
                 isNew = true;
             }

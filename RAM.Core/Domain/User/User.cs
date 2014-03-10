@@ -65,10 +65,10 @@ namespace RAM.Core.Domain.User
         #region IAuditable Members
 
         [DataMember]
-        public virtual int EnteredBy { get; set; }
+        public virtual ObjectId EnteredBy { get; set; }
 
         [DataMember]
-        public virtual int ChangedBy { get; set; }
+        public virtual ObjectId ChangedBy { get; set; }
 
         [DataMember]
         public virtual DateTime DateCreated { get; set; }
@@ -80,8 +80,8 @@ namespace RAM.Core.Domain.User
 
         #region ISystemObject Members
 
-        [DataMember]
-        public virtual int ID { get; set; }
+        //[DataMember]
+        //public virtual int ID { get; set; }
 
         [DataMember]
         public virtual Guid SystemID { get; set; }
@@ -90,12 +90,9 @@ namespace RAM.Core.Domain.User
         public virtual string Type { get; set; }
 
         #endregion
-
+        [DataMember]
         public ObjectId Id { get; set; }
-
-        public string email { get; set; }
-        public string firstname { get; set; }
-        public string lastname { get; set; }
+        
 
         public User()
         {

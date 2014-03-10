@@ -56,10 +56,10 @@ namespace RAM.Services.Implementations
             {
                 userAccount.IsAuthenticated = true;
                 userAccount.Email = response.SelectedUser.Email;
-                userAccount.AuthenticationToken = response.SelectedUser.ID.ToString();
+                userAccount.AuthenticationToken = response.SelectedUser.Id.ToString();
                 userAccount.FirstName = response.SelectedUser.FirstName;
                 userAccount.LastName = response.SelectedUser.LastName;
-                userAccount.Type = response.SelectedUser.Type;
+                //userAccount.Type = response.SelectedUser.Type;
             }
             return userAccount;
         }

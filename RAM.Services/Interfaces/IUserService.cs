@@ -16,6 +16,10 @@ namespace RAM.Services.Interfaces
 
         User FindByEmail(string email);
         IList<User> FindAll();
+        User CreateNewUser(User user);
+
+        User UpdateUser(User user);
+
 
 
     }

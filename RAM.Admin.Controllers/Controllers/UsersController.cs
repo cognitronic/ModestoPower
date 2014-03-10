@@ -12,6 +12,7 @@ using System.Web.Mvc;
 using System.Web;
 using System.IO;
 using System.Configuration;
+using RAM.Core;
 
 namespace RAM.Admin.Controllers.Controllers
 {
@@ -34,6 +35,43 @@ namespace RAM.Admin.Controllers.Controllers
             view.Users = _userService.FindAll();
             return View(view);
 
+        }
+
+        public ActionResult UserList()
+        {
+            HomeView view = new HomeView();
+            view.NavView.SelectedMenuItem = "nav-users";
+            view.Users = _userService.FindAll();
+
+            return PartialView("_UserList", view);
+        }
+
+        public ActionResult SaveUser(User user)
+        {
+            user.LastUpdated = DateTime.Now;
+            user.ChangedBy = SecurityContextManager.Current.CurrentUser.Id;
+            if (user.Id == null || user.Id.ToString().Equals("000000000000000000000000"))
+            {
+                user.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;
+                user.DateCreated = DateTime.Now;
+                user.AccessLevel = 60;
+                user.IsActive = true;
+                user.LastLoginDate = DateTime.Now;
+                user.PasswordAnswer = user.Password;
+                user.PasswordQuestion = user.Password;
+                _userService.CreateNewUser(user);
+            }
+            else
+            {
+                _userService.UpdateUser(user);
+            }
+
+            return Json(new
+            {
+                Message = "user saved!",
+                Status = "success",
+                UserID = user.Id
+            });
         }
     }
 }

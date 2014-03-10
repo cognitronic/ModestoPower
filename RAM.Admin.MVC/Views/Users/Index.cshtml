@@ -48,7 +48,6 @@
     <script type="text/javascript">
     $(document).ready(function () {
 
-        var User = {};
 
         $(".editModal").on('click', function (e) {
             e.preventDefault();
@@ -73,6 +72,34 @@
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
                     window.location = data.ReturnUrl;
+                    $('#userList').effect("highlight", { color: "#7fd658" }, 1000);
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        });
+
+
+        $("#submit-all").on('click', function (e) {
+            e.preventDefault();
+            var u = {
+                FirstName: $("#modalFirst").val(),
+                LastName: $("#modalLast").val(),
+                Email: $("#modalEmail").val(),
+                Password: $("#modalPassword").val(),
+                Id: $("#hdnUserID").val()
+            };
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Users/SaveUser',
+                type: 'POST',
+                data: JSON.stringify(u),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    $("#usersModal").modal('hide');
+                    $("#userList").html("");
+                    $("#userList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Users/UserList');
                     $('#userList').effect("highlight", { color: "#7fd658" }, 1000);
                 },
                 error: function (x, y, z) {

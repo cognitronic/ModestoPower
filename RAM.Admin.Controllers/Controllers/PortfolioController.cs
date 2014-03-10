@@ -84,7 +84,7 @@ namespace RAM.Admin.Controllers.Controllers
                 {
 
                     portfolio.DateCreated = DateTime.Now;
-                    portfolio.EnteredBy = SecurityContextManager.Current.CurrentUser.ID;
+                    //portfolio.EnteredBy = SecurityContextManager.Current.CurrentUser.ID;
                     portfolio.DefaultImagePath = "";
                 }
                 portfolio.Title = Request.Form["title"];

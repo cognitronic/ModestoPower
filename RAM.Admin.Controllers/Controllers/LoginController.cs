@@ -56,7 +56,7 @@ namespace RAM.Admin.Controllers.Controllers
                 SecurityContextManager.Current.IsAuthenticated = true;
                 SecurityContextManager.Current.CurrentAccessLevel = user.SelectedUser.AccessLevel;
 
-                _formsAuthentications.SetAuthenticationToken(user.SelectedUser.ID.ToString());
+                _formsAuthentications.SetAuthenticationToken(user.SelectedUser.Id.ToString());
                 if (!string.IsNullOrEmpty(returnUrl))
                     return Redirect(returnUrl);
                 else

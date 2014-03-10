@@ -154,7 +154,5 @@ C:\Projects\ModestoPower\RAM.Admin.MVC\bin\Iesi.Collections.xml
 C:\Projects\ModestoPower\RAM.Admin.MVC\obj\Debug\RAM.Admin.MVC.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Admin.MVC\obj\Debug\RAM.Admin.MVC.dll
 C:\Projects\ModestoPower\RAM.Admin.MVC\obj\Debug\RAM.Admin.MVC.pdb
-C:\Projects\ModestoPower\RAM.Admin.MVC\bin\MongoDB.Web.dll
-C:\Projects\ModestoPower\RAM.Admin.MVC\bin\MongoDB.Web.pdb
 C:\Projects\ModestoPower\RAM.Admin.MVC\bin\RAM.Repository.Mongo.dll
 C:\Projects\ModestoPower\RAM.Admin.MVC\bin\RAM.Repository.Mongo.pdb

@@ -36,7 +36,7 @@ namespace RAM.Controllers.Controllers
         {
             var view = new HomeView();
             view.Posts = _blogService.GetLatestPosts(2);
-            view.UserView.FirstName = _userService.FindByID(0).firstname;
+            view.UserView.FirstName = _userService.FindByID(0).FirstName;
             view.NavView.SelectedMenuItem = "nav-contact";
             return View(view);
 

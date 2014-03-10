@@ -8,8 +8,8 @@ namespace RAM.Infrastructure.Domain
 {
     public interface IRepository<T> : IReadOnlyRepository<T> where T : IAggregateRoot
     {
-        int Save(T entity);
-        int Add(T entity);
-        int Remove(T entity);
+        T Save(T entity);
+        T Add(T entity);
+        T Remove(T entity);
     }
 }

@@ -8,6 +8,7 @@ using RAM.Infrastructure.Domain;
 using RAM.Infrastructure.Querying;
 using RAM.Infrastructure.UnitOfWork;
 
+
 namespace RAM.Repository.NHibernate.Repositories
 {
     public class UserRepository : BaseRepository<User, int>, IUserRepository, IUnitOfWorkRepository

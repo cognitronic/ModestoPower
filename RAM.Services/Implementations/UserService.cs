@@ -38,6 +38,24 @@ namespace RAM.Services.Implementations
             return _repository.FindAll();
         }
 
+        public User CreateNewUser(User user)
+        { 
+            if(user != null)
+            {
+                return _repository.Add(user);
+            }
+            return null;
+        }
+
+        public User UpdateUser(User user)
+        {
+            if (user != null)
+            {
+                return _repository.Save(user);
+            }
+            return null;
+        }
+
         #region IUserService Members
 
         //public GetAllUsersByTypeResponse GetAllUsers()

@@ -40,17 +40,19 @@ namespace RAM.Repository.Mongo.Repositories
             return userCollection.FindAs<User>(query).FirstOrDefault();
         }
 
-        public int Save(User entity)
+        public User Save(User entity)
         {
             throw new NotImplementedException();
         }
 
-        public int Add(User entity)
+        public User Add(User entity)
         {
-            throw new NotImplementedException();
+            userCollection.Insert<User>(entity);
+            return entity;
+
         }
 
-        public int Remove(User entity)
+        public User Remove(User entity)
         {
             throw new NotImplementedException();
         }

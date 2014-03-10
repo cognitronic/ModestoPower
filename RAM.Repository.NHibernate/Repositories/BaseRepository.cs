@@ -84,23 +84,23 @@ namespace RAM.Repository.NHibernate.Repositories
 
         #region IRepository<T> Members
 
-        int IRepository<T>.Save(T entity)
+        T IRepository<T>.Save(T entity)
         {
             this.Save(entity);
-            return entity.ID;
+            return entity;
         }
 
-        int IRepository<T>.Add(T entity)
+        T IRepository<T>.Add(T entity)
         {
             this.Add(entity);
-            return entity.ID;
+            return entity;
         }
 
-        int IRepository<T>.Remove(T entity)
+        T IRepository<T>.Remove(T entity)
         {
             int id = entity.ID;
             this.Remove(entity);
-            return id;
+            return entity;
         }
 
         #endregion
