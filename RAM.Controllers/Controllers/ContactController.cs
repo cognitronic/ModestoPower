@@ -17,17 +17,13 @@ namespace RAM.Controllers.Controllers
 {
     public class ContactController : BaseController
     {
-        private readonly IBlogService _blogService;
-        //private readonly IUserService _userService;
         public ContactController(ILocalAuthenticationService authenticationService,
             IUserService userService,
-            IBlogService blogService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
-            _blogService = blogService;
             //_userService = userService;
         }
 
@@ -35,7 +31,6 @@ namespace RAM.Controllers.Controllers
         public ActionResult Index()
         {
             var view = new HomeView();
-            view.Posts = _blogService.GetLatestPosts(2);
             view.UserView.FirstName = _userService.FindByID(0).FirstName;
             view.NavView.SelectedMenuItem = "nav-contact";
             return View(view);

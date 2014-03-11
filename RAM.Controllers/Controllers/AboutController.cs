@@ -13,17 +13,15 @@ namespace RAM.Controllers.Controllers
 {
     public class AboutController : BaseController
     {
-        private readonly IBlogService _blogService;
+        
         public AboutController(ILocalAuthenticationService authenticationService,
             IUserService userService,
-            IBlogService blogService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
-
-            _blogService = blogService;
+            
         }
 
 

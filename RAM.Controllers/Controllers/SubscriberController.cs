@@ -14,17 +14,13 @@ namespace RAM.Controllers.Controllers
 {
     public class SubscriberController : BaseController
     {
-        private readonly ISubscriberService _subscriberService;
         public SubscriberController(ILocalAuthenticationService authenticationService,
             IUserService userService,
-            ISubscriberService subscriberService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
-
-            _subscriberService = subscriberService;
         }
 
 
@@ -37,25 +33,6 @@ namespace RAM.Controllers.Controllers
 
         public ActionResult SubscribeToNewsletter(Subscriber subscriber)
         { 
-            var s = _subscriberService.GetByEmail(subscriber.Email);
-            if (s != null && !string.IsNullOrEmpty(s.Email))
-            {
-                return Json(new
-                {
-                    Message = "It appears you're already on the list, we appreciate your enthusiasm",
-                    Status = "fail"
-                });
-            }
-            else
-            {
-                s = new Subscriber();
-                s.DateCreated = DateTime.Now;
-                s.Email = subscriber.Email;
-                s.FirstName = "";
-                s.LastName = "";
-                s.Phone = "";
-            }
-            _subscriberService.Save(s);
             return Json(new
             {
                 Message = "You've been successfully added to the list!",

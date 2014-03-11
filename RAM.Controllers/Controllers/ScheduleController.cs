@@ -12,17 +12,13 @@ namespace RAM.Controllers.Controllers
 {
     public class ScheduleController : BaseController
     {
-        private readonly IBlogService _blogService;
         public ScheduleController(ILocalAuthenticationService authenticationService,
             IUserService userService,
-            IBlogService blogService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
-
-            _blogService = blogService;
         }
 
 
