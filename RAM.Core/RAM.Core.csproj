@@ -65,6 +65,9 @@
     <Compile Include="Domain\Blog\ITag.cs" />
     <Compile Include="Domain\Blog\ITagRepository.cs" />
     <Compile Include="Domain\Blog\Tag.cs" />
+    <Compile Include="Domain\Programs\IProgram.cs" />
+    <Compile Include="Domain\Programs\IProgramRepository.cs" />
+    <Compile Include="Domain\Programs\Program.cs" />
     <Compile Include="Domain\Project\IProject.cs" />
     <Compile Include="Domain\Project\IProjectImage.cs" />
     <Compile Include="Domain\Project\IProjectImageRespository.cs" />

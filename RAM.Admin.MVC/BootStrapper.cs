@@ -19,7 +19,9 @@ using RAM.Infrastructure.UnitOfWork;
 using RAM.Repository.NHibernate;
 using RAM.Services.Cache;
 using System.Web.Security;
+using ModestoPower.Core.Domain.Programs;
 using RAM.Web.Security;
+using RAM.Repository.Mongo.Repositories;
 using RAM.Repository.NHibernate.Repositories;
 
 namespace RAM.Admin.MVC
@@ -56,6 +58,7 @@ namespace RAM.Admin.MVC
                // For<IBlogTagRepository>().Use<BlogTagRepository>();
                //// For<ISubscriberRepository>().Use<SubscriberRepository>();
                // For<IProjectRepository>().Use<ProjectRepository>();
+               For<IProgramRepository>().Use<ProgramRepository>();
                // For<IProjectImageRepository>().Use<ProjectImageRepository>();
                // For<IBannerRepository>().Use<BannerRepository>();
                // For<IBlogCategoryRepository>().Use<BlogCategoryRepository>();
@@ -72,9 +75,11 @@ namespace RAM.Admin.MVC
                 For<IProjectImage>().Use<ProjectImage>();
                 For<IBanner>().Use<Banner>();
                 For<IBlogCategory>().Use<BlogCategory>();
+                For<IProgram>().Use<Program>();
 
                 //Services
                 For<IUserService>().Use<UserService>();
+                For<IProgramService>().Use<ProgramService>();
                 //For<IBannerService>().Use<BannerService>();
                 //For<ISubscriberService>().Use<SubscriberService>();
                 //For<IBlogService>().Use<BlogService>();
@@ -125,7 +130,7 @@ namespace RAM.Admin.MVC
                     //x.For<ISubscriberService>().Use<SubscriberService>();
                     //x.For<IBlogCategoryService>().Use<BlogCategoryService>();
 
-                    x.For<IUserRepository>().Use<UserRepository>();
+                    x.For<IUserRepository>().Use<RAM.Repository.NHibernate.Repositories.UserRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     //x.For<IBlogRepository>().Use<BlogRepository>();
@@ -168,8 +173,10 @@ namespace RAM.Admin.MVC
                     x.For<IProjectService>().Use<ProjectService>();
                     x.For<ISubscriberService>().Use<SubscriberService>();
                     x.For<IBlogCategoryService>().Use<BlogCategoryService>();
+                    x.For<IProgramService>().Use<ProgramService>();
 
                     x.For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
+                    x.For<IProgramRepository>().Use<RAM.Repository.Mongo.Repositories.ProgramRepository>();
                     x.For<IBannerRepository>().Use<BannerRepository>();
                     x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     x.For<IBlogRepository>().Use<BlogRepository>();
@@ -189,6 +196,7 @@ namespace RAM.Admin.MVC
                     x.For<IProject>().Use<Project>();
                     x.For<IProjectImage>().Use<ProjectImage>();
                     x.For<IBlogCategory>().Use<BlogCategory>();
+                    x.For<IProgram>().Use<Program>();
 
                     x.For<ILogger>().Use<Log4NetAdapter>();
 

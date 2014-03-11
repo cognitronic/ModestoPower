@@ -31,7 +31,6 @@ namespace RAM.Controllers.Controllers
         public ActionResult Index()
         {
             var view = new HomeView();
-            view.UserView.FirstName = _userService.FindByID(0).FirstName;
             view.NavView.SelectedMenuItem = "nav-contact";
             return View(view);
 

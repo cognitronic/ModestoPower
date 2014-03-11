@@ -117,6 +117,7 @@
     <Compile Include="Implementations\BlogCategoryService.cs" />
     <Compile Include="Implementations\BlogService.cs" />
     <Compile Include="Implementations\HRRMarketingAuthenticationService.cs" />
+    <Compile Include="Implementations\ProgramService.cs" />
     <Compile Include="Implementations\ProjectService.cs" />
     <Compile Include="Implementations\SubscriberService.cs" />
     <Compile Include="Implementations\TagService.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Interfaces\IBlogCategoryService.cs" />
     <Compile Include="Interfaces\IBlogService.cs" />
     <Compile Include="Interfaces\IHRRMarketingAuthenticationService.cs" />
+    <Compile Include="Interfaces\IProgramService.cs" />
     <Compile Include="Interfaces\IProjectService.cs" />
     <Compile Include="Interfaces\ISubscriberService.cs" />
     <Compile Include="Interfaces\ITagService.cs" />

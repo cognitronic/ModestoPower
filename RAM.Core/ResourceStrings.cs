@@ -19,6 +19,11 @@ namespace RAM.Core
         public static string Cache_BlogPosts = "Cache_BlogPosts";
         public static string Cache_Projects = "Cache_Projects";
         public static string Cache_Banners = "Cache_Banners";
+        public static string Cache_Programs = "Cache_Programs";
+        #endregion
+
+        #region Mongo
+        public static string Mongo_Programs_Collection = "programs";
         #endregion
     }
 }

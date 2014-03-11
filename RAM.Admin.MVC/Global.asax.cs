@@ -16,6 +16,7 @@ using RAM.Repository.NHibernate.Repositories;
 using RAM.Infrastructure.UnitOfWork;
 using RAM.Repository.NHibernate;
 using RAM.Services.Cache;
+using ModestoPower.Core.Domain.Programs;
 
 namespace RAM.Admin.MVC
 {
@@ -25,6 +26,7 @@ namespace RAM.Admin.MVC
         {
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Program>();
 
             GlobalConfiguration.Configuration.DependencyResolver = new WebApiContrib.IoC.StructureMap.StructureMapResolver(BootStrapper.ConfigureStructureMapWebAPI());
 
