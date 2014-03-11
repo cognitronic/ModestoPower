@@ -15,22 +15,19 @@ namespace RAM.Controllers.Controllers
 {
     public class HomeController : BaseController
     {
-        private readonly IBannerService _bannerService;
-        private readonly IProjectService _projectService;
-        private readonly IBlogService _blogService;
+        //private readonly IBannerService _bannerService;
+        //private readonly IProjectService _projectService;
+        //private readonly IBlogService _blogService;
         public HomeController(ILocalAuthenticationService authenticationService,
             IUserService userService,
-            IProjectService projectService,
-            IBlogService blogService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
-            IBannerService bannerService,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
-            _bannerService = bannerService;
-            _projectService = projectService;
-            _blogService = blogService;
+            //_bannerService = bannerService;
+            //_projectService = projectService;
+            //_blogService = blogService;
         }
 
 
