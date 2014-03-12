@@ -55,7 +55,7 @@ namespace RAM.Admin.Controllers.Controllers
             program.imagepaths.Add("/images/BG/testimonials_px.png");
             _programService.Save(program);
             return Json(new {
-                Message = "Program Saved!",
+                Message = "Program Saved!!",
                 ProgramRef = program
         });
         }
