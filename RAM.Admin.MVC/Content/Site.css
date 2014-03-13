@@ -124,3 +124,7 @@ input[type="checkbox"].input-validation-error {
     border:1px solid #94a0b4;
     color:#000
 }
+
+.treerow {
+    width: 100%;
+}                                                                                                                                  
