@@ -1,4 +1,6 @@
-﻿@model RAM.Admin.Controllers.ViewModels.HomeView
+﻿
+
+@model RAM.Admin.Controllers.ViewModels.HomeView
 @{
     ViewBag.Title = "Programs Management";
 }
@@ -56,12 +58,13 @@
             var program = programs[$(this).data('id') - 1 ];*@
             $("#modalName").val($("#name_" + $(this).data('id')).text().trim());
             $("#modalDescription").val($("#description_" + $(this).data('id')).text().trim());
-            $("#hdProgramID").val($(this).data('id'));
+            $("#hdnProgramID").val($(this).data('id'));
+            console.log($("#hdnProgramID").val());
         });
 
-        $(".deleteprogram").on('click', function(e){
+        $(".deleteprogram").on('click', function (e) {
             e.preventDefault();
-            if (!confirm("Do you want to delete")){
+            if (!confirm("Do you want to delete")) {
                 return false;
             }
             $.ajax({
@@ -89,7 +92,8 @@
         function SaveProgramDetails() {
             var program = {
                 name: $("#modalName").val(),
-                description: $("#modalDescription").val()
+                description: $("#modalDescription").val(),
+                sid: $("#hdnProgramID").val()
             }
             console.log(JSON.stringify(program));
             $.ajax({

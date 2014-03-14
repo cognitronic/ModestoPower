@@ -49,11 +49,24 @@ namespace RAM.Admin.Controllers.Controllers
 
         public ActionResult Save(Program program) 
         {
+            var p = new Program();
+            p.description = program.description;
+            p.imagepaths = program.imagepaths;
+            p.name = program.name;
+            p.imagepaths.Add("/images/BG/customer_px.png");
+            p.imagepaths.Add("/images/BG/IMG_0851.png");
+            p.imagepaths.Add("/images/BG/testimonials_px.png");
+            if (program.sid == null || program.sid.Equals("000000000000000000000000"))
+            {
+                _programService.Save(p);
+            }
+            else
+            {
+                p.Id = new MongoDB.Bson.ObjectId(program.sid);
+                _programService.Save(p);
+            }
             HomeView view = new HomeView();
-            program.imagepaths.Add("/images/BG/customer_px.png");
-            program.imagepaths.Add("/images/BG/IMG_0851.png");
-            program.imagepaths.Add("/images/BG/testimonials_px.png");
-            _programService.Save(program);
+            //_programService.Save(program);
             return Json(new {
                 Message = "Program Saved!!",
                 ProgramRef = program

@@ -19,6 +19,9 @@ namespace ModestoPower.Core.Domain.Programs
         public ObjectId Id { get; set; }
 
         [DataMember]
+        public string sid { get; set; }
+
+        [DataMember]
         public string name { get; set; }
 
         [DataMember]
