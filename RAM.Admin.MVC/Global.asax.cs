@@ -12,11 +12,12 @@ using RAM.Infrastructure.Email;
 using RAM.Admin.Controllers;
 using RAM.Admin.Controllers.Controllers;
 using StructureMap;
-using RAM.Repository.NHibernate.Repositories;
+//using RAM.Repository.NHibernate.Repositories;
 using RAM.Infrastructure.UnitOfWork;
-using RAM.Repository.NHibernate;
+//using RAM.Repository.NHibernate;
 using RAM.Services.Cache;
 using ModestoPower.Core.Domain.Programs;
+using ModestoPower.Core.Domain.Pages;
 
 namespace RAM.Admin.MVC
 {
@@ -27,6 +28,7 @@ namespace RAM.Admin.MVC
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
             MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Program>();
+            MongoDB.Bson.Serialization.BsonClassMap.RegisterClassMap<Pages>();
 
             GlobalConfiguration.Configuration.DependencyResolver = new WebApiContrib.IoC.StructureMap.StructureMapResolver(BootStrapper.ConfigureStructureMapWebAPI());
 

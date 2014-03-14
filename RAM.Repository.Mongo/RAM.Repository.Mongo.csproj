@@ -51,9 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MongoUnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\BaseRepository.cs" />
     <Compile Include="Repositories\ProgramRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\WebPageRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Core\RAM.Core.csproj">
@@ -63,6 +66,10 @@
     <ProjectReference Include="..\RAM.Infrastructure\RAM.Infrastructure.csproj">
       <Project>{318913d4-209c-454e-90c2-366ad973e701}</Project>
       <Name>RAM.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RAM.Services\RAM.Services.csproj">
+      <Project>{6d850b93-7be8-4684-b7dc-91c157040065}</Project>
+      <Name>RAM.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

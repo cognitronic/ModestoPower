@@ -1,4 +1,6 @@
-﻿@{
+﻿@model RAM.Admin.Controllers.ViewModels.HomeView
+
+@{
     ViewBag.Title = "Index";
 }
 
@@ -12,73 +14,119 @@
             <li>
                 <span><i class="glyphicon glyphicon-folder-open"></i> </span> <a href=""></a>
                 <ul>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/home">Home</a>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i> </span> <a href="/pages/about">About</a>
-                        <ul>
-                            <li>
-                                <table class="treerow table-hover">
-                                    <tr>
-                                        <td>
-                                            <span><i class="glyphicon glyphicon-leaf"></i> </span> <a href="/pages/our-history">Our History</a>
-                                        </td>
-                                        <td>
-                                            Is Online
-                                        </td>
-                                        <td>
-                                            Last updated: 3/12/2014
-                                        </td>
-                                    </tr>
-                                </table>
-                            </li>
-                            <li>
-                                <span><i class="glyphicon glyphicon-leaf"></i> </span> <a href="/pages/community-outreach">Community Outreach</a>
-                            </li>
-                            <li>
-                                <span><i class="glyphicon glyphicon-leaf"></i> </span> <a href="/pages/member-info">Member Info</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/programs">Programs</a>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/schedule">Schedule</a>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/instructors">Instructors</a>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/blog">Blog</a>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/gallery">Gallery</a>
-                    </li>
-                    <li>
-                        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/contact">Contact</a>
-                    </li>
-                </ul>
+                    @*<li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/home">Home</a>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i> </span> <a href="/pages/about">About</a>
+        <ul>
+            <li>
+                <table class="treerow table-hover">
+                    <tr>
+                        <td>
+                            <span><i class="glyphicon glyphicon-leaf"></i> </span> <a href="/pages/our-history">Our History</a>
+                        </td>
+                        <td>
+                            Is Online
+                        </td>
+                        <td>
+                            Last updated: 3/12/2014
+                        </td>
+                    </tr>
+                </table>
+            </li>
+            <li>
+                <span><i class="glyphicon glyphicon-leaf"></i> </span> <a href="/pages/community-outreach">Community Outreach</a>
+            </li>
+            <li>
+                <span><i class="glyphicon glyphicon-leaf"></i> </span> <a href="/pages/member-info">Member Info</a>
             </li>
         </ul>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/programs">Programs</a>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/schedule">Schedule</a>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/instructors">Instructors</a>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/blog">Blog</a>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/gallery">Gallery</a>
+    </li>
+    <li>
+        <span><i class="glyphicon glyphicon-minus"></i></span> <a href="/pages/contact">Contact</a>
+    </li>*@
+            </ul>
+        </li>
+    </ul>
     </div>
 </div>
 
-        <script>
-            $(function () {
-                $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
-                $('.tree li.parent_li > span').on('click', function (e) {
-                    var children = $(this).parent('li.parent_li').find(' > ul > li');
-                    if (children.is(":visible")) {
-                        children.hide('fast');
-                        $(this).attr('title', 'Expand this branch').find(' > i').addClass('glyphicon-plus').removeClass('glyphicon-minus');
-                    } else {
-                        children.show('fast');
-                        $(this).attr('title', 'Collapse this branch').find(' > i').addClass('glyphicon-minus').removeClass('glyphicon-plus');
-                    }
-                    e.stopPropagation();
-                });
-            });
-        </script>
+<script>
+    $(document).ready(function(){
+        var pages = @Html.Raw(Json.Encode(Model.WebPages));
+        pages.forEach(buildTree);
+        console.log(pages.length);
+
+        function parseJsonDate(jsonDate) {
+            var offset = new Date().getTimezoneOffset() * 60000;
+            var parts = /\/Date\((-?\d+)([+-]\d{2})?(\d{2})?.*/.exec(jsonDate);
+    
+            if (parts[2] == undefined) 
+                parts[2] = 0;
+    
+            if (parts[3] == undefined) 
+                parts[3] = 0;
+    
+            return new Date(+parts[1] + offset + parts[2]*3600000 + parts[3]*60000).toLocaleDateString()}
+
+    
+        function buildTree(page){
+            if(page.parent === 'undefined' || page.parent === null){
+                console.log('here i am');
+                $("<li id='" + page.title + "' class='hover'><span><i class='glyphicon glyphicon-minus'></i></span> <a href='/pages/" + page.title + "'>" + page.title + "</a></li>").appendTo('.tree>ul>li>ul');
+            } else {
+                var status;
+                if(page.isonline)
+                    status = 'online';
+                else
+                    status = 'offline';
+
+                if($('#' + page.parent.replace(' ', '') + '_ul')){
+                    $('#' + page.parent.replace(' ', '')).removeClass('hover');
+
+                    $("<ul id='" + page.parent.replace(' ', '') + "_ul' ><li><table class='treerow table-hover'><tr><td><span><i class='glyphicon glyphicon-leaf'></i></span> <a href='/pages/" + page.title + "'>" + page.title + "</a></td><td>" + status + "</td><td>Last updated: " + parseJsonDate(page.lastupdated)  + "</td></tr></table></li><ul>").appendTo('#' + page.parent.replace(' ', ''));
+                } else {
+                    $('#' + page.parent.replace(' ', '')).removeClass('hover');
+
+                    $("<li id='" + page.title + "' ><table class='treerow table-hover'><tr><td><span><i class='glyphicon glyphicon-leaf'></i></span> <a href='/pages/" + page.title + "'>" + page.title + "</a></td><td>" + status + "</td><td>Last updated: " + page.lastupdated + "</td></tr></table></li>").appendTo('#' + page.parent.replace(' ', '') + '_ul');
+                }
+                
+            }
+        }
+    
+    });
+
+
+    $(function () {
+        console.log('there you are');
+        $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
+        $('.tree li.parent_li > span').on('click', function (e) {
+            var children = $(this).parent('li.parent_li').find(' > ul > li');
+            if (children.is(":visible")) {
+                children.hide('fast');
+                $(this).attr('title', 'Expand this branch').find(' > i').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+            } else {
+                children.show('fast');
+                $(this).attr('title', 'Collapse this branch').find(' > i').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+            }
+            e.stopPropagation();
+        });
+    });
+</script>
 

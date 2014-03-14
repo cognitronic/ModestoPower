@@ -594,10 +594,6 @@
       <Project>{b91685b3-d723-4937-bfca-37c39149756a}</Project>
       <Name>RAM.Repository.Mongo</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RAM.Repository.NHibernate\RAM.Repository.NHibernate.csproj">
-      <Project>{3b0f4c02-3f78-415d-ad1b-abd5a3144bbc}</Project>
-      <Name>RAM.Repository.NHibernate</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RAM.Services\RAM.Services.csproj">
       <Project>{6d850b93-7be8-4684-b7dc-91c157040065}</Project>
       <Name>RAM.Services</Name>
