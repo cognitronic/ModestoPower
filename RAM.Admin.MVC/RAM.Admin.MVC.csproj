@@ -577,6 +577,8 @@
     <Content Include="Views\Program\Index.cshtml" />
     <Content Include="Views\Program\_ProgramsList.cshtml" />
     <Content Include="Views\Pages\Home.cshtml" />
+    <Content Include="Views\Pages\GetPage.cshtml" />
+    <Content Include="Views\Pages\OurHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Admin.Controllers\RAM.Admin.Controllers.csproj">

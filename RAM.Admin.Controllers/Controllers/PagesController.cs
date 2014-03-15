@@ -47,6 +47,13 @@ namespace RAM.Admin.Controllers.Controllers
             return View("Home", view);
         }
 
+        public ActionResult GetPage(string id)
+        {
+            var view = new HomeView();
+            view.SelectedPage = _pagesRepository.GetByTitle(id.Replace("-", " "));
+            return View(view);
+        }
+
         public ActionResult GetPageImages(string id)
         {
             return Json(new

@@ -99,11 +99,11 @@
                 if($('#' + page.parent.replace(' ', '') + '_ul')){
                     $('#' + page.parent.replace(' ', '')).removeClass('hover');
 
-                    $("<ul id='" + page.parent.replace(' ', '') + "_ul' ><li><table class='treerow table-hover'><tr><td style='text-align: left;'><span><i class='glyphicon glyphicon-leaf'></i></span> <a href='/pages/" + page.title.split(' ').join('-') + "'>" + page.title + "</a></td><td style='text-align: right;'>Last updated: " + parseJsonDate(page.lastupdated)  + "</td></tr></table></li><ul>").appendTo('#' + page.parent.replace(' ', ''));
+                    $("<ul id='" + page.parent.replace(' ', '') + "_ul' ><li><table class='treerow table-hover'><tr><td style='text-align: left;'><span><i class='glyphicon glyphicon-leaf'></i></span> <a href='/pages/getpage/" + page.title.split(' ').join('-') + "'>" + page.title + "</a></td><td style='text-align: right;'>Last updated: " + parseJsonDate(page.lastupdated)  + "</td></tr></table></li><ul>").appendTo('#' + page.parent.replace(' ', ''));
                 } else {
                     $('#' + page.parent.replace(' ', '')).removeClass('hover');
 
-                    $("<li id='" + page.title + "' ><table class='treerow table-hover'><tr><td><span><i class='glyphicon glyphicon-leaf'></i></span> <a href='/pages/" + page.title + "'>" + page.title + "</a></td></tr></table></li>").appendTo('#' + page.parent.replace(' ', '') + '_ul');
+                    $("<li id='" + page.title + "' ><table class='treerow table-hover'><tr><td><span><i class='glyphicon glyphicon-leaf'></i></span> <a href='/pages/getpage/" + page.title + "'>" + page.title + "</a></td></tr></table></li>").appendTo('#' + page.parent.replace(' ', '') + '_ul');
                 }
                 
             }
