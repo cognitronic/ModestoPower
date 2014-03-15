@@ -1,0 +1,257 @@
+﻿@model RAM.Admin.Controllers.ViewModels.HomeView
+
+@{
+    ViewBag.Title = "Home";
+}
+
+<div class="container">
+    <div class="row">
+        <h2>@Model.SelectedPage.title - Management Section</h2>
+        <hr />
+        <div class="col-lg-12">
+            <b>Is Online: </b>&nbsp;<input id="isOnline" class="input-large"  type="checkbox" checked="@Model.SelectedPage.isonline"/><br />
+            <b>Title:</b><br />
+            <input id="title" class="form-control input-large required" value="@Model.SelectedPage.title" placeholder="Enter Title" /><br />
+            <b>SEO Keywords:</b>(comma separated list)<br />
+            <input id="seoKeywords" type="text" value="@Model.SelectedPage.seokeywords" class="form-control required input-lg" placeholder="Enter SEO Keywords" /><br />
+            <b>SEO Description:</b><br />
+            <textarea id="seoDescription" class="form-control" rows="6" placeholder="Enter SEO Description">@Model.SelectedPage.seodescription</textarea><br />
+            <b>Content Body:</b><br />
+            <textarea id="contentbody" class="form-control" rows="6" placeholder="Enter Content"></textarea><br />
+            @if (Model.SelectedPage != null)
+            {
+                <span><b>Click To Manage Pictures:</b></span><br />
+                if(Model.SelectedPage.bannerimage.Count > 0)
+                { 
+                    <a href="#pageModal" class="editPageModal" data-toggle="modal" data-id="@Model.SelectedPage.Id.ToString()">
+                        <img id="postimage" src="@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]@Model.SelectedPage.bannerimage[0]" alt="@Model.SelectedPage.title" class="img-thumbnail" style="height: 200px; width: 300px;" />
+                    </a>
+                }
+            }
+            <br /><br />
+            <button class="savePage btn btn-success" role="button">Save Page</button>
+            <a href="/Pages" class="btn btn-info" role="button">Back To List</a>
+        </div>
+    </div>
+</div>
+<div id="pageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 id="modalLabel">Add/Edit Background Images</h3>
+            </div>
+            <div class="modal-body">
+                <form action="~/Pages/SaveBackgroundImages" class="dropzone" id="dropzoneJsForm">
+                    <input name="pageID" type="hidden" id="hdnPageID" />
+                    <input name="test" type="hidden" id="hdntest" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelModal" type="button" class="btn" data-dismiss="modal">Cancel</button>
+                <button id="submit-all" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var dropZoneInstance;
+        var bgImages = [];
+
+        //#region Tiny MCE
+        tinymce.init({
+            selector: "textarea#contentbody",
+            browser_spellcheck: true,
+            importcss_append: true,
+            height: 500,
+            plugins: [
+            "advlist autolink lists link image charmap print preview anchor",
+            "searchreplace visualblocks code fullscreen",
+            "insertdatetime media table contextmenu paste textcolor "
+            ],
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | forecolor | formatselect fontsizeselect",
+            menu: {
+
+            }
+        });
+
+
+        //#region Save Post
+
+        $('.savePage').on('click', function (e) {
+            e.preventDefault();
+            
+            var p = {
+                isonline: $('#isOnline').prop('checked'),
+                title: $('#title').val(),
+                SEOKeywords: $('#seoKeywords').val(),
+                SEODescription: $('#seoDescription').val(),
+                Post: tinyMCE.activeEditor.getContent()
+            };
+            if (isNew) {
+                p.ID = 0;
+            } else {
+
+                p.ID = post.ID;
+            }
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Pages/SavePage',
+                type: 'POST',
+                data: JSON.stringify({ page: p }),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    console.log(data.Message);
+                    if (data.IsNew) {
+                        $("#hdnPageID").val(data.BlogID);
+                        $('#pageModal').modal('show');
+                    } else {
+                        window.location = window.location;
+                    }
+                }
+            });
+        });
+
+        //#endregion
+
+        //#region Dropzone js Blog Image
+
+        $(".editPageModal").on('click', function (e) {
+            e.preventDefault();
+            console.log($(this).data('id'));
+            $("#hdnPageID").val($(this).data('id'));
+
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Pages/GetPageImages',
+                type: 'POST',
+                data: JSON.stringify({id : $(this).data('id')}),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function(data){
+                    bgImages = data.Images;
+                    buildImages(dropZoneInstance(), bgImages);
+                },
+                error: function(x,y,z){
+
+                }
+            });
+        });
+
+        function buildImages(dz, imgs) {
+            for (var i = 0; i < imgs.length; i++) {
+                var mockFile = { name: imgs[i].ID, size: 12345 };
+
+                // Call the default addedfile event handler
+                dz.emit("addedfile", mockFile);
+
+                // And optionally show the thumbnail of the file:
+                dz.emit("thumbnail", mockFile, '@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]' + imgs[i]);
+            }
+            // If you use the maxFiles option, make sure you adjust it to the
+            // correct amount:
+            var existingFileCount = imgs.length; // The number of files already uploaded
+            dz.options.maxFiles = dz.options.maxFiles - existingFileCount;
+        }
+
+        function removeImages(dz, imgs) {
+            for (var i = 0; i < imgs.length; i++) {
+                var mockFile = { name: imgs[i].ID, size: 12345 };
+
+                // Call the default addedfile event handler
+                dz.emit("removefile", mockFile);
+
+                // And optionally show the thumbnail of the file:
+                //dz.emit("thumbnail", mockFile, '@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]' + imgs[i]);
+            }
+            // If you use the maxFiles option, make sure you adjust it to the
+            // correct amount:
+            var existingFileCount = imgs.length; // The number of files already uploaded
+            dz.options.maxFiles = dz.options.maxFiles - existingFileCount;
+        }
+
+        function DeleteFileFromServer(file) {
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Portfolio/DeletePortfolioImage',
+                type: 'POST',
+                data: JSON.stringify({ id: file.name }),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    console.log(file.name + " deleted");
+                    $("#portfolioList").html("");
+                    $("#portfolioList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Portfolio/PortfolioList');
+                },
+                error: function (x, y, z) {
+                    console.log(x + '\n' + y + '\n' + z);
+                }
+            });
+        }
+
+
+
+        Dropzone.options.dropzoneJsForm = {
+
+            //prevents Dropzone from uploading dropped files immediately
+            autoProcessQueue: false,
+            maxFiles: 5,
+            maxFilesize: 3,
+            addRemoveLinks: true,
+            parallelUploads: 5,
+
+            init: function () {
+                var submitButton = document.querySelector("#submit-all");
+                var cancelButton = document.querySelector("#cancelModal");
+                var filesadded = false;
+                var myDropzone = this; //closure
+
+                function getDropZoneInstance() {
+                    return myDropzone;
+                }
+
+                dropZoneInstance = getDropZoneInstance;
+
+                submitButton.addEventListener("click", function () {
+
+                    $("#hdntest").val("3");
+                    console.log(filesadded);
+                    if (filesadded) {
+                        myDropzone.processQueue();
+                    } else {
+                        //SavePortfolioDetails();
+                        $("#pageoModal").modal('hide');
+                    }
+                });
+
+                document.querySelector("button#cancelModal").addEventListener("click", function () {
+                    console.log("cancel clicked");
+                    window.location = window.location;
+                    $('#pageoModal').modal('hide');
+                    
+                });
+
+                this.on("success", function (file, response) {
+                    if (response.Status == "success") {
+                        console.log('Image changed!');
+                        $('#pageModal').modal('hide');
+                        window.location = response.ReturnUrl;
+                    }
+                });
+
+                this.on("complete", function (file) {
+                    this.removeFile(file);
+                });
+
+                this.on("drop", function (event) {
+                    filesadded = true;
+                });
+            }
+        };
+
+        //#endregion
+
+
+    });
+</script>
+
+

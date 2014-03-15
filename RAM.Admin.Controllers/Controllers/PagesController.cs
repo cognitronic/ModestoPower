@@ -34,9 +34,56 @@ namespace RAM.Admin.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.WebPages = _pagesRepository.GetAll();
-            view.NavView.SelectedMenuItem = "nav-banners";
+            view.NavView.SelectedMenuItem = "nav-pages";
             return View(view);
 
+        }
+
+        public ActionResult Home()
+        {
+            HomeView view = new HomeView();
+            view.SelectedPage = _pagesRepository.GetByTitle("Home");
+            view.NavView.SelectedMenuItem = "nav-pages";
+            return View("Home", view);
+        }
+
+        public ActionResult GetPageImages(string id)
+        {
+            return Json(new
+            {
+                Message = "grabbed images ",
+                Images = _pagesRepository.GetById(new MongoDB.Bson.ObjectId(id)).bannerimage
+            });
+        }
+
+        public ActionResult SaveBackgroundImages()
+        {
+            var p = new Pages();
+            if (Request.Form.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(Request.Form["pageID"]))
+                {
+                    p = _pagesRepository.GetById(new MongoDB.Bson.ObjectId(Request.Form["pageID"]));
+                }
+                var list = new List<string>();
+                foreach (string fileName in Request.Files)
+                {
+                    var file = Request.Files[fileName];
+                    list.Add(ConfigurationSettings.AppSettings["PagesBGImageURL"] + file.FileName);
+                    file.SaveAs(ConfigurationSettings.AppSettings["PagesBGImageDir"] + file.FileName);
+                }
+                foreach (var i in p.bannerimage) 
+                {
+                    list.Add(i);
+                }
+                p.bannerimage = list;
+                _pagesRepository.Save(p);
+            }
+            return Json(new
+            {
+                Message = "images saved ",
+                Status = "success"
+            });
         }
     }
 }

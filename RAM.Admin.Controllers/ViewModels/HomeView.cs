@@ -33,6 +33,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public IList<IBlogCategory> BlogCategories { get; set; }
         public IList<Tag> Tags { get; set; }
         public Blog SelectedBlog { get; set; }
+        public IPages SelectedPage { get; set; }
         public IList<BlogTag> SelectedBlogTags { get; set; }
 
         public User SelectedUser { get; set; }

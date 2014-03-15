@@ -37,6 +37,12 @@ namespace ModestoPower.Core.Domain.Pages
         public string bannertext { get; set; }
 
         [DataMember]
+        public string seokeywords { get; set; }
+
+        [DataMember]
+        public string seodescription { get; set; }
+
+        [DataMember]
         public string maincontent { get; set; }
 
         [DataMember]

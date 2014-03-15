@@ -19,6 +19,8 @@ namespace ModestoPower.Core.Domain.Pages
         string headertext { get; set; }
         string maincontent { get; set; }
         string parent { get; set; }
+        string seokeywords { get; set; }
+        string seodescription { get; set; }
         IList<string> bannerimage { get; set; }
     }
 }

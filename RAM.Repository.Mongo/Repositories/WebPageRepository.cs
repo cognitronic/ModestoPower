@@ -25,15 +25,22 @@ namespace RAM.Repository.Mongo.Repositories
             return _collection.FindAllAs<IPages>().OrderBy(o => o.sortorder).ToList<IPages>();
         }
 
-        public IPages GetById(ObjectId id)
+        public Pages GetById(ObjectId id)
         {
-            var query = Query<IPages>.EQ(e => e.Id, id);
-            return _collection.FindOneAs<IPages>(query);
+            var query = Query<Pages>.EQ(e => e.Id, id);
+            return _collection.FindOneAs<Pages>(query);
         }
 
-        public IPages Save(IPages p)
+        public Pages GetByTitle(string title)
         {
-            throw new NotImplementedException();
+            var query = Query<Pages>.EQ(e => e.title, title);
+            return _collection.FindOneAs<Pages>(query);
+        }
+
+        public Pages Save(Pages p)
+        {
+            _collection.Save(p);
+            return null;
         }
 
         public IPages Delete(IPages p)
