@@ -56,6 +56,25 @@ namespace RAM.Admin.Controllers.Controllers
             });
         }
 
+        public ActionResult DeleteImage(string id, string name)
+        {
+            var p = _pagesRepository.GetById(new MongoDB.Bson.ObjectId(id));
+            var images = new List<string>();
+            foreach (var image in p.bannerimage)
+            {
+                if (!image.Equals(name))
+                {
+                    images.Add(image);
+                }
+            }
+            p.bannerimage = images;
+            _pagesRepository.Save(p);
+            return Json(new
+            {
+                Message = "image deleted"
+            });
+        }
+
         public ActionResult SaveBackgroundImages()
         {
             var p = new Pages();
@@ -63,7 +82,7 @@ namespace RAM.Admin.Controllers.Controllers
             {
                 if (!string.IsNullOrEmpty(Request.Form["pageID"]))
                 {
-                    p = _pagesRepository.GetById(new MongoDB.Bson.ObjectId(Request.Form["pageID"]));
+                    p = (Pages)_pagesRepository.GetById(new MongoDB.Bson.ObjectId(Request.Form["pageID"]));
                 }
                 var list = new List<string>();
                 foreach (string fileName in Request.Files)

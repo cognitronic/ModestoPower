@@ -20,9 +20,9 @@ namespace RAM.Repository.Mongo.Repositories
         {
             _cache = cache;
         }
-        public IList<IPages> GetAll()
+        public IList<Pages> GetAll()
         {
-            return _collection.FindAllAs<IPages>().OrderBy(o => o.sortorder).ToList<IPages>();
+            return _collection.FindAllAs<Pages>().OrderBy(o => o.sortorder).ToList<Pages>();
         }
 
         public Pages GetById(ObjectId id)
@@ -40,12 +40,14 @@ namespace RAM.Repository.Mongo.Repositories
         public Pages Save(Pages p)
         {
             _collection.Save(p);
-            return null;
+            return p;
         }
 
-        public IPages Delete(IPages p)
+        public Pages Delete(Pages p)
         {
-            throw new NotImplementedException();
+            var query = Query<Pages>.EQ(e => e.Id, p.Id);
+            _collection.Remove(query);
+            return null;
         }
     }
 }

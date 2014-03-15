@@ -102,13 +102,7 @@
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
-                    console.log(data.Message);
-                    if (data.IsNew) {
-                        $("#hdnPageID").val(data.BlogID);
-                        $('#pageModal').modal('show');
-                    } else {
-                        window.location = window.location;
-                    }
+                    window.location
                 }
             });
         });
@@ -130,7 +124,7 @@
                 contentType: "application/json;charset=utf-8",
                 success: function(data){
                     bgImages = data.Images;
-                    buildImages(dropZoneInstance(), bgImages);
+                    buildImages(dropZoneInstance(), bgImages, $("#hdnPageID").val());
                 },
                 error: function(x,y,z){
 
@@ -138,9 +132,9 @@
             });
         });
 
-        function buildImages(dz, imgs) {
+        function buildImages(dz, imgs, id) {
             for (var i = 0; i < imgs.length; i++) {
-                var mockFile = { name: imgs[i].ID, size: 12345 };
+                var mockFile = { name: imgs[i], size: 12345, id: id};
 
                 // Call the default addedfile event handler
                 dz.emit("addedfile", mockFile);
@@ -156,7 +150,8 @@
 
         function removeImages(dz, imgs) {
             for (var i = 0; i < imgs.length; i++) {
-                var mockFile = { name: imgs[i].ID, size: 12345 };
+                console.log(imgs[i]);
+                var mockFile = { name: imgs[i], size: 12345 };
 
                 // Call the default addedfile event handler
                 dz.emit("removefile", mockFile);
@@ -171,16 +166,15 @@
         }
 
         function DeleteFileFromServer(file) {
+            console.log(file);
             $.ajax({
-                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Portfolio/DeletePortfolioImage',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Pages/DeleteImage',
                 type: 'POST',
-                data: JSON.stringify({ id: file.name }),
+                data: JSON.stringify({ id: file.id, name: file.name}),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
                     console.log(file.name + " deleted");
-                    $("#portfolioList").html("");
-                    $("#portfolioList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Portfolio/PortfolioList');
                 },
                 error: function (x, y, z) {
                     console.log(x + '\n' + y + '\n' + z);
@@ -219,14 +213,14 @@
                         myDropzone.processQueue();
                     } else {
                         //SavePortfolioDetails();
-                        $("#pageoModal").modal('hide');
+                        $("#pageModal").modal('hide');
                     }
                 });
 
                 document.querySelector("button#cancelModal").addEventListener("click", function () {
                     console.log("cancel clicked");
                     window.location = window.location;
-                    $('#pageoModal').modal('hide');
+                    $('#pageModal').modal('hide');
                     
                 });
 
@@ -234,12 +228,16 @@
                     if (response.Status == "success") {
                         console.log('Image changed!');
                         $('#pageModal').modal('hide');
-                        window.location = response.ReturnUrl;
+                        window.location = window.location;
                     }
                 });
 
                 this.on("complete", function (file) {
                     this.removeFile(file);
+                });
+
+                this.on("removedfile", function (file) {
+                    DeleteFileFromServer(file);
                 });
 
                 this.on("drop", function (event) {

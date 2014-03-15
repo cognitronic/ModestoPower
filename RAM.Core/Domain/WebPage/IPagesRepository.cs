@@ -9,10 +9,10 @@ namespace ModestoPower.Core.Domain.Pages
 {
     public interface IPagesRepository
     {
-        IList<IPages> GetAll();
+        IList<Pages> GetAll();
         Pages GetById(ObjectId id);
         Pages Save(Pages p);
-        IPages Delete(IPages p);
+        Pages Delete(Pages p);
         Pages GetByTitle(string title);
     }
 }

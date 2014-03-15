@@ -21,7 +21,7 @@ namespace RAM.Admin.Controllers.ViewModels
             Tags = new List<Tag>();
             Users = new List<User>();
             Programs = new List<IProgram>();
-            WebPages = new List<IPages>();
+            WebPages = new List<Pages>();
         }
         public NavigationView NavView { get; set; }
         public IList<IBanner> Banners { get; set; }
@@ -29,7 +29,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public IList<IProgram> Programs { get; set; }
         public IList<User> Users { get; set; }
         public IList<IBlog> Blogs { get; set; }
-        public IList<IPages> WebPages { get; set; }
+        public IList<Pages> WebPages { get; set; }
         public IList<IBlogCategory> BlogCategories { get; set; }
         public IList<Tag> Tags { get; set; }
         public Blog SelectedBlog { get; set; }
