@@ -53,9 +53,6 @@ namespace RAM.Admin.Controllers.Controllers
             p.description = program.description;
             p.imagepaths = program.imagepaths;
             p.name = program.name;
-            p.imagepaths.Add("/images/BG/customer_px.png");
-            p.imagepaths.Add("/images/BG/IMG_0851.png");
-            p.imagepaths.Add("/images/BG/testimonials_px.png");
             if (program.sid == null || program.sid.Equals("000000000000000000000000"))
             {
                 _programService.Save(p);

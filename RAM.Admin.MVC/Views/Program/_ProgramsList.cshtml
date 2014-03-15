@@ -9,12 +9,9 @@
                 Name
             </th>
             <th>
-                Image
-            </th>
-            <th>
                 Description
             </th>
-            <th>
+            <th style="text-align: right;">
                 Actions
             </th>
         </tr>
@@ -29,16 +26,11 @@
                     </span>
                 </td>
                 <td>
-                    <span>
-                        <img src='@System.Configuration.ConfigurationManager.AppSettings["PublicSiteURL"]@program.imagepaths[0]' class="img-thumbnail" style="width: 300px; height: 200px;" />
-                    </span>
-                </td>
-                <td>
                     <span id="description_@program.Id">
                         @program.description
                     </span>
                 </td>
-                <td>
+                <td style="text-align: right;">
                     <a id="programEdit_@program.Id" href="#programModal" class="editModal btn btn-info" role="button" data-toggle="modal" data-id="@program.Id">Edit</a>
                     <button class="deleteprogram btn btn-danger" data-id="@program.Id" type="button">Delete</button>
                 </td>

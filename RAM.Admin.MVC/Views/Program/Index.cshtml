@@ -31,12 +31,7 @@
                             <input id="modalName" type="text" class="form-control" placeholder="Enter Name of Program" /><br />
                             <b>Description:</b><br />
                             <input id="modalDescription" type="text" class="form-control" placeholder="Enter Sub Text" />
-                            <hr />
-                            <form action="~/Program/SaveProgram" class="dropzone" id="dropzoneJsForm">
-                                <input name="name" type="hidden" id="hdnName" />
-                                <input name="subDescription" type="hidden" id="hdnDescription" />
-                                <input name="programID" type="hidden" id="hdnProgramID" />
-                            </form>
+                            <input name="programID" type="hidden" id="hdnProgramID" />
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -49,17 +44,15 @@
     </div>
     <script type="text/javascript">
     $(document).ready(function () {
-
         var program = {};
 
         $(".editModal").on('click', function (e) {
             e.preventDefault();
             @*var programs = @Html.Raw(Json.Encode(Model.programs));
-            var program = programs[$(this).data('id') - 1 ];*@
+                var program = programs[$(this).data('id') - 1 ];*@
             $("#modalName").val($("#name_" + $(this).data('id')).text().trim());
             $("#modalDescription").val($("#description_" + $(this).data('id')).text().trim());
             $("#hdnProgramID").val($(this).data('id'));
-            console.log($("#hdnProgramID").val());
         });
 
         $(".deleteprogram").on('click', function (e) {
@@ -70,7 +63,7 @@
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Program/DeleteProgram',
                 type: 'POST',
-                data: JSON.stringify({id: $(this).data('id')}),
+                data: JSON.stringify({ id: pid() }),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
@@ -95,7 +88,6 @@
                 description: $("#modalDescription").val(),
                 sid: $("#hdnProgramID").val()
             }
-            console.log(JSON.stringify(program));
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Program/Save',
                 type: 'POST',
@@ -104,16 +96,16 @@
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
                     console.log(data.Message);
+                    $("#programModal").modal('hide');
                     $("#programList").html("");
                     $("#programList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Program/ProgramsList');
-                    $('#programList').effect("highlight", { color: "#7fd658" }, 1000);
-                },
-                error: function (x, y, z) {
-                    console.log(x + '\n' + y + '\n' + z);
-                }
-            });
-        }
-
-    });
+                        $('#programList').effect("highlight", { color: "#7fd658" }, 1000);
+                    },
+                    error: function (x, y, z) {
+                        console.log(x + '\n' + y + '\n' + z);
+                    }
+                });
+            }
+        });
     </script>
 

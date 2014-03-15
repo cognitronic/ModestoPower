@@ -88,7 +88,6 @@
     
         function buildTree(page){
             if(page.parent === 'undefined' || page.parent === null){
-                console.log('here i am');
                 $("<li id='" + page.title + "' class='hover'><span><i class='glyphicon glyphicon-minus'></i></span> <a href='/pages/" + page.title + "'>" + page.title + "</a></li>").appendTo('.tree>ul>li>ul');
             } else {
                 var status;
@@ -114,7 +113,6 @@
 
 
     $(function () {
-        console.log('there you are');
         $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
         $('.tree li.parent_li > span').on('click', function (e) {
             var children = $(this).parent('li.parent_li').find(' > ul > li');
