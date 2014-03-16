@@ -37,7 +37,6 @@ namespace RAM.Controllers.Controllers
         public ActionResult OurHistory()
         {
             var view = new HomeView();
-
             view.SelectedPage = _pagesRepository.GetByTitle("Our History");
             return View(view);
 
@@ -46,6 +45,7 @@ namespace RAM.Controllers.Controllers
         public ActionResult CommunityOutreach()
         {
             var view = new HomeView();
+            view.SelectedPage = _pagesRepository.GetByTitle("Community Outreach");
             return View(view);
 
         }
@@ -53,6 +53,7 @@ namespace RAM.Controllers.Controllers
         public ActionResult MembershipInfo()
         {
             var view = new HomeView();
+            view.SelectedPage = _pagesRepository.GetByTitle("Membership Info");
             return View(view);
 
         }

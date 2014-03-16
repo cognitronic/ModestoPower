@@ -2,7 +2,7 @@
 @model RAM.Controllers.ViewModels.HomeView
 
 @{
-    ViewBag.Title = "Modesto Power | Our History";
+    ViewBag.Title = "Modesto Power | " + Model.SelectedPage.title;
 }
 <section id="promo" class="historyheader parallax">
     <div class="container">
@@ -14,12 +14,12 @@
     <br />
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-md-6 col-sm-12 col-xs-12 about-inner">
+            <div class="col-lg-9 col-md-6 col-sm-12 col-xs-12 about-inner">
                 <h2>@Model.SelectedPage.title</h2>
                 <h3>@Model.SelectedPage.headertext</h3>
                 @Html.Raw(Model.SelectedPage.maincontent)
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+            <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
                 <div class="visual">
                     <img class="about-mockup thumbnail" src="/images/basic/IMG_0535.jpg" alt="/">
                 </div>
