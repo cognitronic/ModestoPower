@@ -8,20 +8,22 @@ using RAM.Services.Interfaces;
 using RAM.Controllers.ActionArguments;
 using RAM.Controllers.ViewModels;
 using System.Web.Mvc;
+using ModestoPower.Core.Domain.Pages;
 
 namespace RAM.Controllers.Controllers
 {
     public class AboutController : BaseController
     {
-        
+        private readonly IPagesRepository _pagesRepository;
         public AboutController(ILocalAuthenticationService authenticationService,
             IUserService userService,
+            IPagesRepository pagesRepository,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
-            
+            _pagesRepository = pagesRepository;
         }
 
 
@@ -35,6 +37,8 @@ namespace RAM.Controllers.Controllers
         public ActionResult OurHistory()
         {
             var view = new HomeView();
+
+            view.SelectedPage = _pagesRepository.GetByTitle("Our History");
             return View(view);
 
         }

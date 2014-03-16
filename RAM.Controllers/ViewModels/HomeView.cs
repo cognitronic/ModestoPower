@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using RAM.Core.Domain.Banner;
 using RAM.Core.Domain.Project;
 using RAM.Core.Domain.Blog;
+using ModestoPower.Core.Domain.Pages;
 
 namespace RAM.Controllers.ViewModels
 {
@@ -22,6 +23,8 @@ namespace RAM.Controllers.ViewModels
 
         public IList<IProject> Projects { get; set; }
         public IProject SelectedProject { get; set; }
+
+        public IPages SelectedPage { get; set; }
 
         public IList<IBlog> Posts { get; set; }
 

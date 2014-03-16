@@ -22,6 +22,7 @@ using RAM.Services.Cache;
 using System.Web.Security;
 using RAM.Web.Security;
 using RAM.Repository.NHibernate.Repositories;
+using ModestoPower.Core.Domain.Pages;
 
 namespace ModestoPower.Mvc
 {
@@ -51,6 +52,7 @@ namespace ModestoPower.Mvc
                 else
                 {
                     For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
+                    For<IPagesRepository>().Use<RAM.Repository.Mongo.Repositories.WebPageRepository>();
                 }
 
                 // For<IBlogRepository>().Use<BlogRepository>();
@@ -70,6 +72,7 @@ namespace ModestoPower.Mvc
                 For<IBlog>().Use<Blog>();
                 // For<ISubscriber>().Use<Subscriber>();
                 For<IProject>().Use<Project>();
+                For<IPages>().Use<Pages>();
                 For<IProjectImage>().Use<ProjectImage>();
                 For<IBanner>().Use<Banner>();
                 For<IBlogCategory>().Use<BlogCategory>();
@@ -127,6 +130,7 @@ namespace ModestoPower.Mvc
                     //x.For<IBlogCategoryService>().Use<BlogCategoryService>();
 
                     x.For<IUserRepository>().Use<UserRepository>();
+                    x.For<IPagesRepository>().Use<RAM.Repository.Mongo.Repositories.WebPageRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     //x.For<IBlogRepository>().Use<BlogRepository>();
@@ -144,6 +148,7 @@ namespace ModestoPower.Mvc
                     x.For<IBlog>().Use<Blog>();
                     // x.For<ISubscriber>().Use<Subscriber>();
                     x.For<IProject>().Use<Project>();
+                    x.For<IPages>().Use<Pages>();
                     x.For<IProjectImage>().Use<ProjectImage>();
                     x.For<IBlogCategory>().Use<BlogCategory>();
 

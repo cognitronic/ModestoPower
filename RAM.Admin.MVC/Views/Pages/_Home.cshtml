@@ -9,6 +9,10 @@
             <b>Is Online: </b>&nbsp;<input id="isOnline" class="input-large" type="checkbox" checked="@Model.SelectedPage.isonline" /><br />
             <b>Title:</b><br />
             <input id="title" class="form-control input-large required" value="@Model.SelectedPage.title" placeholder="Enter Title" /><br />
+            <b>Banner Text:</b><br />
+            <input id="bannertext" class="form-control input-large required" value="@Model.SelectedPage.bannertext" placeholder="Enter Banner Text" /><br />
+            <b>Header Text:</b><br />
+            <input id="headertext" class="form-control input-large required" value="@Model.SelectedPage.headertext" placeholder="Enter Header Text" /><br />
             <b>SEO Keywords:</b>(comma separated list)<br />
             <input id="seoKeywords" type="text" value="@Model.SelectedPage.seokeywords" class="form-control required input-lg" placeholder="Enter SEO Keywords" /><br />
             <b>SEO Description:</b><br />
@@ -84,6 +88,8 @@
                 title: $('#title').val(),
                 SEOKeywords: $('#seoKeywords').val(),
                 SEODescription: $('#seoDescription').val(),
+                bannertext: $('#bannertext').val(),
+                headertext: $('#headertext').val(),
                 Post: tinyMCE.activeEditor.getContent()
                 
             };
