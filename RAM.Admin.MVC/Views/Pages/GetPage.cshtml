@@ -1,10 +1,8 @@
 ﻿@model RAM.Admin.Controllers.ViewModels.HomeView
 
 @{
-    ViewBag.Title = "GetPage";
+    ViewBag.Title = Model.SelectedPage.title;
 }
-
-<h2>GetPage</h2>
 
 @Html.Partial("_" + Model.SelectedPage.title.Replace(" ", ""))
 

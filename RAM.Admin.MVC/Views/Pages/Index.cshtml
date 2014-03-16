@@ -88,7 +88,7 @@
     
         function buildTree(page){
             if(page.parent === 'undefined' || page.parent === null){
-                $("<li id='" + page.title + "' class='hover'><span><i class='glyphicon glyphicon-minus'></i></span> <a href='/pages/" + page.title.split(' ').join('-') + "'>" + page.title + "</a></li>").appendTo('.tree>ul>li>ul');
+                $("<li id='" + page.title + "' class='hover'><span><i class='glyphicon glyphicon-minus'></i></span> <a href='/pages/getpage/" + page.title.split(' ').join('-') + "'>" + page.title + "</a></li>").appendTo('.tree>ul>li>ul');
             } else {
                 var status;
                 if(page.isonline)
