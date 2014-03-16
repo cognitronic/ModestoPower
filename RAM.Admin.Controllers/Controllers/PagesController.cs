@@ -13,6 +13,7 @@ using System.Web;
 using System.IO;
 using System.Configuration;
 using ModestoPower.Core.Domain.Pages;
+using System.Web.Script.Serialization;
 
 namespace RAM.Admin.Controllers.Controllers
 {
@@ -51,6 +52,19 @@ namespace RAM.Admin.Controllers.Controllers
         {
             var view = new HomeView();
             view.SelectedPage = _pagesRepository.GetByTitle(id.Replace("-", " "));
+            switch (view.SelectedPage.title) 
+            {
+                case "Home":
+                case "Blog":
+                case "Schedule":
+                case "Gallery":
+                case "Contact":
+                    view.UsePartialView = true;
+                    break;
+                default:
+                    view.UsePartialView = false;
+                    break;
+            }
             return View(view);
         }
 
@@ -109,6 +123,26 @@ namespace RAM.Admin.Controllers.Controllers
             {
                 Message = "images saved ",
                 Status = "success"
+            });
+        }
+
+        public ActionResult SavePage(Pages page)
+        {
+            var p = _pagesRepository.GetById(new MongoDB.Bson.ObjectId(page.sid));
+            if (p != null)
+            {
+                p.isonline = page.isonline;
+                p.title = page.title;
+                p.seodescription = page.seodescription;
+                p.seokeywords = page.seokeywords;
+                p.maincontent = page.maincontent;
+                p.lastupdated = DateTime.Now;
+                _pagesRepository.Save(p);
+            }
+
+            return Json(new
+            {
+                Message = "image deleted"
             });
         }
     }

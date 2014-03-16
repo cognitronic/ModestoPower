@@ -22,6 +22,9 @@ namespace ModestoPower.Core.Domain.Pages
         public string title { get; set; }
 
         [DataMember]
+        public string sid { get; set; }
+
+        [DataMember]
         public bool isonline { get; set; }
 
         [DataMember]

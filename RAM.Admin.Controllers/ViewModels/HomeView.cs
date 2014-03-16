@@ -35,7 +35,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public Blog SelectedBlog { get; set; }
         public IPages SelectedPage { get; set; }
         public IList<BlogTag> SelectedBlogTags { get; set; }
-
+        public bool UsePartialView { get; set; }
         public User SelectedUser { get; set; }
     }
 }
