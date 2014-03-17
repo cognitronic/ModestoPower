@@ -5,24 +5,24 @@ using System.Text;
 using System.Threading.Tasks;
 using RAM.Infrastructure.Domain;
 using RAM.Core.Domain.User;
+using MongoDB.Bson;
 
 namespace RAM.Core.Domain.Blog
 {
-    public interface IBlog : ISystemObject
+    public interface IBlog
     {
-        string Title { get; set; }
-        int BlogCategoryID { get; set; }
-        string Post { get; set; }
-        string PostPreview { get; set; }
-        int EnteredBy { get; set; }
-        string SEOKeywords { get; set; }
-        string SEODescription { get; set; }
-        DateTime DatePosted { get; set; }
-        bool IsActive { get; set; }
-        string ImagePath { get; set; }
-        IUser EnteredByRef { get; set; }
-        IBlogCategory Category { get; set; }
-
-        IList<BlogTag> Tags { get; set; }
+        ObjectId Id { get; set; }
+        string sid { get; set; }
+        string title { get; set; }
+        string category { get; set; }
+        string post { get; set; }
+        string postpreview { get; set; }
+        string enteredby { get; set; }
+        string seokeywords { get; set; }
+        string seodescription { get; set; }
+        DateTime dateposted { get; set; }
+        bool isactive { get; set; }
+        string imagepath { get; set; }
+        IList<string> tags { get; set; }
     }
 }

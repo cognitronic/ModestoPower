@@ -12,7 +12,7 @@ namespace RAM.Services.Interfaces
     {
         GetBlogByTitleResponse GetByTitle(GetBlogByTitleRequest request);
         GetBlogsResponse GetByCategory(GetBlogsByCategoryRequest request);
-        Blog GetByID(int postID);
+        Blog GetByID(string postID);
         GetBlogsResponse GetAll();
         GetBlogsResponse GetAllForAdmin();
         void SavePost(Blog post);

@@ -21,32 +21,28 @@ namespace RAM.Admin.Controllers.Controllers
 {
     public class BlogController : BaseUserAccountController
     {
-        private readonly IBlogService _blogService;
-        private readonly IBlogCategoryService _categoryService;
-        private readonly ITagService _tagService;
+        private readonly ITagRepository _tagRepository;
+        private readonly IBlogRepository _blogRepository;
         public BlogController(ILocalAuthenticationService authenticationService,
             IUserService userService,
-            IBlogService blogService,
-            ITagService tagService,
+            IBlogRepository blogRepository,
+            ITagRepository tagRepository,
             IBlogCategoryService categoryService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, formsAuthentication, actionArguments)
         {
-            _blogService = blogService;
-            _categoryService = categoryService;
-            _tagService = tagService;
+            _blogRepository = blogRepository;
+            _tagRepository = tagRepository;
 
         }
 
         public ActionResult Index()
         {
             HomeView view = new HomeView();
-            view.BlogCategories = _categoryService.GetAll().Categories;
-            view.Tags = _tagService.GetAll();
             view.NavView.SelectedMenuItem = "nav-blog";
-            view.Blogs = _blogService.GetAll().BlogList;
+            view.Blogs = _blogRepository.GetAll();
             return View(view);
 
         }
@@ -55,22 +51,20 @@ namespace RAM.Admin.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
-            view.Blogs = _blogService.GetAll().BlogList;
+            view.Blogs = _blogRepository.GetAll();
 
             return PartialView("_BlogList", view);
 
         }
 
-        public ActionResult Post(int id = 0)
+        public ActionResult Post(string id)
         {
             HomeView view = new HomeView();
-            if (id != 0)
-                view.SelectedBlog = _blogService.GetByID(id);
+            if (!string.IsNullOrEmpty(id))
+                view.SelectedBlog = _blogRepository.GetById(new MongoDB.Bson.ObjectId(id));
             else
                 view.SelectedBlog = null;
             view.NavView.SelectedMenuItem = "nav-blog";
-            view.BlogCategories = _categoryService.GetAll().Categories;
-            //view.SelectedBlogTags = _blogService.g
             return View(view); 
         }
 
@@ -78,59 +72,52 @@ namespace RAM.Admin.Controllers.Controllers
         {
             var b = new Blog();
             var isNew = false;
-            if (blog.ID == 0)
+            if (blog.Id == null)
             {
                 //b.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;
-                b.DatePosted = DateTime.Now;
+                b.dateposted = DateTime.Now;
                 isNew = true;
             }
             else
             {
-                b = _blogService.GetByID(blog.ID);
+                b = _blogRepository.GetById(blog.Id);
             }
-            b.BlogCategoryID = blog.BlogCategoryID;
-            b.IsActive = blog.IsActive;
-            b.Post = blog.Post;
-            if (blog.Post.Length > 300)
+            b.category = blog.category;
+            b.isactive = blog.isactive;
+            b.post = blog.post;
+            if (blog.post.Length > 300)
             {
-                b.PostPreview = Regex.Replace(blog.Post.Substring(0, 297), @"<[^>]*>", String.Empty) + "...";
+                b.postpreview = Regex.Replace(blog.post.Substring(0, 297), @"<[^>]*>", String.Empty) + "...";
             }
             else
             {
-                b.PostPreview = Regex.Replace(blog.Post, @"<[^>]*>", String.Empty); 
+                b.postpreview = Regex.Replace(blog.post, @"<[^>]*>", String.Empty); 
             }
-            b.SEODescription = blog.SEODescription;
-            b.SEOKeywords = blog.SEOKeywords;
-            b.Title = blog.Title;
-            _blogService.SavePost(b);
-            foreach (var bt in b.Tags)
+            b.seodescription = blog.seodescription;
+            b.seokeywords = blog.seokeywords;
+            b.title = blog.title;
+            _blogRepository.Save(b);
+            foreach (var bt in b.tags)
             {
-                _blogService.DeleteBlogTag(bt);
+                _tagRepository.Delete(_tagRepository.GetByTitle(bt));
             }
             foreach (var t in tags.Split(','))
             {
-                var tag = _tagService.GetByName(t);
+                var tag = _tagRepository.GetByTitle(t);
                 var blogtag = new BlogTag();
                 var newtag = new Tag();
                 if (tag == null)
                 {
-                    newtag.Name = t;
-                    _tagService.SaveTag(newtag);
+                    newtag.name = t;
+                    _tagRepository.Save(newtag);
                 }
-                else 
-                {
-                    newtag = tag;
-                }
-                blogtag.BlogID = blog.ID;
-                blogtag.TagID = newtag.ID;
-                _blogService.SaveBlogTag(blogtag);
 
             }
             return Json(new
             {
                 Message = "Blog saved!",
                 Status = "success",
-                BlogID = b.ID,
+                BlogID = b.Id,
                 IsNew = isNew,
                 ReturnUrl = "/Blog"
             });
@@ -138,61 +125,61 @@ namespace RAM.Admin.Controllers.Controllers
 
         public ActionResult SavePostImage()
         {
-            var post = new Blog();
-            if (Request.Form.Count > 0)
-            {
-                if (!string.IsNullOrEmpty(Request.Form["blogID"]))
-                {
-                    post = _blogService.GetByID(Convert.ToInt16(Request.Form["blogID"]));
-                }
-            }
-            foreach (string fileName in Request.Files)
-            {
-                try
-                {
-                    var file = Request.Files[fileName];
-                    post.ImagePath = ConfigurationSettings.AppSettings["BlogImageURL"] + file.FileName;
-                    file.SaveAs(ConfigurationSettings.AppSettings["BlogImageDir"] + file.FileName);
-                }
-                catch (Exception fileException)
-                {
-                    return Json(new
-                    {
-                        Message = "File failed to save with following error: " + fileException.Message,
-                        Status = "failed"
-                    });
-                }
-            }
-            try
-            {
-                _blogService.SavePost(post);
-            }
-            catch (Exception exc)
-            {
-                return Json(new
-                {
-                    Message = "Blog post failed to save with following error: " + exc.Message,
-                    Status = "failed"
-                });
-            }
+            //var post = new Blog();
+            //if (Request.Form.Count > 0)
+            //{
+            //    if (!string.IsNullOrEmpty(Request.Form["blogID"]))
+            //    {
+            //        post = _blogService.GetByID(Convert.ToInt16(Request.Form["blogID"]));
+            //    }
+            //}
+            //foreach (string fileName in Request.Files)
+            //{
+            //    try
+            //    {
+            //        var file = Request.Files[fileName];
+            //        post.ImagePath = ConfigurationSettings.AppSettings["BlogImageURL"] + file.FileName;
+            //        file.SaveAs(ConfigurationSettings.AppSettings["BlogImageDir"] + file.FileName);
+            //    }
+            //    catch (Exception fileException)
+            //    {
+            //        return Json(new
+            //        {
+            //            Message = "File failed to save with following error: " + fileException.Message,
+            //            Status = "failed"
+            //        });
+            //    }
+            //}
+            //try
+            //{
+            //    _blogService.SavePost(post);
+            //}
+            //catch (Exception exc)
+            //{
+            //    return Json(new
+            //    {
+            //        Message = "Blog post failed to save with following error: " + exc.Message,
+            //        Status = "failed"
+            //    });
+            //}
 
             return Json(new
             {
                 Message = "Blog Image saved!",
                 Status = "success",
-                ReturnUrl = "/Blog/Post/" + post.ID.ToString()
+                ReturnUrl = "/Blog/Post/" //+ post.ID.ToString()
             });
         }
 
-        public ActionResult GetByID(int id)
+        public ActionResult GetByID(string id)
         {
-            if (id > 0)
+            if (!string.IsNullOrEmpty(id))
             {
                 return Json(new
                 {
                     Message = "Blog retreived!",
                     Status = "success",
-                    BlogRef = _blogService.GetByID(id),
+                    BlogRef = _blogRepository.GetById(new MongoDB.Bson.ObjectId(id)),
                     ReturnUrl = "/Blog"
                 });
             }
@@ -209,7 +196,7 @@ namespace RAM.Admin.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
-            view.Tags = _tagService.GetAll();
+            view.Tags = _tagRepository.GetAll();
 
             return PartialView("_BlogTags", view);
 
@@ -219,19 +206,19 @@ namespace RAM.Admin.Controllers.Controllers
         {
             return Json(new
             {
-                Tags = _tagService.GetForAutoComplete(query)
+                Tags = _tagRepository.GetForAutoComplete(query)
             }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetTagByID(int id)
+        public ActionResult GetTagByID(string id)
         {
-            if (id > 0)
+            if (!string.IsNullOrEmpty(id))
             {
                 return Json(new
                 {
                     Message = "Tag retreived!",
                     Status = "success",
-                    TagRef = _tagService.GetByID(id),
+                    TagRef = _tagRepository.GetById(new MongoDB.Bson.ObjectId(id)),
                     ReturnUrl = "/Blog"
                 });
             }
@@ -248,12 +235,12 @@ namespace RAM.Admin.Controllers.Controllers
             var t = new Tag();
             if (tag != null)
             {
-                if (tag.ID > 0)
+                if (tag.Id != null)
                 {
-                    t = _tagService.GetByID(tag.ID);
+                    t = _tagRepository.GetById(new MongoDB.Bson.ObjectId(tag.sid));
                 }
-                t.Name = tag.Name;
-                _tagService.SaveTag(t);
+                t.name = tag.name;
+                _tagRepository.Save(t);
             }
 
             return Json(new
@@ -264,13 +251,13 @@ namespace RAM.Admin.Controllers.Controllers
             });
         }
 
-        public ActionResult DeleteTag(int id)
+        public ActionResult DeleteTag(string id)
         {
-            if (id > 0)
+            if (!string.IsNullOrEmpty(id))
             {
                 try
                 {                    
-                    _tagService.DeleteTag(_tagService.GetByID(id));
+                    _tagRepository.Delete(_tagRepository.GetById(new MongoDB.Bson.ObjectId(id)));
                     return Json(new
                     {
                         Message = "Tag deleted!",
@@ -297,88 +284,88 @@ namespace RAM.Admin.Controllers.Controllers
         }
 
 
-        public ActionResult CategoryList()
-        {
-            HomeView view = new HomeView();
-            view.NavView.SelectedMenuItem = "nav-blog";
-            view.BlogCategories = _categoryService.GetAll().Categories;
+        //public ActionResult CategoryList()
+        //{
+        //    HomeView view = new HomeView();
+        //    view.NavView.SelectedMenuItem = "nav-blog";
+        //    view.BlogCategories = _categoryService.GetAll().Categories;
 
-            return PartialView("_BlogCategories", view);
+        //    return PartialView("_BlogCategories", view);
 
-        }
+        //}
 
-        public ActionResult GetCategoryByID(int id)
-        {
-            if (id > 0)
-            {
-                var cat = _categoryService.GetByID(id);
-                return Json(new
-                {
-                    Message = "Category retreived!",
-                    Status = "success",
-                    CategoryRef = cat,
-                    ReturnUrl = "/Blog"
-                });
-            }
-            return Json(new
-            {
-                Message = "Category could not be found!",
-                Status = "failed",
-                ReturnUrl = "/Blog"
-            });
-        }
+        //public ActionResult GetCategoryByID(int id)
+        //{
+        //    if (id > 0)
+        //    {
+        //        var cat = _categoryService.GetByID(id);
+        //        return Json(new
+        //        {
+        //            Message = "Category retreived!",
+        //            Status = "success",
+        //            CategoryRef = cat,
+        //            ReturnUrl = "/Blog"
+        //        });
+        //    }
+        //    return Json(new
+        //    {
+        //        Message = "Category could not be found!",
+        //        Status = "failed",
+        //        ReturnUrl = "/Blog"
+        //    });
+        //}
 
-        public ActionResult SaveCategory(BlogCategory category)
-        {
-            var c = new BlogCategory();
-            if (category != null)
-            {
-                if (category.ID > 0)
-                {
-                    c = (BlogCategory)_categoryService.GetByID(category.ID);
-                }
-                c.Name = category.Name;
-                _categoryService.Save(c);
-            }
+        //public ActionResult SaveCategory(BlogCategory category)
+        //{
+        //    var c = new BlogCategory();
+        //    if (category != null)
+        //    {
+        //        if (category.ID > 0)
+        //        {
+        //            c = (BlogCategory)_categoryService.GetByID(category.ID);
+        //        }
+        //        c.Name = category.Name;
+        //        _categoryService.Save(c);
+        //    }
 
-            return Json(new
-            {
-                Message = "Category saved!",
-                Status = "success",
-                ReturnUrl = "/Blog"
-            });
-        }
+        //    return Json(new
+        //    {
+        //        Message = "Category saved!",
+        //        Status = "success",
+        //        ReturnUrl = "/Blog"
+        //    });
+        //}
 
-        public ActionResult DeleteCategory(int id)
-        {
-            if (id > 0)
-            {
-                try
-                {
-                    _categoryService.Delete((BlogCategory)_categoryService.GetByID(id));
-                    return Json(new
-                    {
-                        Message = "Category deleted!",
-                        Status = "success",
-                        ReturnUrl = "/Blog"
-                    });
-                }
-                catch (Exception exc)
-                {
-                    return Json(new
-                    {
-                        Message = "Category failed to delete!  You must remove all blog posts with this category before it can be deleted.",
-                        Status = "failed",
-                        ReturnUrl = "/Blog"
-                    });
-                }
-            }
-            return Json(new
-            {
-                Message = "Category failed to delete!  Category was null.",
-                Status = "failed",
-                ReturnUrl = "/Blog"
-            });
-        }
+        //public ActionResult DeleteCategory(int id)
+        //{
+        //    if (id > 0)
+        //    {
+        //        try
+        //        {
+        //            _categoryService.Delete((BlogCategory)_categoryService.GetByID(id));
+        //            return Json(new
+        //            {
+        //                Message = "Category deleted!",
+        //                Status = "success",
+        //                ReturnUrl = "/Blog"
+        //            });
+        //        }
+        //        catch (Exception exc)
+        //        {
+        //            return Json(new
+        //            {
+        //                Message = "Category failed to delete!  You must remove all blog posts with this category before it can be deleted.",
+        //                Status = "failed",
+        //                ReturnUrl = "/Blog"
+        //            });
+        //        }
+        //    }
+        //    return Json(new
+        //    {
+        //        Message = "Category failed to delete!  Category was null.",
+        //        Status = "failed",
+        //        ReturnUrl = "/Blog"
+        //    });
+        //}
     }
 }

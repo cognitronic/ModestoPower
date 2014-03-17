@@ -10,52 +10,39 @@ using RAM.Core.Domain.User;
 namespace RAM.Core.Domain.Blog
 {
     [Serializable]
-    public class Blog : EntityBase, IBlog
+    public class Blog :  IBlog
     {
         #region IBlog Members
         [DataMember]
-        public virtual string Title { get; set; }
+        public string title { get; set; }
         [DataMember]
-        public virtual int BlogCategoryID { get; set; }
+        public string category { get; set; }
         [DataMember]
-        public virtual string Post { get; set; }
+        public string post { get; set; }
         [DataMember]
-        public virtual string PostPreview { get; set; }
+        public string postpreview { get; set; }
         [DataMember]
-        public virtual int EnteredBy { get; set; }
+        public string enteredby { get; set; }
         [DataMember]
-        public virtual string SEOKeywords { get; set; }
+        public string seokeywords { get; set; }
         [DataMember]
-        public virtual bool IsActive { get; set; }
+        public bool isactive { get; set; }
         [DataMember]
-        public virtual string SEODescription { get; set; }
+        public string seodescription { get; set; }
         [DataMember]
-        public virtual DateTime DatePosted { get; set; }
+        public DateTime dateposted { get; set; }
         [DataMember]
-        public virtual string ImagePath { get; set; }
-
-        public virtual IUser EnteredByRef { get; set; }
-        public virtual IBlogCategory Category { get; set; }
-
-        private IList<BlogTag> _tags = new List<BlogTag>();
-        [DataMember]
-        public virtual IList<BlogTag> Tags { get { return _tags; } set { _tags = value; } }
+        public string imagepath { get; set; }
+        public IList<string> tags { get; set; }
 
         #endregion
 
         #region ISystemObject Members
         [DataMember]
-        public virtual int ID { get; set; }
+        public string sid { get; set; }
         [DataMember]
-        public virtual Guid SystemID { get; set; }
-        [DataMember]
-        public virtual string Type { get; set; }
+        public MongoDB.Bson.ObjectId Id { get; set; }
 
         #endregion
-
-        protected override void Validate()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

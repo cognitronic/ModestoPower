@@ -10,6 +10,7 @@ using RAM.Services.Messaging.Blog;
 using RAM.Services.Mapping;
 using RAM.Services.Cache;
 using RAM.Infrastructure.UnitOfWork;
+using MongoDB.Bson;
 
 namespace RAM.Services.Implementations
 {
@@ -28,10 +29,8 @@ namespace RAM.Services.Implementations
 
         public Tag GetByID(int tagID)
         {
-            var query = new Query();
-            query.Add(new Criterion("ID", tagID, CriteriaOperator.Equal));
 
-            return _repository.FindBy(query).FirstOrDefault<Tag>();
+            return _repository.GetById(query).FirstOrDefault<Tag>();
         }
 
         public Tag GetByName(string name)

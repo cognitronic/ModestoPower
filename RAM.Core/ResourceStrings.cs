@@ -25,6 +25,8 @@ namespace RAM.Core
         #region Mongo
         public static string Mongo_Programs_Collection = "programs";
         public static string Mongo_WebPages_Collection = "pages";
+        public static string Mongo_Blog_Collection = "blogs";
+        public static string Mongo_Tags_Collection = "tags";
         #endregion
     }
 }

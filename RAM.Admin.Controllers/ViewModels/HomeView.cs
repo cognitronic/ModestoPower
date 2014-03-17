@@ -28,7 +28,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public IList<IProject> Projects { get; set; }
         public IList<IProgram> Programs { get; set; }
         public IList<User> Users { get; set; }
-        public IList<IBlog> Blogs { get; set; }
+        public IList<Blog> Blogs { get; set; }
         public IList<Pages> WebPages { get; set; }
         public IList<IBlogCategory> BlogCategories { get; set; }
         public IList<Tag> Tags { get; set; }

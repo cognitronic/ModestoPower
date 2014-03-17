@@ -33,16 +33,13 @@ namespace RAM.Services.Implementations
         public GetBlogByTitleResponse GetByTitle(GetBlogByTitleRequest request)
         {
             var response = new GetBlogByTitleResponse();
-            Query query = new Query();
 
-            query.Add(new Criterion("Title", request.Title, CriteriaOperator.Equal));
-
-            var post = _repository.FindBy(query);
+            var post = _repository.GetByTitle(request.Title);
             if (post != null)
             {
                 response.Success = true;
                 response.Message = "Blogs Retrieved Successfully!";
-                response.BlogPost = post.FirstOrDefault<IBlog>();
+                response.BlogPost = post;
             }
             else
             {
@@ -56,19 +53,8 @@ namespace RAM.Services.Implementations
         public GetBlogsResponse GetByCategory(GetBlogsByCategoryRequest request)
         {
             var response = new GetBlogsResponse();
-            Query query = new Query();
-            if (!string.IsNullOrEmpty(request.CategoryName))
-            {
-                query.Add(new Criterion("Category.Name", request.CategoryName.Replace('-', ' '), CriteriaOperator.Equal));
-            }
-            else
-            {
-                query.Add(new Criterion("BlogCategoryID", request.CategoryID, CriteriaOperator.Equal));
-            }
 
-            var list = _repository.FindBy(query)
-                .Where(o => o.IsActive = true)
-                .OrderByDescending(o => o.DatePosted);
+            var list = _repository.GetByCategory(request.CategoryName);
             if (list != null)
             {
                 response.Success = true;
@@ -90,9 +76,9 @@ namespace RAM.Services.Implementations
             var list = new List<IBlog>();
             if (_cache.Get<IList<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts) == null)
             {
-                list = _repository.FindAll()
-                    .Where(o => o.IsActive = true)
-                    .OrderByDescending(o => o.DatePosted).ToList<IBlog>();
+                list = _repository.GetAll()
+                    .Where(o => o.isactive = true)
+                    .OrderByDescending(o => o.dateposted).ToList<IBlog>();
                 _cache.Store(RAM.Core.ResourceStrings.Cache_BlogPosts, list);
             }
             else
@@ -120,15 +106,11 @@ namespace RAM.Services.Implementations
             var list = _cache.Get<IList<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts);
             if (list == null)
             {
-                list = _repository.FindAll()
-                    .Where(o => o.IsActive = true)
-                    .OrderByDescending(o => o.DatePosted).Take(count).ToList<IBlog>();
+                list = _repository.GetAll()
+                    .Where(o => o.isactive = true)
+                    .OrderByDescending(o => o.dateposted).Take(count).ToList<IBlog>();
                 _cache.Store(RAM.Core.ResourceStrings.Cache_BlogPosts, list);
             }
-            //else
-            //{
-            //    list = _cache.Get<List<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts).Take(count).ToList();
-            //}
             return list;
         }
 
@@ -138,8 +120,8 @@ namespace RAM.Services.Implementations
             var list = new List<IBlog>();
             if (_cache.Get<IList<IBlog>>(RAM.Core.ResourceStrings.Cache_BlogPosts) == null)
             {
-                list = _repository.FindAll()
-                    .OrderByDescending(o => o.DatePosted).ToList<IBlog>();
+                list = _repository.GetAll()
+                    .OrderByDescending(o => o.dateposted).ToList<IBlog>();
                 _cache.Store(RAM.Core.ResourceStrings.Cache_BlogPosts, list);
             }
             else
@@ -162,28 +144,21 @@ namespace RAM.Services.Implementations
             return response;
         }
 
-        public Blog GetByID(int postID)
+        public Blog GetByID(string postID)
         {
-            Query query = new Query();
-            query.Add(new Criterion("ID", postID, CriteriaOperator.Equal));
-
-            var blog = _repository.FindBy(query).First<Blog>();
-            
-
+            var blog = _repository.GetById(new MongoDB.Bson.ObjectId(postID));
             return blog;
         }
 
         public void SavePost(Blog post)
         {
             _repository.Save(post);
-            _uow.Commit();
             _cache.Remove(RAM.Core.ResourceStrings.Cache_BlogPosts);
         }
 
         public void DeletePost(Blog post)
         {
-            _repository.Remove(post);
-            _uow.Commit();
+            _repository.Delete(post);
             _cache.Remove(RAM.Core.ResourceStrings.Cache_BlogPosts);
         }
         #endregion

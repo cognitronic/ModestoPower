@@ -5,23 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using RAM.Infrastructure.Domain;
+using MongoDB.Bson;
 
 namespace RAM.Core.Domain.Blog
 {
     [Serializable]
-    public class Tag : EntityBase, ITag
+    public class Tag : ITag
     {
         [DataMember]
-        public virtual string Name { get; set; }
+        public string name { get; set; }
         [DataMember]
-        public virtual int ID { get; set; }
+        public ObjectId Id { get; set; }
         [DataMember]
-        public virtual Guid SystemID { get; set; }
-        [DataMember]
-        public virtual string Type { get; set; }
-        protected override void Validate()
-        {
-            throw new NotImplementedException();
-        }
+        public string sid { get; set; }
     }
 }
