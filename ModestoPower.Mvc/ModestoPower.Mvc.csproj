@@ -718,6 +718,7 @@
     <Content Include="Views\Schedule\Index.cshtml" />
     <Content Include="Views\Blog\Index.cshtml" />
     <Content Include="Views\Gallery\Index.cshtml" />
+    <Content Include="Views\Instructors\ChewyYbarra.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Controllers\RAM.Controllers.csproj">
