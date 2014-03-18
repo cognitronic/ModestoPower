@@ -17,7 +17,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public HomeView()
         {
             NavView = new NavigationView();
-            BlogCategories = new List<IBlogCategory>();
+            BlogCategories = new List<string>();
             Tags = new List<Tag>();
             Users = new List<User>();
             Programs = new List<IProgram>();
@@ -30,7 +30,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public IList<User> Users { get; set; }
         public IList<Blog> Blogs { get; set; }
         public IList<Pages> WebPages { get; set; }
-        public IList<IBlogCategory> BlogCategories { get; set; }
+        public IList<string> BlogCategories { get; set; }
         public IList<Tag> Tags { get; set; }
         public Blog SelectedBlog { get; set; }
         public IPages SelectedPage { get; set; }

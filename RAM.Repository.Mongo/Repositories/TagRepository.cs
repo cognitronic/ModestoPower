@@ -53,8 +53,11 @@ namespace RAM.Repository.Mongo.Repositories
 
         public Tag Delete(Tag p)
         {
-            var query = Query<Tag>.EQ(e => e.Id, p.Id);
-            _collection.Remove(query);
+            if (p != null)
+            {
+                var query = Query<Tag>.EQ(e => e.Id, p.Id);
+                _collection.Remove(query);
+            }
             return null;
         }
     }

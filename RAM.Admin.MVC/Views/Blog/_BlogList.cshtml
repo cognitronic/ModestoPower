@@ -26,28 +26,28 @@
         { 
             <tr>
                 <td>
-                    <span id="title_@blog.ID">
-                        @blog.Title
+                    <span id="title_@blog.Id.ToString()">
+                        @blog.title
                     </span>
                 </td>
                 <td>
-                    <span id="category_@blog.ID">
-                        @blog.Category.Name
+                    <span id="category_@blog.Id.ToString()">
+                        @blog.category
                     </span>
                 </td>
                 <td>
-                    <span id="status_@blog.ID">
-                        @(blog.IsActive == true? "Active" : "Inactive")
+                    <span id="status_@blog.Id.ToString()">
+                        @(blog.isactive == true? "Active" : "Inactive")
                     </span>
                 </td>
                 <td>
-                    <span id="postdate_@blog.ID">
-                        @blog.DatePosted.ToShortDateString()
+                    <span id="postdate_@blog.Id.ToString()">
+                        @blog.dateposted.ToShortDateString()
                     </span>
                 </td>
                 <td>
-                    <a id="blogEdit_@blog.ID" href="/Blog/Post/@blog.ID" class="btn btn-info" role="button" data-id="@blog.ID" data-category="@blog.Category.ID">Edit</a>
-                    <button class="deletePost btn btn-danger" data-id="@blog.ID" type="button">Delete</button>
+                    <a id="blogEdit_@blog.Id.ToString()" href="/Blog/Post/@blog.Id.ToString()" class="btn btn-info" role="button" data-id="@blog.Id.ToString()" data-category="@blog.category">Edit</a>
+                    <button class="deletePost btn btn-danger" data-id="@blog.Id.ToString()" type="button">Delete</button>
                 </td>
             </tr>
         }

@@ -27,7 +27,6 @@ namespace RAM.Admin.Controllers.Controllers
             IUserService userService,
             IBlogRepository blogRepository,
             ITagRepository tagRepository,
-            IBlogCategoryService categoryService,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
@@ -42,7 +41,9 @@ namespace RAM.Admin.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
+            view.BlogCategories = ConfigurationSettings.AppSettings["BlogCategories"].Split(',').ToList<string>();
             view.Blogs = _blogRepository.GetAll();
+            view.Tags = _tagRepository.GetAll();
             return View(view);
 
         }
@@ -60,6 +61,7 @@ namespace RAM.Admin.Controllers.Controllers
         public ActionResult Post(string id)
         {
             HomeView view = new HomeView();
+            view.BlogCategories = ConfigurationSettings.AppSettings["BlogCategories"].Split(',').ToList<string>();
             if (!string.IsNullOrEmpty(id))
                 view.SelectedBlog = _blogRepository.GetById(new MongoDB.Bson.ObjectId(id));
             else
@@ -72,18 +74,24 @@ namespace RAM.Admin.Controllers.Controllers
         {
             var b = new Blog();
             var isNew = false;
-            if (blog.Id == null)
+            if (string.IsNullOrEmpty(blog.sid))
             {
-                //b.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;
+                var images = new List<string>();
+                b.imagepath = "";
                 b.dateposted = DateTime.Now;
                 isNew = true;
             }
             else
             {
-                b = _blogRepository.GetById(blog.Id);
+                b = _blogRepository.GetById(new MongoDB.Bson.ObjectId(blog.sid));
             }
             b.category = blog.category;
             b.isactive = blog.isactive;
+            b.tags.Clear();
+            foreach (var tag in tags.Split(','))
+            {
+                b.tags.Add(tag);
+            }
             b.post = blog.post;
             if (blog.post.Length > 300)
             {
@@ -97,9 +105,12 @@ namespace RAM.Admin.Controllers.Controllers
             b.seokeywords = blog.seokeywords;
             b.title = blog.title;
             _blogRepository.Save(b);
-            foreach (var bt in b.tags)
+            if (b.tags != null)
             {
-                _tagRepository.Delete(_tagRepository.GetByTitle(bt));
+                foreach (var bt in b.tags)
+                {
+                    _tagRepository.Delete(_tagRepository.GetByTitle(bt));
+                }
             }
             foreach (var t in tags.Split(','))
             {
@@ -367,5 +378,7 @@ namespace RAM.Admin.Controllers.Controllers
         //        ReturnUrl = "/Blog"
         //    });
         //}
+
+        
     }
 }

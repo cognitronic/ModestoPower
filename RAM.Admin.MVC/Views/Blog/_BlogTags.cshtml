@@ -18,13 +18,13 @@
         {
             <tr>
                 <td>
-                    <span id="name_@tag.ID">
-                        @tag.Name
+                    <span id="name_@tag.Id.ToString()">
+                        @tag.name
                     </span>
                 </td>
                 <td>
-                    <a id="blogTagsEdit_@tag.ID" href="#tagModal" class="editTagsModal btn btn-info" role="button" data-toggle="modal" data-id="@tag.ID">Edit</a>
-                    <button class="deleteTag btn btn-danger" data-id="@tag.ID" type="button">Delete</button>
+                    <a id="blogTagsEdit_@tag.Id.ToString()" href="#tagModal" class="editTagsModal btn btn-info" role="button" data-toggle="modal" data-id="@tag.Id.ToString()">Edit</a>
+                    <button class="deleteTag btn btn-danger" data-id="@tag.Id.ToString()" type="button">Delete</button>
                 </td>
             </tr>
         }

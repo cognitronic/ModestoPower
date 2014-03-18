@@ -16,8 +16,8 @@
             <select name="category" id="category" class="form-control input-lg">
                 @foreach (var item in Model.BlogCategories)
                 {
-                    <option value="@item.ID">
-                        @item.Name
+                    <option value="@item">
+                        @item
                     </option>
                 }
             </select><br />
@@ -28,19 +28,19 @@
             @if(Model.SelectedBlog != null)
             { 
                 <span><b>Click Picture To Manage:</b></span><br />
-            <a href="#blogModal" class="editBlogModal" data-toggle="modal" data-id="@Model.SelectedBlog.ID">
-                <img id="postimage" src="@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]@Model.SelectedBlog.ImagePath" alt="@Model.SelectedBlog.Title" class="img-thumbnail" style="height: 200px; width: 300px;" />
+            <a href="#blogModal" class="editBlogModal" data-toggle="modal" data-id="@Model.SelectedBlog.Id.ToString()">
+                <img id="postimage" src="@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]@Model.SelectedBlog.imagepath" alt="@Model.SelectedBlog.title" class="img-thumbnail" style="height: 200px; width: 300px;" />
             </a><br />
              }
             <br />
             <b>Tags:</b><br />
             <ul id="blogTags" class="form-control input-lg">
-                @if (Model.SelectedBlog != null && Model.SelectedBlog.Tags.Count > 0)
+                @if (Model.SelectedBlog != null && Model.SelectedBlog.tags != null && Model.SelectedBlog.tags.Count > 0)
                 {
-                    foreach (var tag in Model.SelectedBlog.Tags)
+                    foreach (var tag in Model.SelectedBlog.tags)
                     {
                         <li>
-                            @tag.TagRef.Name
+                            @tag
                         </li>
                     }
                 }
@@ -103,15 +103,15 @@
             console.log('new blog post');
             $('.col-lg-9 h2').text('New Blog Post');
         } else{
-            console.log(post.IsActive);
+            console.log(post.category);
             isNew = false;
-            $('.col-lg-9 h2').text(post.Title);
-            $("#status").prop('checked', post.IsActive);
-            $('#title').val(post.Title);
-            $('[name=category]').val(post.BlogCategoryID);
-            $('#seoKeywords').val(post.SEOKeywords);
-            $('#seoDescription').val(post.SEODescription);
-            $('#post').val(post.Post);
+            $('.col-lg-9 h2').text(post.title);
+            $("#status").prop('checked', post.isactive);
+            $('#title').val(post.title);
+            $('[name=category]').val(post.category);
+            $('#seoKeywords').val(post.seokeywords);
+            $('#seoDescription').val(post.seodescription);
+            $('#post').val(post.post);
         }
 
 
@@ -150,19 +150,20 @@
         $('.savePost').on('click', function(e){
             e.preventDefault();
             var taglist = $('#blogTags').tagit("assignedTags") + "";
+            console.log(taglist);
             var p = {
                 IsActive: $('#status').prop('checked'),
                 Title: $('#title').val(),
-                BlogCategoryID: $('#category').val(),
+                Category: $('#category').val(),
                 SEOKeywords: $('#seoKeywords').val(),
                 SEODescription: $('#seoDescription').val(),
                 Post: tinyMCE.activeEditor.getContent()
             };
             if(isNew){
-                p.ID = 0;
+                p.sid = '';
             } else{
-                
-                p.ID = post.ID;
+                console.log(isNew);
+                p.sid = $(".editBlogModal").data('id');
             }
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Blog/SavePost',

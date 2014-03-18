@@ -55,7 +55,8 @@ namespace RAM.Admin.MVC
                     For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                 }
 
-               // For<IBlogRepository>().Use<BlogRepository>();
+                For<IBlogRepository>().Use<BlogRepository>();
+                For<ITagRepository>().Use<TagRepository>();
                // For<IBlogTagRepository>().Use<BlogTagRepository>();
                //// For<ISubscriberRepository>().Use<SubscriberRepository>();
                // For<IProjectRepository>().Use<ProjectRepository>();
@@ -72,6 +73,7 @@ namespace RAM.Admin.MVC
                 //Models
                 For<IUser>().Use<User>();
                 For<IBlog>().Use<Blog>();
+                For<ITag>().Use<Tag>();
                 For<IPages>().Use<Pages>();
                // For<ISubscriber>().Use<Subscriber>();
                 For<IProject>().Use<Project>();
@@ -136,7 +138,8 @@ namespace RAM.Admin.MVC
                    // x.For<IUserRepository>().Use<RAM.Repository.NHibernate.Repositories.UserRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
-                    //x.For<IBlogRepository>().Use<BlogRepository>();
+                    x.For<IBlogRepository>().Use<BlogRepository>();
+                    x.For<ITagRepository>().Use<TagRepository>();
                     ////x.For<ISubscriberRepository>().Use<SubscriberRepository>();
                     //x.For<IProjectRepository>().Use<ProjectRepository>();
                     //x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
@@ -149,6 +152,7 @@ namespace RAM.Admin.MVC
                     x.For<IUser>().Use<User>();
                     x.For<IBanner>().Use<Banner>();
                     x.For<IBlog>().Use<Blog>();
+                    x.For<ITag>().Use<Tag>();
                    // x.For<ISubscriber>().Use<Subscriber>();
                     x.For<IProject>().Use<Project>();
                     x.For<IProjectImage>().Use<ProjectImage>();
@@ -172,17 +176,18 @@ namespace RAM.Admin.MVC
                 {
                     x.For<IUserService>().Use<UserService>();
                     x.For<IBannerService>().Use<BannerService>();
-                    x.For<IBlogService>().Use<BlogService>();
-                    x.For<IProjectService>().Use<ProjectService>();
-                    x.For<ISubscriberService>().Use<SubscriberService>();
-                    x.For<IBlogCategoryService>().Use<BlogCategoryService>();
+                    //x.For<IBlogService>().Use<BlogService>();
+                    //x.For<IProjectService>().Use<ProjectService>();
+                    //x.For<ISubscriberService>().Use<SubscriberService>();
+                    //x.For<IBlogCategoryService>().Use<BlogCategoryService>();
                     x.For<IProgramService>().Use<ProgramService>();
 
                     x.For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                     x.For<IProgramRepository>().Use<RAM.Repository.Mongo.Repositories.ProgramRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
-                    //x.For<IBlogRepository>().Use<BlogRepository>();
+                    x.For<IBlogRepository>().Use<BlogRepository>();
+                    x.For<ITagRepository>().Use<TagRepository>();
                    // x.For<ISubscriberRepository>().Use<SubscriberRepository>();
                     //x.For<IProjectRepository>().Use<ProjectRepository>();
                     //x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
@@ -195,6 +200,7 @@ namespace RAM.Admin.MVC
                     x.For<IUser>().Use<User>();
                     x.For<IBanner>().Use<Banner>();
                     x.For<IBlog>().Use<Blog>();
+                    x.For<ITag>().Use<Tag>();
                    // x.For<ISubscriber>().Use<Subscriber>();
                     x.For<IProject>().Use<Project>();
                     x.For<IProjectImage>().Use<ProjectImage>();

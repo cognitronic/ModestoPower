@@ -114,7 +114,6 @@
     <Compile Include="DependencyResolution\StructureMapDependencyResolver.cs" />
     <Compile Include="DependencyResolution\StructureMapDependencyScope.cs" />
     <Compile Include="Implementations\BannerService.cs" />
-    <Compile Include="Implementations\BlogCategoryService.cs" />
     <Compile Include="Implementations\BlogService.cs" />
     <Compile Include="Implementations\HRRMarketingAuthenticationService.cs" />
     <Compile Include="Implementations\ProgramService.cs" />

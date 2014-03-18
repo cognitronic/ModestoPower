@@ -12,6 +12,11 @@ namespace RAM.Core.Domain.Blog
     [Serializable]
     public class Blog :  IBlog
     {
+
+        public Blog()
+        {
+            this.tags = new List<string>();
+        }
         #region IBlog Members
         [DataMember]
         public string title { get; set; }
