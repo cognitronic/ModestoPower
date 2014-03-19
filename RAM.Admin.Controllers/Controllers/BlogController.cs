@@ -109,7 +109,7 @@ namespace RAM.Admin.Controllers.Controllers
             {
                 foreach (var bt in b.tags)
                 {
-                    _tagRepository.Delete(_tagRepository.GetByTitle(bt));
+                    _tagRepository.Delete(_tagRepository.GetByTitle(bt.ToLower()));
                 }
             }
             foreach (var t in tags.Split(','))
@@ -119,7 +119,7 @@ namespace RAM.Admin.Controllers.Controllers
                 var newtag = new Tag();
                 if (tag == null)
                 {
-                    newtag.name = t;
+                    newtag.name = t.ToLower();
                     _tagRepository.Save(newtag);
                 }
 
@@ -217,7 +217,7 @@ namespace RAM.Admin.Controllers.Controllers
         {
             return Json(new
             {
-                Tags = _tagRepository.GetForAutoComplete(query)
+                Tags = _tagRepository.GetForAutoComplete(query.ToLower())
             }, JsonRequestBehavior.AllowGet);
         }
 

@@ -4,7 +4,7 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th class="col-sm-7">
+            <th class="col-sm-5">
                 Title
             </th>
             <th class="col-sm-1">
@@ -45,7 +45,7 @@
                         @blog.dateposted.ToShortDateString()
                     </span>
                 </td>
-                <td>
+                <td style="text-align: right;">
                     <a id="blogEdit_@blog.Id.ToString()" href="/Blog/Post/@blog.Id.ToString()" class="btn btn-info" role="button" data-id="@blog.Id.ToString()" data-category="@blog.category">Edit</a>
                     <button class="deletePost btn btn-danger" data-id="@blog.Id.ToString()" type="button">Delete</button>
                 </td>

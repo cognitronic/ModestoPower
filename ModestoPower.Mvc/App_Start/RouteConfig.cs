@@ -15,11 +15,18 @@ namespace ModestoPower.Mvc
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.Add(
+            new Route("Instructors/{instructor}",
+                new RouteValueDictionary(
+                    new { controller = "Instructors", action = "GetInstructor" }),
+                    new ModestoPower.Mvc.App_Start.HyphenatedRouteHandler())
+                    );
+
+            routes.Add(
             new Route("{controller}/{action}/{id}",
                 new RouteValueDictionary(
                     new { controller = "Home", action = "Index", id = UrlParameter.Optional }),
                     new ModestoPower.Mvc.App_Start.HyphenatedRouteHandler())
-        );
+            );
         }
     }
 }
