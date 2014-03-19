@@ -33,5 +33,12 @@ namespace RAM.Controllers.Controllers
             return View(view);
 
         }
+
+        public ActionResult GetProgram(string program)
+        {
+            var view = new HomeView();
+            view.SelectedPage = _pagesRepository.GetByTitle(program.Replace("-", " "));
+            return View("Index", view);
+        }
     }
 }

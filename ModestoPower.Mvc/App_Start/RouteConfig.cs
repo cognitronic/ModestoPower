@@ -22,6 +22,13 @@ namespace ModestoPower.Mvc
                     );
 
             routes.Add(
+            new Route("Programs/{program}",
+                new RouteValueDictionary(
+                    new { controller = "Programs", action = "GetProgram" }),
+                    new ModestoPower.Mvc.App_Start.HyphenatedRouteHandler())
+                    );
+
+            routes.Add(
             new Route("{controller}/{action}/{id}",
                 new RouteValueDictionary(
                     new { controller = "Home", action = "Index", id = UrlParameter.Optional }),
