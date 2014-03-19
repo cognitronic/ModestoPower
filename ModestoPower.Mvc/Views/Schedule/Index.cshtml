@@ -15,12 +15,16 @@
     <br />
     <div class="container">
         <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <b>Class: </b><select class="input-lg" id="classddl"></select>
+                
+                <button type="button" class="btn btn-lg btn-primary" id="submitfilter">Search</button>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 about-inner">
                 <h2>Monday</h2>
-                @foreach (var item in Model.Schedules.Where(o => o.day == "Monday"))
-                {
-                    <h5>@item.description - <b>@item.times</b></h5>
-                }
+                <ul id="Monday"></ul>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <h2>Tuesday</h2>
@@ -74,4 +78,67 @@
         }, 500);
 
     })();
+
+    $(document).ready(function() {
+        var schedule = @Html.Raw(Json.Encode(Model.Schedules));
+
+        var list = [];
+
+        $("#submitfilter").on('click', function(e){
+            clearSchedules();
+            console.log('hi ' + $(this).val());
+            buildSchedules($('#classddl').val());
+        });
+
+        function buildScheduleByDay(day, program){
+            schedule.forEach(getByFilters);
+            function getByFilters(element, index, array){
+                console.log(program);
+                if(program != ''){
+                    if(element.day == day && element.name == program){
+                        $("#" + day).append($('<li></li>').html(element.name + " - <b>" + element.times + "</b>" ));
+                    }
+                } else {
+                    if(element.day == day){
+                        $("#" + day).append($('<li></li>').html(element.name + " - <b>" + element.times + "</b>" ));
+                    }
+                }
+            }
+        }
+
+        function loadClassesDDL(){
+            var temp = [];
+            $.each(schedule, function(idx, text){
+                if(idx == 0){
+                    $('#classddl').append($('<option></option').val("").html("-- Select --"));
+                }
+                if(temp === null || temp === 'undefined' ){
+                    temp.push(text.name);
+                    $('#classddl').append($('<option></option').val(text.name).html(text.name));
+                } else {
+                    if(temp.indexOf(text.name) == -1){
+                        temp.push(text.name);
+                        $('#classddl').append($('<option></option').val(text.name).html(text.name));
+                    }
+                }
+            });
+            temp = null;
+        }
+
+        function buildSchedules(program){
+            buildScheduleByDay('Monday', program);
+            buildScheduleByDay('Tuesday', program);
+            buildScheduleByDay('Wednesday', program);
+            buildScheduleByDay('Thursday', program);
+            buildScheduleByDay('Friday', program);
+            buildScheduleByDay('Saturday', program);
+        }
+
+        function clearSchedules(){
+            $('#Monday').html('');
+        }
+
+        loadClassesDDL();
+        buildSchedules('');
+    });
 </script>
