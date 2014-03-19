@@ -128,7 +128,7 @@ namespace RAM.Admin.Controllers.Controllers
             {
                 Message = "Blog saved!",
                 Status = "success",
-                BlogID = b.Id,
+                BlogID = b.Id.ToString(),
                 IsNew = isNew,
                 ReturnUrl = "/Blog"
             });
@@ -136,49 +136,49 @@ namespace RAM.Admin.Controllers.Controllers
 
         public ActionResult SavePostImage()
         {
-            //var post = new Blog();
-            //if (Request.Form.Count > 0)
-            //{
-            //    if (!string.IsNullOrEmpty(Request.Form["blogID"]))
-            //    {
-            //        post = _blogService.GetByID(Convert.ToInt16(Request.Form["blogID"]));
-            //    }
-            //}
-            //foreach (string fileName in Request.Files)
-            //{
-            //    try
-            //    {
-            //        var file = Request.Files[fileName];
-            //        post.ImagePath = ConfigurationSettings.AppSettings["BlogImageURL"] + file.FileName;
-            //        file.SaveAs(ConfigurationSettings.AppSettings["BlogImageDir"] + file.FileName);
-            //    }
-            //    catch (Exception fileException)
-            //    {
-            //        return Json(new
-            //        {
-            //            Message = "File failed to save with following error: " + fileException.Message,
-            //            Status = "failed"
-            //        });
-            //    }
-            //}
-            //try
-            //{
-            //    _blogService.SavePost(post);
-            //}
-            //catch (Exception exc)
-            //{
-            //    return Json(new
-            //    {
-            //        Message = "Blog post failed to save with following error: " + exc.Message,
-            //        Status = "failed"
-            //    });
-            //}
+            var post = new Blog();
+            if (Request.Form.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(Request.Form["blogID"]))
+                {
+                    post = _blogRepository.GetById(new MongoDB.Bson.ObjectId(Request.Form["blogID"]));
+                }
+            }
+            foreach (string fileName in Request.Files)
+            {
+                try
+                {
+                    var file = Request.Files[fileName];
+                    post.imagepath = ConfigurationSettings.AppSettings["BlogImageURL"] + file.FileName;
+                    file.SaveAs(ConfigurationSettings.AppSettings["BlogImageDir"] + file.FileName);
+                }
+                catch (Exception fileException)
+                {
+                    return Json(new
+                    {
+                        Message = "File failed to save with following error: " + fileException.Message,
+                        Status = "failed"
+                    });
+                }
+            }
+            try
+            {
+                _blogRepository.Save(post);
+            }
+            catch (Exception exc)
+            {
+                return Json(new
+                {
+                    Message = "Blog post failed to save with following error: " + exc.Message,
+                    Status = "failed"
+                });
+            }
 
             return Json(new
             {
                 Message = "Blog Image saved!",
                 Status = "success",
-                ReturnUrl = "/Blog/Post/" //+ post.ID.ToString()
+                ReturnUrl = "/Blog/Post/" + post.Id.ToString()
             });
         }
 

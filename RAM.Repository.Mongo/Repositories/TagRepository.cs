@@ -29,8 +29,8 @@ namespace RAM.Repository.Mongo.Repositories
 
         public IList<Tag> GetForAutoComplete(string input)
         {
-            var query = Query.Matches("name", ".*" + input + ".*");
-            return _collection.FindAllAs<Tag>().OrderBy(o => o.name).ToList<Tag>();
+            var query = Query.Matches("name", "/^" + input + "/");
+            return _collection.FindAs<Tag>(query).OrderBy(o => o.name).ToList<Tag>();
         }
 
         public Tag GetById(ObjectId id)

@@ -126,10 +126,11 @@
                         dataType: 'json',
                         type: 'GET',
                         success: function(data){
+                            console.log(data.Tags);
                             response($.map(data.Tags, function(item){
                                 return{
-                                    label: item.Name,
-                                    value: item.Name
+                                    label: item.name,
+                                    value: item.name
                                 }
                             }));
                         },
