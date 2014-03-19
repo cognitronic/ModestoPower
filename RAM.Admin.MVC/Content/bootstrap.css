@@ -3940,6 +3940,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-default {
   background-color: #f8f8f8;
   border-color: #e7e7e7;
+ webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .6);
+box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .6)
 }
 .navbar-default .navbar-brand {
   color: #777;
