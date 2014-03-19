@@ -8,20 +8,25 @@ using System.Runtime.Serialization;
 
 namespace ModestoPower.Core.Domain.Schedule
 {
+    [Serializable]
     public class Schedule : ISchedule
     {
-        public Schedule()
-        {
-            this.sessions = new List<Sessions>();
-        }
+        [DataMember]
         public ObjectId Id { get; set; }
 
+        [DataMember]
         public string instructor { get; set; }
 
+        [DataMember]
         public string name { get; set; }
 
+        [DataMember]
         public string description { get; set; }
 
-        public IList<Sessions> sessions { get; set; }
+        [DataMember]
+        public string day { get; set; }
+
+        [DataMember]
+        public string times { get; set; }
     }
 }

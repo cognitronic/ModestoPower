@@ -1,4 +1,8 @@
-﻿@{
+﻿@model RAM.Controllers.ViewModels.HomeView
+
+@using ModestoPower.Core.Domain.Schedule
+
+@{
     ViewBag.Title = "Modesto Power | Schedule";
 }
 <section id="promo" class="historyheader parallax">
@@ -11,22 +15,54 @@
     <br />
     <div class="container">
         <div class="row">
-            <div class="col-lg-7 col-md-12 col-sm-12 col-xs-12 about-inner">
-                <h2>About Modesto Power</h2>
-                <h3>We turn couch potatoes into olympic super stars. </h3>
-                <h4>We make the weak strong, and produce world class combative atheletes.</h4>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Quisque congue dui et justo vulputate, eget vehicula lorem fringilla. Vestibulum vitae edor dolor euimod, scelerisque emenim sed, consectetur nibh.</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Quisque congue dui et justo vulputate, eget vehicula lorem fringilla. Vestibulum vitae edor dolor euimod, scelerisque emenim sed, consectetur nibh.</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Quisque congue dui et justo vulputate, eget vehicula lorem fringilla. Vestibulum vitae edor dolor euimod, scelerisque emenim sed, consectetur nibh.</p>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 about-inner">
+                <h2>Monday</h2>
+                @foreach (var item in Model.Schedules.Where(o => o.day == "Monday"))
+                {
+                    <h5>@item.description - <b>@item.times</b></h5>
+                }
             </div>
-            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
-                <div class="visual">
-                    <img class="about-mockup thumbnail" src="/images/basic/IMG_0535.jpg" alt="/">
-                </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <h2>Tuesday</h2>
+                @foreach (var item in Model.Schedules.Where(o => o.day == "Tuesday"))
+                {
+                    <h5>@item.description - <b>@item.times</b></h5>
+                }
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <h2>Wednesday</h2>
+                @foreach (var item in Model.Schedules.Where(o => o.day == "Wednesday"))
+                {
+                    <h5>@item.description - <b>@item.times</b></h5>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 about-inner">
+                <h2>Thursday</h2>
+                @foreach (var item in Model.Schedules.Where(o => o.day == "Thursday"))
+                {
+                    <h5>@item.description - <b>@item.times</b></h5>
+                }
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <h2>Friday</h2>
+                @foreach (var item in Model.Schedules.Where(o => o.day == "Friday"))
+                {
+                    <h5>@item.description - <b>@item.times</b></h5>
+                }
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <h2>Saturday</h2>
+                @foreach (var item in Model.Schedules.Where(o => o.day == "Saturday"))
+                {
+                    <h5>@item.description - <b>@item.times</b></h5>
+                }
             </div>
         </div>
     </div>
 </section>
+
 
 <script>
 

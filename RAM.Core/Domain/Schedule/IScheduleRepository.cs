@@ -9,10 +9,11 @@ namespace ModestoPower.Core.Domain.Schedule
 {
     public interface IScheduleRepository
     {
-        IList<ISchedule> GetAll();
-        ISchedule GetById(ObjectId id);
-        ISchedule GetByName(string name);
-        ISchedule Save(ISchedule s);
-        ISchedule Delete(ISchedule s);
+        IList<Schedule> GetAll();
+        IList<Schedule> GetByDayOfWeek(string dow);
+        Schedule GetById(ObjectId id);
+        Schedule GetByName(string name);
+        Schedule Save(Schedule s);
+        Schedule Delete(Schedule s);
     }
 }

@@ -13,6 +13,7 @@ namespace ModestoPower.Core.Domain.Schedule
         string instructor { get; set; }
         string name { get; set; }
         string description { get; set; }
-        IList<Sessions> sessions { get; set; }
+        string day { get; set; }
+        string times { get; set; }
     }
 }

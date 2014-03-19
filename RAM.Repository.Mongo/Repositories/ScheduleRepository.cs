@@ -21,32 +21,38 @@ namespace RAM.Repository.Mongo.Repositories
             _cache = cache;
         }
 
-        public IList<ISchedule> GetAll()
+        public IList<Schedule> GetAll()
         {
-            return _collection.FindAllAs<ISchedule>().OrderBy(o => o.sessions).ToList<ISchedule>();
+            return _collection.FindAllAs<Schedule>().OrderBy( o => o.day).ToList<Schedule>();
         }
 
-        public ISchedule GetById(ObjectId id)
+        public Schedule GetById(ObjectId id)
         {
-            var query = Query<ISchedule>.EQ(e => e.Id, id);
-            return _collection.FindOneAs<ISchedule>(query);
+            var query = Query<Schedule>.EQ(e => e.Id, id);
+            return _collection.FindOneAs<Schedule>(query);
         }
 
-        public ISchedule GetByName(string name)
+        public Schedule GetByName(string name)
         {
-            var query = Query<ISchedule>.EQ(e => e.name, name);
-            return _collection.FindOneAs<ISchedule>(query);
+            var query = Query<Schedule>.EQ(e => e.name, name);
+            return _collection.FindOneAs<Schedule>(query);
         }
 
-        public ISchedule Save(ISchedule p)
+        public IList<Schedule> GetByDayOfWeek(string dow)
+        {
+            var query = Query<ISchedule>.EQ(e => e.day, dow);
+            return _collection.FindAllAs<Schedule>().ToList<Schedule>();
+        }
+
+        public Schedule Save(Schedule p)
         {
             _collection.Save(p);
             return p;
         }
 
-        public ISchedule Delete(ISchedule p)
+        public Schedule Delete(Schedule p)
         {
-            var query = Query<ISchedule>.EQ(e => e.Id, p.Id);
+            var query = Query<Schedule>.EQ(e => e.Id, p.Id);
             _collection.Remove(query);
             return null;
         }
