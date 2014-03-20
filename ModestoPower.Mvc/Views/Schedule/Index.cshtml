@@ -16,52 +16,37 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                <b>Class: </b><select class="input-lg" id="classddl"></select>
+                <b style="color:#0094ff">Filter By Class: </b><select class="input-lg" id="classddl"></select>
                 
-                <button type="button" class="btn btn-lg btn-primary" id="submitfilter">Search</button>
+                <button style="vertical-align: top;" type="button" class="btn btn-lg btn-danger" id="submitfilter">Search</button>
             </div>
-        </div>
+        </div><hr />
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 about-inner">
                 <h2>Monday</h2>
-                <ul id="Monday"></ul>
+                <ul class="schedulelist" id="Monday"></ul>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <h2>Tuesday</h2>
-                @foreach (var item in Model.Schedules.Where(o => o.day == "Tuesday"))
-                {
-                    <h5>@item.description - <b>@item.times</b></h5>
-                }
+                <ul class="schedulelist" id="Tuesday"></ul>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <h2>Wednesday</h2>
-                @foreach (var item in Model.Schedules.Where(o => o.day == "Wednesday"))
-                {
-                    <h5>@item.description - <b>@item.times</b></h5>
-                }
+                <ul class="schedulelist" id="Wednesday"></ul>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 about-inner">
                 <h2>Thursday</h2>
-                @foreach (var item in Model.Schedules.Where(o => o.day == "Thursday"))
-                {
-                    <h5>@item.description - <b>@item.times</b></h5>
-                }
+                <ul class="schedulelist" id="Thursday"></ul>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <h2>Friday</h2>
-                @foreach (var item in Model.Schedules.Where(o => o.day == "Friday"))
-                {
-                    <h5>@item.description - <b>@item.times</b></h5>
-                }
+                <ul class="schedulelist" id="Friday"></ul>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <h2>Saturday</h2>
-                @foreach (var item in Model.Schedules.Where(o => o.day == "Saturday"))
-                {
-                    <h5>@item.description - <b>@item.times</b></h5>
-                }
+                <ul class="schedulelist" id="Saturday"></ul>
             </div>
         </div>
     </div>
@@ -136,6 +121,11 @@
 
         function clearSchedules(){
             $('#Monday').html('');
+            $('#Tuesday').html('');
+            $('#Wednesday').html('');
+            $('#Thursday').html('');
+            $('#Friday').html('');
+            $('#Saturday').html('');
         }
 
         loadClassesDDL();

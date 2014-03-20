@@ -3940,11 +3940,12 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-default {
   background-color: #f8f8f8;
   border-color: #e7e7e7;
- webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .6);
-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .6)
+  webkit-box-shadow: 0px 1px 5px 0px #333;
+  box-shadow: 0px 1px 5px 0px #333;
 }
 .navbar-default .navbar-brand {
   color: #777;
+  border-right: 1px solid #eee;
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
@@ -3956,17 +3957,21 @@ box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .6)
 }
 .navbar-default .navbar-nav > li > a {
   color: #777;
+  border-right: 1px solid #eee;
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
   color: #333;
-  background-color: transparent;
+  background-color: #eee;
 }
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
   color: #555;
   background-color: #e7e7e7;
+  
+  border-left: 1px solid #999;
+  border-right: 1px solid #999;
 }
 .navbar-default .navbar-nav > .disabled > a,
 .navbar-default .navbar-nav > .disabled > a:hover,

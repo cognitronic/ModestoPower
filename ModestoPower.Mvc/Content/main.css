@@ -501,8 +501,10 @@ ul.navbar-nav {
 	text-align: center;
 }
 .navbar-default {
-	background: #000000;
-	border: none;
+    webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .6);
+    border: none;
+    background: #000000;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, .8);
 }
 .navbar-nav > li {
 	margin: 0;
@@ -510,6 +512,7 @@ ul.navbar-nav {
 	padding-right: 10px;
 	padding-bottom: 7px;
 	position: relative;
+    border-right: 1px solid #222;
 }
 .navbar-nav > li > a {
 	padding: 0;
@@ -3466,4 +3469,10 @@ footer .text-right {
 
 strong {
     color: #000;
+}
+
+
+
+.schedulelist {
+    list-style-type: none !important;
 }
