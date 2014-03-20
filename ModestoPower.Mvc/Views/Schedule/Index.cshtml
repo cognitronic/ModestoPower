@@ -65,27 +65,26 @@
     })();
 
     $(document).ready(function() {
-        var schedule = @Html.Raw(Json.Encode(Model.Schedules));
+        var schedule = @Html.Raw(Json.Encode(Model.Schedules.OrderBy( o => o.name)));
 
         var list = [];
 
         $("#submitfilter").on('click', function(e){
             clearSchedules();
-            console.log('hi ' + $(this).val());
             buildSchedules($('#classddl').val());
         });
 
         function buildScheduleByDay(day, program){
             schedule.forEach(getByFilters);
             function getByFilters(element, index, array){
-                console.log(program);
                 if(program != ''){
                     if(element.day == day && element.name == program){
-                        $("#" + day).append($('<li></li>').html(element.name + " - <b>" + element.times + "</b>" ));
+                        $("#" + prettyName(day)).append($('<li></li>').html(prettyName(element.name) + " - <b>" + element.times + "</b>" ));
                     }
                 } else {
                     if(element.day == day){
-                        $("#" + day).append($('<li></li>').html(element.name + " - <b>" + element.times + "</b>" ));
+                        console.log(element.name);
+                        $("#" + prettyName(day)).append($('<li></li>').html(prettyName(element.name) + " - <b>" + element.times + "</b>" ));
                     }
                 }
             }
@@ -99,11 +98,11 @@
                 }
                 if(temp === null || temp === 'undefined' ){
                     temp.push(text.name);
-                    $('#classddl').append($('<option></option').val(text.name).html(text.name));
+                    $('#classddl').append($('<option></option').val(text.name).html(prettyName(text.name)));
                 } else {
                     if(temp.indexOf(text.name) == -1){
                         temp.push(text.name);
-                        $('#classddl').append($('<option></option').val(text.name).html(text.name));
+                        $('#classddl').append($('<option></option').val(text.name).html(prettyName(text.name)));
                     }
                 }
             });
@@ -111,12 +110,12 @@
         }
 
         function buildSchedules(program){
-            buildScheduleByDay('Monday', program);
-            buildScheduleByDay('Tuesday', program);
-            buildScheduleByDay('Wednesday', program);
-            buildScheduleByDay('Thursday', program);
-            buildScheduleByDay('Friday', program);
-            buildScheduleByDay('Saturday', program);
+            buildScheduleByDay('monday', program);
+            buildScheduleByDay('tuesday', program);
+            buildScheduleByDay('wednesday', program);
+            buildScheduleByDay('thursday', program);
+            buildScheduleByDay('friday', program);
+            buildScheduleByDay('saturday', program);
         }
 
         function clearSchedules(){
@@ -126,6 +125,15 @@
             $('#Thursday').html('');
             $('#Friday').html('');
             $('#Saturday').html('');
+        }
+
+        function prettyName(txt){
+            var arr = txt.split(' ');
+            for(var i = 0, l = arr.length; i < l; i++){
+                arr[i] = arr[i].substring(0,1).toUpperCase() + 
+                arr[i].substring(1, arr[i].length);
+            }
+            return arr.join(' ');
         }
 
         loadClassesDDL();
