@@ -28,5 +28,8 @@ namespace ModestoPower.Core.Domain.Schedule
 
         [DataMember]
         public string times { get; set; }
+        
+        [DataMember]
+        public string sid { get; set; }
     }
 }

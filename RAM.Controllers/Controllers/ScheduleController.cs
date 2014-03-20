@@ -34,6 +34,5 @@ namespace RAM.Controllers.Controllers
             return View(view);
         }
 
-
     }
 }

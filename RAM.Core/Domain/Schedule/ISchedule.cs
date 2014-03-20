@@ -15,5 +15,6 @@ namespace ModestoPower.Core.Domain.Schedule
         string description { get; set; }
         string day { get; set; }
         string times { get; set; }
+        string sid { get; set; }
     }
 }

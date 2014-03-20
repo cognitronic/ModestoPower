@@ -50,7 +50,7 @@ namespace RAM.Admin.Controllers.Controllers
         {
             var u = new User();
 
-           
+
             if (user.PasswordAnswer == null || user.PasswordAnswer.Equals("000000000000000000000000"))
             {
                 u.EnteredBy = SecurityContextManager.Current.CurrentUser.Id;

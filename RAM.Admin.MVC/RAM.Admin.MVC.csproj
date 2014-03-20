@@ -595,6 +595,7 @@
     <Content Include="Views\Pages\_Gallery.cshtml" />
     <Content Include="Views\Pages\_Contact.cshtml" />
     <Content Include="Views\Schedule\Index.cshtml" />
+    <Content Include="Views\Schedule\_ScheduleList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Admin.Controllers\RAM.Admin.Controllers.csproj">

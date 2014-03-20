@@ -33,7 +33,9 @@
                             <input id="modalDescription" type="text" class="form-control" placeholder="Enter Description" /><br />
                             <b>Day:</b><br />
                             <input id="modalDay" type="text" class="form-control" placeholder="Enter Day of the Week" /><br />
-                            <input name="userID" type="hidden" id="hdnUserID" />
+                            <b>Time:</b><br />
+                            <input id="modalTime" type="text" class="form-control" placeholder="Enter Time Range i.e 4pm-5pm" /><br />
+                            <input name="scheduleID" type="hidden" id="hdnScheduleID" />
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -53,28 +55,30 @@
             e.preventDefault();
             @*var banners = @Html.Raw(Json.Encode(Model.Banners));
             var banner = banners[$(this).data('id') - 1 ];*@
-            $("#modalFirst").val($("#firstname_" + $(this).data('id')).text().trim());
-            $("#modalLast").val($("#lastname_" + $(this).data('id')).text().trim());
-            $("#modalEmail").val($("#email_" + $(this).data('id')).text().trim());
-            $("#hdnUserID").val($(this).data('id'));
+            $("#modalInstructor").val($("#instructor_" + $(this).data('id')).text().trim());
+            $("#modalClass").val($("#class_" + $(this).data('id')).text().trim());
+            $("#modalDescription").val($("#description_" + $(this).data('id')).text().trim());
+            $("#modalDay").val($("#day_" + $(this).data('id')).text().trim());
+            $("#modalTime").val($("#time_" + $(this).data('id')).text().trim());
+            $("#hdnScheduleID").val($(this).data('id'));
         });
 
-        $(".deleteUser").on('click', function(e){
+        $(".deleteClass").on('click', function(e){
             e.preventDefault();
             if (!confirm("Do you want to delete")){
                 return false;
             }
             $.ajax({
-                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Users/DeleteUser',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Schedule/DeleteClass',
                 type: 'POST',
                 data: JSON.stringify({id: $(this).data('id')}),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
-                    $("#usersModal").modal('hide');
-                    $("#userList").html("");
-                    $("#userList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Users/UserList');
-                    $('#userList').effect("highlight", { color: "#7fd658" }, 1000);
+                    $("#scheduleModal").modal('hide');
+                    $("#scheduleList").html("");
+                    $("#scheduleList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Schedule/ScheduleList');
+                    $('#scheduleList').effect("highlight", { color: "#7fd658" }, 1000);
                 },
                 error: function (x, y, z) {
                     alert(x + '\n' + y + '\n' + z);
@@ -85,25 +89,26 @@
 
         $("#submit-all").on('click', function (e) {
             e.preventDefault();
-            var u = {
-                FirstName: $("#modalFirst").val(),
-                LastName: $("#modalLast").val(),
-                Email: $("#modalEmail").val(),
-                Password: $("#modalPassword").val(),
-                PasswordAnswer: $("#hdnUserID").val()
+            var s = {
+                instructor: $("#modalInstructor").val(),
+                name: $("#modalClass").val(),
+                description: $("#modalDescription").val(),
+                day: $("#modalDay").val(),
+                times: $("#modalTime").val(),
+                sid: $("#hdnScheduleID").val()
             };
-            console.log(JSON.stringify(u));
+            console.log(JSON.stringify(s));
             $.ajax({
-                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Users/SaveUser',
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Schedule/SaveClass',
                 type: 'POST',
-                data: JSON.stringify(u),
+                data: JSON.stringify(s),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
-                    $("#usersModal").modal('hide');
-                    $("#userList").html("");
-                    $("#userList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Users/UserList');
-                    $('#userList').effect("highlight", { color: "#7fd658" }, 1000);
+                    $("#scheduleModal").modal('hide');
+                    $("#scheduleList").html("");
+                    $("#scheduleList").load('@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Schedule/ScheduleList');
+                    $('#scheduleList').effect("highlight", { color: "#7fd658" }, 1000);
                 },
                 error: function (x, y, z) {
                     alert(x + '\n' + y + '\n' + z);
