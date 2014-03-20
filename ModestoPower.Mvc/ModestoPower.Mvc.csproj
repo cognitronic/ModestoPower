@@ -669,6 +669,7 @@
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery.carouFredSel-6.2.1-packed.js" />
     <Content Include="Scripts\jquery.easing-1.3.pack.js" />
+    <Content Include="Scripts\jquery.embedagram.min.js" />
     <Content Include="Scripts\jquery.flexslider-min.js" />
     <Content Include="Scripts\jquery.inview.js" />
     <Content Include="Scripts\jquery.knob.js" />
@@ -719,6 +720,8 @@
     <Content Include="Views\Blog\Index.cshtml" />
     <Content Include="Views\Gallery\Index.cshtml" />
     <Content Include="Views\Instructors\ChewyYbarra.cshtml" />
+    <Content Include="Views\Blog\_SideBar.cshtml" />
+    <Content Include="Views\Blog\_Categories.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Controllers\RAM.Controllers.csproj">

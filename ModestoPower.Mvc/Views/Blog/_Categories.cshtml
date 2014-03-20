@@ -1,0 +1,20 @@
+﻿
+@model RAM.Controllers.ViewModels.HomeView
+
+<li class="widget menu-widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-content">
+        <div class="widget-content-inner">
+            <ul class="category-list">
+                <li><a href="/Blog">Show All</a></li>
+                @foreach (var c in Model.Posts.Select(o => o.category).Distinct())
+                {
+                    <li>
+                        <a href="/Blog/@c.Replace(" ", "-")">@c</a>
+                    </li>
+                }
+            </ul>
+
+        </div>
+    </div>
+</li>

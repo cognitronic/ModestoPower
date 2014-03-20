@@ -44,7 +44,7 @@ namespace RAM.Admin.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-schedule";
-            view.ClassList = _scheduleRepository.GetAll();
+            view.ClassList = _scheduleRepository.GetAll().OrderBy(o => o.name).ThenBy(o => o.day).ToList();
             return PartialView("_ScheduleList", view);
         }
 

@@ -26,6 +26,7 @@ namespace ModestoPower.Mvc
 
             bundles.Add(new ScriptBundle("~/bundles/mp").Include(
                       "~/Scripts/jquery.easing-1.3.pack.js",
+                        "~/Scripts/jquery.embedagram.min.js",
                       "~/Scripts/jquery.sticky.js",
                       "~/Scripts/jquery.inview.js",
                       "~/Scripts/jquery.flexslider-min.js",

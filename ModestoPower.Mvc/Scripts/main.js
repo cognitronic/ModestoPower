@@ -21,6 +21,136 @@
 	/*=================================
 	0-Genral
 	=================================*/
+
+    /* -------------------------------------------------------------------------
+		IMAGES LOADED
+	------------------------------------------------------------------------- */
+
+    $.fn.stImagesLoaded = function (options) {
+        if ($.isFunction(options)) {
+
+            var images = $(this).find('img'),
+			loaded_images = 0,
+			count = images.length;
+
+            if (count > 0) {
+                images.one('load', function () {
+                    loaded_images++;
+                    if (loaded_images === count) {
+                        options.call();
+                    }
+                }).each(function () {
+                    if (this.complete) { $(this).load(); }
+                });
+            }
+            else {
+                options.call();
+            }
+
+        }
+    };
+
+    /* -------------------------------------------------------------------------
+		FLICKR FEED WIDGET
+	------------------------------------------------------------------------- */
+
+    $.fn.stFlickrFeed = function () {
+        
+        console.log('suck ittttt');
+        $(this).append('<div class="widget-feed"></div>');
+
+        var self = $(this),
+		feed = $(this).find('.widget-feed'),
+		feed_id = $(this).data('id'),
+		feed_limit = $(this).data('limit');
+
+        if (isNaN(feed_limit) || feed_limit < 1) {
+            feed_limit = 1;
+        }
+
+        // create blank image list inside feed
+        feed.html('<ul class="image-list clearfix"></ul>');
+
+        // get the feed
+        $.getJSON('http://api.flickr.com/services/feeds/photos_public.gne?id=' + feed_id + '&lang=en-us&format=json&jsoncallback=?', function (data) {
+
+            // get number of images to be shown
+            var number_of_images = feed_limit;
+            if (data.items.length < feed_limit) {
+                number_of_images = data.items.length;
+            }
+
+            // insert items
+            var i;
+            for (i = 0; i < number_of_images; i++) {
+                feed.find('ul').append('<li class="image-list-item"><a class="image-list-link" href="' + data.items[i].link + '" style="background-image: url(' + data.items[i].media.m + ');" target="_blank" rel="external"><img class="image-list-thumb" src="' + data.items[i].media.m + '" alt="' + data.items[i].title + '"></a></li>');
+            }
+
+            // images loaded
+            self.stImagesLoaded(function () {
+                self.find('.loading-anim').fadeOut(300, function () {
+                    self.find('.widget-feed').fadeIn(300, function () {
+                        self.removeClass('loading');
+                    });
+                });
+            });
+
+        });
+
+    };
+
+    /* -------------------------------------------------------------------------
+		INSTAGRAM FEED WIDGET
+	------------------------------------------------------------------------- */
+
+    $.fn.stInstagramFeed = function () {
+        console.log('suck it');
+        if ($.fn.embedagram) {
+
+            $(this).append('<div class="widget-feed"></div>');
+
+            var self = $(this),
+			feed = $(this).find('.widget-feed'),
+			feed_id = $(this).data('id'),
+			feed_limit = $(this).data('limit');
+
+            if (isNaN(feed_limit) || feed_limit < 1) {
+                feed_limit = 1;
+            }
+
+            // create blank image list inside feed
+            feed.html('<ul class="image-list clearfix"></ul>');
+
+            // launch embedagram
+            feed.find('ul.image-list').embedagram({
+                instagram_id: feed_id,
+                limit: feed_limit,
+                success: function () {
+
+                    feed.find('li').addClass('image-list-item');
+                    feed.find('a').each(function () {
+                        $(this).addClass('image-list-link').css('background-image', 'url(' + $(this).find('img').attr('src') + ')').attr('target', '_blank').attr('rel', 'external');
+                        $(this).find('img').addClass('image-list-thumb');
+                        if ($(this).find('img').attr('title')) {
+                            $(this).find('img').attr('alt', $(this).find('img').attr('title'));
+                            $(this).find('img').removeAttr('title');
+                        }
+                    });
+
+                    // images loaded
+                    self.stImagesLoaded(function () {
+                        self.find('> *').not('.widget-feed').fadeOut(300, function () {
+                            self.find('.widget-feed').fadeIn(300, function () {
+                                self.removeClass('loading');
+                            });
+                        });
+                    });
+
+                }
+            });
+
+        }
+    };
 	
 	var isMobile = {
         Android: function () {
@@ -842,6 +972,14 @@
     });
 
 
+    // FLICKR FEED
+	$( '.flickr-feed' ).each(function(){
+		$(this).stFlickrFeed();
+	});
 
+	// INSTAGRAM FEED
+	$( '.instagram-feed' ).each(function(){
+		$(this).stInstagramFeed();
+	});
 
 })(jQuery);

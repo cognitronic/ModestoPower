@@ -15,6 +15,31 @@ namespace ModestoPower.Mvc
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.Add(
+            new Route("Blog/{category}/{title}",
+                new RouteValueDictionary(
+                    new
+                    {
+                        controller = "Blog",
+                        action = "ByTitle"
+                    }),
+                    new HyphenatedRouteHandler())
+        );
+
+            routes.Add(
+            new Route("Blog/{category}",
+                new RouteValueDictionary(
+                    new { controller = "Blog", action = "ByCategory" }),
+                    new HyphenatedRouteHandler())
+        );
+
+            routes.Add(
+            new Route("Blog",
+                new RouteValueDictionary(
+                    new { controller = "Blog", action = "Index" }),
+                    new HyphenatedRouteHandler())
+        );
+
+            routes.Add(
             new Route("Instructors/{instructor}",
                 new RouteValueDictionary(
                     new { controller = "Instructors", action = "GetInstructor" }),

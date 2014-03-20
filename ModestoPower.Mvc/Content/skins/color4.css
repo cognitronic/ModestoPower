@@ -10,6 +10,10 @@ a.btn,.progress-bar,.ny_nav,.ny_nav.grey li.active a:after, .ny_nav.grey li:hove
 	background-color:#ed1c24;
 }
 
+.widget > h3 {
+    color: #000000 !important;
+}
+
 .service.style3 .service-icon,{
 	border-color:#ed1c24;
 }

@@ -15,13 +15,16 @@ namespace RAM.Controllers.Controllers
 {
     public class BlogController : BaseController
     {
+        private readonly IBlogRepository _blogRepository;
         public BlogController(ILocalAuthenticationService authenticationService,
             IUserService userService,
+            IBlogRepository blogRepository,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
+            _blogRepository = blogRepository;
         }
 
 
@@ -29,6 +32,7 @@ namespace RAM.Controllers.Controllers
         {
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
+            view.Posts = _blogRepository.GetAll();
             return View(view);
 
         }
@@ -52,6 +56,7 @@ namespace RAM.Controllers.Controllers
 
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
+            view.SelectedPost = _blogRepository.GetByTitle(title.Replace("-", " "));
             return View("BlogPost", view);
 
         }
@@ -60,7 +65,8 @@ namespace RAM.Controllers.Controllers
         {
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
-            return View("BlogsByCategory", view);
+            view.Posts = _blogRepository.GetByCategory(category.Replace("-", " "));
+            return View("Index", view);
 
         }
 
@@ -68,7 +74,8 @@ namespace RAM.Controllers.Controllers
         {
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
-            return PartialView("Sidebar", view);
+            view.Posts = _blogRepository.GetAll();
+            return PartialView("_Sidebar", view);
 
         }
     }

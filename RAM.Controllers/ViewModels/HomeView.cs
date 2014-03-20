@@ -18,6 +18,8 @@ namespace RAM.Controllers.ViewModels
             NavView = new NavigationView();
             UserView = new User.UserAccountView();
             Schedules = new List<Schedule>();
+            Posts = new List<Blog>();
+            Categories = new List<string>();
         }
         public NavigationView NavView { get; set; }
 
@@ -28,11 +30,11 @@ namespace RAM.Controllers.ViewModels
 
         public IPages SelectedPage { get; set; }
 
-        public IList<IBlog> Posts { get; set; }
+        public IList<Blog> Posts { get; set; }
 
         public IBlog SelectedPost { get; set; }
 
-        public IList<IBlogCategory> Categories { get; set; }
+        public IList<string> Categories { get; set; }
 
         public IList<Schedule> Schedules { get; set; }
 
