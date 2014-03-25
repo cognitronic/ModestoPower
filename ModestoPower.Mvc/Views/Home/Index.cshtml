@@ -1,4 +1,6 @@
-﻿@{
+﻿@model RAM.Controllers.ViewModels.HomeView
+
+@{
     ViewBag.Title = "Home Page";
 }
 
@@ -36,7 +38,7 @@
                 <li><a href="#programs">Programs</a></li>
                 <li><a href="/Schedule">Schedule</a></li>
                 <li><a href="#team">Instructors</a></li>
-                <li><a href="#blog">Blog</a></li>
+                <li><a href="/blog">Blog</a></li>
                 <li><a href="#portfolio">Gallery</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -59,6 +61,7 @@ About
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Quisque congue dui et justo vulputate, eget vehicula lorem fringilla. Vestibulum vitae edor dolor euimod, scelerisque emenim sed, consectetur nibh.</p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Quisque congue dui et justo vulputate, eget vehicula lorem fringilla. Vestibulum vitae edor dolor euimod, scelerisque emenim sed, consectetur nibh.</p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing. Quisque congue dui et justo vulputate, eget vehicula lorem fringilla. Vestibulum vitae edor dolor euimod, scelerisque emenim sed, consectetur nibh.</p>
+                <a class="btn" href="/About/Our-History">learn more</a>
             </div>
             <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
                 <div class="visual">
@@ -187,8 +190,8 @@ Team
                     <div class="member">
                         <img src="/images/team/chewy.png" class="thumbnail" alt="/">
                         <div class="member-content">
-                            <h5>Chewy Ybarra</h5>
-                            <h6>Director / Brazilian Jiu Jitsu</h6>
+                            <h5><a href="/Instructors/Chewy-Ybarra">Chewy Ybarra</a></h5>
+                            <span>Director / Brazilian Jiu Jitsu</span>
                             <ul class="social">
                                 <li><a href="#"><i class="icon-facebook"></i></a></li>
                                 <li><a href="#"><i class=" icon-google-plus"></i></a></li>
@@ -204,8 +207,8 @@ Team
                     <div class="member">
                         <img src="/images/team/steve.jpg" class="thumbnail" alt="/">
                         <div class="member-content">
-                            <h5>Steve Shelburn</h5>
-                            <h6>Muay Thai / SEMA</h6>
+                            <h5><a href="/Instructors/Steve-Shelburn">Steve Shelburn</a></h5>
+                            <span>Muay Thai / SEAMA</span>
                             <ul class="social">
                                 <li><a href="#"><i class="icon-facebook"></i></a></li>
                                 <li><a href="#"><i class=" icon-google-plus"></i></a></li>
@@ -221,8 +224,8 @@ Team
                     <div class="member">
                         <img src="/images/team/img_0535.jpg" class="thumbnail" alt="Danny Schreiber Brazilian Jiu Jitsu">
                         <div class="member-content">
-                            <h5>Danny Schreiber</h5>
-                            <h6>Cardio Kickboxing / Brazilian Jiu Jitsu</h6>
+                            <h5><a href="/Instructors/Danny-Schreiber">Danny Schreiber</a></h5>
+                            <span>Cardio Kickboxing / Brazilian Jiu Jitsu</span>
                             <ul class="social">
                                 <li><a href="#"><i class="icon-facebook"></i></a></li>
                                 <li><a href="#"><i class=" icon-google-plus"></i></a></li>
@@ -238,8 +241,8 @@ Team
                     <div class="member">
                         <img src="/images/team/brett.jpg" class="thumbnail" alt="">
                         <div class="member-content">
-                            <h5>Brett Butler</h5>
-                            <h6>The Performance Lab</h6>
+                            <h5><a href="/Instructors/Brett-Butler">Brett Butler</a></h5>
+                            <span>The Performance Lab</span>
                             <ul class="social">
                                 <li><a href="#"><i class="icon-facebook"></i></a></li>
                                 <li><a href="#"><i class=" icon-google-plus"></i></a></li>
@@ -253,10 +256,10 @@ Team
 
                 <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12">
                     <div class="member">
-                        <img src="/images/team/cali.jpg" class="thumbnail" alt="">
+                        <img src="/images/team/gabe.jpg" class="thumbnail" alt="">
                         <div class="member-content">
-                            <h5>Cali Ybarra</h5>
-                            <h6>Font Desk</h6>
+                            <h5>Gabe Torres</h5>
+                            <h6>Office Manager</h6>
                             <ul class="social">
                                 <li><a href="#"><i class="icon-facebook"></i></a></li>
                                 <li><a href="#"><i class=" icon-google-plus"></i></a></li>
@@ -266,362 +269,15 @@ Team
                         </div>
                         <div class="clearfix"></div>
                     </div><!--member-->
-
-                    <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12">
-                        <div class="member">
-                            <img src="/images/team/gabe.jpg" class="thumbnail" alt="">
-                            <div class="member-content">
-                                <h5>Gabe Torres</h5>
-                                <h6>Office Manager</h6>
-                                <ul class="social">
-                                    <li><a href="#"><i class="icon-facebook"></i></a></li>
-                                    <li><a href="#"><i class=" icon-google-plus"></i></a></li>
-                                    <li><a href="#"><i class=" icon-twitter"></i></a></li>
-                                    <li><a href="#"><i class=" icon-linkedin"></i></a></li>
-                                </ul>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div><!--member-->
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!--=================================
-
-=================================-->
-<section id="customer" class="parallax-customer parallax">
-    <div class="container">
-        <h5>some important facts </h5>
-        <h1>about modesto power</h1>
-    </div>
-</section>
 
 
 
-
-<!--=================================
-Portfolio
-=================================-->
-<section id="portfolio">
-    <div class="container">
-        <h2>Scenes from the gallery</h2>
-        <h3>Some captured moments of the modesto power family.</h3>
-        <h4></h4>
-
-        <div class="filter-wrapper">
-            <h5>Featured photos -</h5>
-            <ul class="portfolio-filter">
-                <li class="active" data-filter="*">all</li>
-                <li data-filter=".type1">Jiu Jitsu</li>
-                <li data-filter=".type2">Muay Thai</li>
-                <li data-filter=".type3">Cardio Kickboxing</li>
-                <li data-filter=".type4">TPL</li>
-                <li data-filter=".type5">Peak Physique</li>
-                <li data-filter=".type6">Having Fun!</li>
-            </ul>
-        </div>
-    </div>
-    <div class="projects-wrapper">
-        <div class="projects">
-            <div class="project ajax-project type3">
-                <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3 type6">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-
-            <div class="project ajax-project type3">
-                <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3 type6">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-
-            <div class="project ajax-project type4">
-                <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3 type6">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3">
-                <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3 type4">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type2">
-                <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3 type2">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-        </div>
-        <div class="clearfix"></div>
-    </div>
-
-</section>
 
 <!--=================================
 Testimonials
@@ -720,6 +376,16 @@ Testimonials
     <div class="clearfix"></div>
 </section>
 
+<!--=================================
+
+=================================-->
+<section id="customer" class="parallax-customer parallax">
+    <div class="container">
+        <h5>some important facts </h5>
+        <h1>about modesto power</h1>
+    </div>
+</section>
+
 <section id="blog">
     <div class="container">
         <h2>Latest Posts</h2>
@@ -728,9 +394,11 @@ Testimonials
     </div>
     <div class="projects-wrapper">
         <div class="projects">
-            <div class="project ajax-project type3">
+            @foreach (var b in Model.Posts.Take(5))
+            {
+                <div class="project ajax-project type3">
                 <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
+                    <img src="@b.imagepath" alt="@b.title">
                     <div class="hover">
                         <ul>
                             <li>
@@ -748,148 +416,14 @@ Testimonials
                         </ul>
                     </div>
                 </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
+                <div class="project-content" style="height: 75px;">
+                    <h4><a href="/blog/@b.category.Replace(" ", "-")/@b.title.Replace(" ", "-")" class="pop-project">@b.title</a></h4>
+                    <a class="visit" href="/blog/@b.category.Replace(" ", "-")/@b.title.Replace(" ", "-")"></a>
                 </div>
             </div><!--project-->
-
-            <div class="project ajax-project type3 type6">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-
-            <div class="project ajax-project type3">
-                <div class="visual">
-                    <img src="/images/portfolio/pic1.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-            <div class="project ajax-project type3 type6">
-                <div class="visual">
-                    <img src="/images/portfolio/pic2.jpg" alt="">
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project2.html" class=" pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="assets/img/portfolio/folio-img2.jpg" data-rel="prettyPhoto">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
-
-
-            <div class="project ajax-project type4">
-                <div class="visual">
-                    <iframe style="width: 284px; height: 208px;" src="//player.vimeo.com/video/87884655?title=0&amp;byline=0&amp;portrait=0&amp;badge=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-                    <div class="hover">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="icon-facebook"></span>
-                                    <span>share</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class=" icon-twitter"></span>
-                                    <span>tweet</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <h4><a href="#project1.html" class="pop-project">moments</a></h4>
-                    <ul class="tags">
-                        <li><a href="folio.html">Team Modesto Power</a></li>
-                    </ul>
-                    <a class="visit" href="#"></a>
-                </div>
-            </div><!--project-->
+            }
         </div>
         <div class="clearfix"></div>
-    </div>
-    <div class="clearfix"></div>
-</section>
-
-<section id="hire-us" class="parallax parallax-two">
-    <div class="container">
-        <h2>&nbsp;</h2>
-        <h3>&nbsp;</h3>
-        <h4>&nbsp;</h4>
-    </div>
-    <div class="hiring-form">
-        <div class="container">
-
-        </div>
     </div>
     <div class="clearfix"></div>
 </section>
@@ -899,7 +433,6 @@ Getintouch
 =================================-->
 <section id="contact">
     <div class="container">
-        <br />
         <h2>get in touch</h2>
         <h3>Don't be shy, give us a shout.</h3>
         <h4>We're ready to make your fitness and training dreams become a reality!</h4>

@@ -16,6 +16,7 @@
         <div class="jumbotron">
             @using (Html.BeginForm("Authenticate", "Login", FormMethod.Post, new { email = ViewBag.UserName, password = "password", ReturnUrl = "/Home/Index", @class = "form-signin" }))
             {
+                <img src="/images/logo.png" alt="" style="width: 225px; margin-bottom: 20px;"/>
                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", id = "regular", placeholder = "Email address", name = "Email" })
                     @Html.ValidationMessageFor(m => m.Email)
 

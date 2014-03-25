@@ -1,0 +1,78 @@
+﻿@model RAM.Controllers.ViewModels.HomeView
+
+@{
+    ViewBag.Title = "Modesto Power | Blog";
+}
+<section id="promo" class="historyheader parallax">
+    <div class="container">
+        <h5>Here is some statement about</h5>
+        <h1>The Schedule</h1>
+    </div>
+</section>
+<section id="aboutcontent">
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 about-inner">
+                <article class="blog-post">
+                    <header class="post-header">
+                        <h2 class="post-title"><a href="/blog/@Model.SelectedPost.title.Replace(" ", "-")">@Model.SelectedPost.title</a> </h2>
+                        <ul class="post-info">
+                            <li><i class="glyphicon glyphicon-time"></i> @Model.SelectedPost.dateposted.ToShortDateString()</li>
+                            <li><i class="glyphicon glyphicon-user"></i> @Model.SelectedPost.enteredby</li>
+                            <li>
+                                <i class="glyphicon glyphicon-folder-open"></i>
+                                @foreach (var t in Model.SelectedPost.tags)
+                                {
+                                    if (Model.SelectedPost.tags.IndexOf(t) == Model.SelectedPost.tags.Count - 1)
+                                    {
+                                        <a href="#"> @t</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="#"> @t, </a>
+                                    }
+                                }
+                            </li>
+
+                        </ul>
+
+
+                    </header>
+                    <div class="post-content">
+                        <p class="post-featured-image">
+                            <a href="/blog/@Model.SelectedPost.category.Replace(" ", "-")/@Model.SelectedPost.title.Replace(" ", "-")"><img class="img-responsive" src="@Model.SelectedPost.imagepath" alt="@Model.SelectedPost.title"></a>
+                        </p>
+                        <p>@Html.Raw(Model.SelectedPost.post)</p>
+                    </div>
+                    <!-- POST CONTENT : end -->
+                    <!-- POST FOOTER : begin -->
+                    <footer class="post-footer">
+                        
+                    </footer>
+
+                </article>
+
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                @Html.Action("Sidebar", "Blog")
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<script>
+
+    (function () {
+        setTimeout(function () {
+            $('#sticktop-sticky-wrapper').hide();
+            $('#internalnav').show();
+            $('#nav-blog').addClass('active');
+        }, 500);
+
+    })();
+</script>

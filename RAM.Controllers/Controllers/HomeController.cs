@@ -10,6 +10,7 @@ using RAM.Controllers.ViewModels;
 using System.Web.Mvc;
 using RAM.Core.Domain.Banner;
 using RAM.Core.Domain.Project;
+using RAM.Core.Domain.Blog;
 
 namespace RAM.Controllers.Controllers
 {
@@ -17,9 +18,10 @@ namespace RAM.Controllers.Controllers
     {
         //private readonly IBannerService _bannerService;
         //private readonly IProjectService _projectService;
-        //private readonly IBlogService _blogService;
+        private readonly IBlogRepository _blogRepository;
         public HomeController(ILocalAuthenticationService authenticationService,
             IUserService userService,
+            IBlogRepository blogRepository,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
@@ -27,7 +29,7 @@ namespace RAM.Controllers.Controllers
         {
             //_bannerService = bannerService;
             //_projectService = projectService;
-            //_blogService = blogService;
+            _blogRepository = blogRepository;
         }
 
 
@@ -35,6 +37,7 @@ namespace RAM.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-home";
+            view.Posts = _blogRepository.GetAll();
             //Session.Add("_blog" + DateTime.Now.Ticks.ToString() + "_test", view.NavView.SelectedMenuItem);
             return View(view);
 

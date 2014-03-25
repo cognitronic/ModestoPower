@@ -57,7 +57,7 @@ namespace RAM.Controllers.Controllers
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-blog";
             view.SelectedPost = _blogRepository.GetByTitle(title.Replace("-", " "));
-            return View("BlogPost", view);
+            return View("Post", view);
 
         }
 
