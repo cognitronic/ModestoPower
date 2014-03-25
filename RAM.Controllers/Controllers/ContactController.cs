@@ -41,7 +41,40 @@ namespace RAM.Controllers.Controllers
             string body = "<b>Name: </b>" + Request.Form["field_name"] + "<br />" +
                 "<b>Email: </b>" + Request.Form["field_email"] + "<br />" +
                 "<b>Phone: </b>" + Request.Form["field_phone"] + "<br />" +
-                "<b>Message: </b>" + Request.Form["field_message"] + "<br />";
+                "<b>Message: </b>" + Request.Form["field_message"] + "<br /><h2>Interests:</h2><br />";
+            if (Request.Form["interestedbjj"] != null)
+            {
+                body += "<span><b>Jiu Jitsu </b></span><br />";
+            }
+            if (Request.Form["interestedmuaythai"] != null)
+            {
+                body += "<span><b>Muay Thai </b></span><br />";
+            }
+            if (Request.Form["interestedmma"] != null)
+            {
+                body += "<span><b>MMA </b></span><br />";
+            }
+            if (Request.Form["interestedkickboxing"] != null)
+            {
+                body += "<span><b>Cardio Kickboxing </b></span><br />";
+            }
+            if (Request.Form["interestedtpl"] != null)
+            {
+                body += "<span><b>The Performance Lab </b></span><br />";
+            }
+            if (Request.Form["interestedpeak"] != null)
+            {
+                body += "<span><b>Peak Physique </b></span><br />";
+            }
+            if (Request.Form["interestedweightloss"] != null)
+            {
+                body += "<span><b>Weight Loss </b></span><br />";
+            }
+            if (Request.Form["interestedstrength"] != null)
+            {
+                body += "<span><b>Increase Strength </b></span><br />";
+            }
+
             try
             {
                 EmailUtils.SendEmail(ConfigurationSettings.AppSettings["ContactMessageToAddress"],
