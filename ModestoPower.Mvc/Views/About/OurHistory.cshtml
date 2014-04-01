@@ -4,10 +4,23 @@
 @{
     ViewBag.Title = "Modesto Power | " + Model.SelectedPage.title;
 }
-<section id="promo" class="historyheader parallax">
-    <div class="container">
-        <h5>push yourself to</h5>
-        <h1>the next level</h1>
+<section class="main-slider no-bottom-margin has-pagination has-navigation " data-interval="10000">
+    <div class="slider-item-list">
+        @foreach (var img in Model.SelectedPage.bannerimage)
+        {
+            <div class="slider-item " data-label="Intro">
+                <!-- SLIDE 1 BACKGROUND IMAGE : begin -->
+                <img class="slider-item-bg" src="@img" alt="Modesto Power Danny Schreiber">
+                <!-- SLIDE 1 BACKGROUND IMAGE : end -->
+
+                <div class="slider-item-inner">
+                    <div class="slider-item-content valign-bottom">
+                        <div class="wrapper">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </section>
 <section id="aboutcontent">

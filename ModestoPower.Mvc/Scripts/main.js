@@ -194,7 +194,123 @@
 	2-Carousel/sliders
 	=================================*/
 	
-	
+    $('.main-slider').each(function () {
+        if ($.fn.owlCarousel) {
+
+            var slider = $(this),
+			slides_list = slider.find('.slider-item-list'),
+			slides = slider.find('.slider-item'),
+			slides_count = slides.length,
+			interval = slider.data('interval') ? parseInt(slider.data('interval')) : false,
+			stop_on_hover = slider.hasClass('stop-on-hover') ? true : false;
+
+            // SET SLIDER BACKGROUND IMAGES
+            var slider_bg_image = slider.find('.slider-bg').length > 0 ? slider.find('.slider-bg').attr('src') : false;
+            if (slider_bg_image !== false) {
+                slider.css('background-image', 'url(' + slider_bg_image + ')');
+            }
+
+            // SET ITEMS BACKGROUND IMAGES
+            slides.each(function () {
+                var bg_image = $(this).find('.slider-item-bg').length > 0 ? $(this).find('.slider-item-bg').attr('src') : false;
+                if (bg_image !== false) {
+                    $(this).css('background-image', 'url(' + bg_image + ')');
+                }
+            });
+
+           
+
+            // CREATE ARROW NAVIGATION
+            if (slides_count > 1 && slider.hasClass('has-navigation')) {
+
+                var arrows_html = '<div class="slider-navigation-prev"><button><i class="icon-angle-left"></i></button></div>';
+                arrows_html += '<div class="slider-navigation-next"><button><i class="icon-angle-right"></i></button></div>';
+                slider.append(arrows_html);
+
+            }
+
+            // CREATE INDICATOR
+            if (interval) {
+                slider.append('<div class="slider-indicator"><span></span></div>');
+            }
+
+            // INIT SLIDER
+            slides_list.owlCarousel({
+                autoPlay: interval,
+                slideSpeed: 300,
+                pagination: false,
+                singleItem: true,
+                stopOnHover: stop_on_hover,
+                addClassActive: true,
+                beforeMove: function () {
+
+                    // REFRESH INDICATOR
+                    if (interval) {
+                        slider.find('.slider-indicator > span').stop(0, 1).css('width', 0);
+                    }
+
+                },
+                afterMove: function () {
+
+                    // REFRESH PAGINATION
+                    var active_index = slides_list.find('.owl-item.active').index();
+                    slider.find('.slider-pagination .active').removeClass('active');
+                    slider.find('.slider-pagination > li:eq(' + active_index + ')').addClass('active');
+
+                    // REFRESH INDICATOR
+                    if (interval) {
+                        slider.find('.slider-indicator > span').animate({ width: "100%" }, interval);
+                    }
+
+                }
+            });
+
+            // PAGINATION NAVIGATION
+            slider.find('.slider-pagination button').click(function () {
+                var label = $(this).parent(),
+				index = label.index();
+                if (!label.hasClass('active')) {
+                    slides_list.trigger('owl.goTo', index);
+                }
+            });
+
+            // ARROWS NAVIGATION
+            slider.find('.slider-navigation-prev button').click(function () {
+                slides_list.trigger('owl.prev');
+            });
+            slider.find('.slider-navigation-next button').click(function () {
+                slides_list.trigger('owl.next');
+            });
+
+            // INDICATOR ANIMATION
+            if (interval) {
+
+                // INITIAL ANIMATION
+                slider.find('.slider-indicator > span').animate({
+                    width: "100%"
+                }, interval);
+
+                if (stop_on_hover) {
+
+                    // STOP ON HOVER
+                    slider.mouseover(function () {
+                        slider.find('.slider-indicator > span').stop(0, 0);
+                    });
+                    slider.hover(function () {
+                        slider.find('.slider-indicator > span').stop(0, 0);
+                    }, function () {
+                        // CONTINUE ON OUT
+                        slider.find('.slider-indicator > span').animate({
+                            width: "100%"
+                        }, interval);
+                    });
+
+                }
+
+            }
+
+        }
+    });
 	
 	
 

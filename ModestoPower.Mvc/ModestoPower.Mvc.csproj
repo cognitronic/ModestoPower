@@ -188,6 +188,7 @@
     <Content Include="Content\navigation.css" />
     <Content Include="Content\nlform.css" />
     <Content Include="Content\odometer-theme-default.css" />
+    <Content Include="Content\owl.carousel.css" />
     <Content Include="Content\prettyPhoto.css" />
     <Content Include="Content\skins\color1.css" />
     <Content Include="Content\skins\color2.css" />
@@ -683,6 +684,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\nlform.js" />
     <Content Include="Scripts\odometer.min.js" />
+    <Content Include="Scripts\owl.carousel.min.js" />
     <Content Include="Scripts\parallax.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
