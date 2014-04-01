@@ -21,6 +21,7 @@ using RAM.Services.Cache;
 using System.Web.Security;
 using ModestoPower.Core.Domain.Programs;
 using ModestoPower.Core.Domain.Pages;
+using ModestoPower.Core.Domain.Settings;
 using RAM.Web.Security;
 using RAM.Repository.Mongo.Repositories;
 using ModestoPower.Core.Domain.Schedule;
@@ -55,6 +56,7 @@ namespace RAM.Admin.MVC
                 {
                     For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                     For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
+                    For<ISettingsRepository>().Use<RAM.Repository.Mongo.Repositories.SettingsRepository>();
                 }
 
                 For<IBlogRepository>().Use<BlogRepository>();
@@ -77,6 +79,7 @@ namespace RAM.Admin.MVC
                 For<IBlog>().Use<Blog>();
                 For<ITag>().Use<Tag>();
                 For<ISchedule>().Use<Schedule>();
+                For<ISettings>().Use<Settings>();
                 For<IPages>().Use<Pages>();
                // For<ISubscriber>().Use<Subscriber>();
                 For<IProject>().Use<Project>();
@@ -144,6 +147,7 @@ namespace RAM.Admin.MVC
                     x.For<IBlogRepository>().Use<BlogRepository>();
                     x.For<ITagRepository>().Use<TagRepository>();
                     x.For<IScheduleRepository>().Use<ScheduleRepository>();
+                    x.For<ISettingsRepository>().Use<SettingsRepository>();
                     ////x.For<ISubscriberRepository>().Use<SubscriberRepository>();
                     //x.For<IProjectRepository>().Use<ProjectRepository>();
                     //x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
@@ -156,6 +160,7 @@ namespace RAM.Admin.MVC
                     x.For<IUser>().Use<User>();
                     x.For<IBanner>().Use<Banner>();
                     x.For<ISchedule>().Use<Schedule>();
+                    x.For<ISettings>().Use<Settings>();
                     x.For<IBlog>().Use<Blog>();
                     x.For<ITag>().Use<Tag>();
                    // x.For<ISubscriber>().Use<Subscriber>();
@@ -190,6 +195,7 @@ namespace RAM.Admin.MVC
                     x.For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                     x.For<IProgramRepository>().Use<RAM.Repository.Mongo.Repositories.ProgramRepository>();
                     x.For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
+                    x.For<ISettingsRepository>().Use<RAM.Repository.Mongo.Repositories.SettingsRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     x.For<IBlogRepository>().Use<BlogRepository>();
@@ -207,6 +213,7 @@ namespace RAM.Admin.MVC
                     x.For<IBanner>().Use<Banner>();
                     x.For<IBlog>().Use<Blog>();
                     x.For<ISchedule>().Use<Schedule>();
+                    x.For<ISettings>().Use<Settings>();
                     x.For<ITag>().Use<Tag>();
                    // x.For<ISubscriber>().Use<Subscriber>();
                     x.For<IProject>().Use<Project>();
@@ -226,7 +233,6 @@ namespace RAM.Admin.MVC
                 });
                 return container;
             }
-            return null;
         }
     }
 }

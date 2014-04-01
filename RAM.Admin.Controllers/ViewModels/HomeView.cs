@@ -10,6 +10,7 @@ using ModestoPower.Core.Domain.Programs;
 using RAM.Core.Domain.User;
 using ModestoPower.Core.Domain.Pages;
 using ModestoPower.Core.Domain.Schedule;
+using ModestoPower.Core.Domain.Settings;
 
 namespace RAM.Admin.Controllers.ViewModels
 {
@@ -24,12 +25,14 @@ namespace RAM.Admin.Controllers.ViewModels
             Programs = new List<IProgram>();
             WebPages = new List<Pages>();
             ClassList = new List<Schedule>();
+            Settings = new List<Settings>();
         }
         public NavigationView NavView { get; set; }
         public IList<IBanner> Banners { get; set; }
         public IList<IProject> Projects { get; set; }
         public IList<IProgram> Programs { get; set; }
         public IList<User> Users { get; set; }
+        public IList<Settings> Settings { get; set; }
         public IList<Blog> Blogs { get; set; }
         public IList<Pages> WebPages { get; set; }
         public IList<string> BlogCategories { get; set; }

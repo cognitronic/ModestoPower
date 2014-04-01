@@ -57,6 +57,7 @@
     <Compile Include="Repositories\BlogRepository.cs" />
     <Compile Include="Repositories\ProgramRepository.cs" />
     <Compile Include="Repositories\ScheduleRepository.cs" />
+    <Compile Include="Repositories\SettingsRepository.cs" />
     <Compile Include="Repositories\TagRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Repositories\WebPageRepository.cs" />
