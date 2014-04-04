@@ -39,13 +39,15 @@ namespace RAM.Repository.Mongo.Repositories
 
         public Waiver GetByEmail(string email)
         {
-            return null;
+            var query = Query<Waiver>.EQ(e => e.email, email);
+            return _collection.FindOneAs<Waiver>(query);
         }
 
-        public Waiver Delete(Waiver waiver)
+        public Waiver Delete(string id)
         {
-
-            return waiver;
+            var query = Query<Waiver>.EQ(e => e.Id, new ObjectId(id));
+            _collection.Remove(query);
+            return null;
         }
     }
 }

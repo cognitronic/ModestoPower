@@ -12,7 +12,7 @@ namespace ModestoPower.Core.Domain.Forms
         IList<Waiver> GetAll();
         Waiver GetById(string id);
         Waiver Save(Waiver waiver);
-        Waiver Delete(Waiver waiver);
+        Waiver Delete(string id);
         Waiver GetByEmail(string email);
     }
 }

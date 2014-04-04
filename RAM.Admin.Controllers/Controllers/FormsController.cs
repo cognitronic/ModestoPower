@@ -44,9 +44,9 @@ namespace RAM.Admin.Controllers.Controllers
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-forms";
 
-            if (id.Equals("new"))
+            if (id.ToLower().Equals("new"))
             {
-
+                view.SelectedWaiver = new Waiver();
             }
             else 
             {
@@ -59,7 +59,16 @@ namespace RAM.Admin.Controllers.Controllers
         {
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-forms";
+            view.SelectedWaiver = _waiverRepository.Save(waiver);
+            return View(view);
+        }
 
+        public ActionResult DeleteWaiver(string id)
+        {
+            var view = new HomeView();
+            view.NavView.SelectedMenuItem = "nav-forms";
+            _waiverRepository.Delete(id);
+            view.SelectedWaiver = null;
             return View(view);
         }
     }
