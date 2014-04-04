@@ -1,0 +1,100 @@
+﻿@model RAM.Admin.Controllers.ViewModels.HomeView
+
+@{
+    ViewBag.Title = "Waiver Management";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="pull-right" style="margin-top: 20px;">
+            <a href="/Forms/Waiver/New" class="btn btn-success" role="button">New Waiver</a>
+        </div>
+        <h2 class="pull-left">Waiver List</h2>
+    </div>
+    <div class="row">
+        <hr />
+        <div id="settingsList">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Phone
+                        </th>
+                        <th>
+                            Date Signed
+                        </th>
+                        <th style="text-align: right;">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var waiver in Model.Waivers)
+                    {
+                        <tr>
+                            <td>
+                                <span id="name_@waiver.Id">
+                                    @waiver.first @waiver.last
+                                </span>
+                            </td>
+                            <td>
+                                <span id="email_@waiver.Id">
+                                    @waiver.email
+                                </span>
+                            </td>
+                            <td>
+                                <span id="phone_@waiver.Id">
+                                    @waiver.phone
+                                </span>
+                            </td>
+                            <td>
+                                <span id="datesigned_@waiver.Id">
+                                    @waiver.datecreated
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a id="waiverEdit_@waiver.Id" href="/Forms/Waiver/@waiver.Id.ToString()" class="btn btn-info" role="button" data-id="@waiver.Id">Edit</a>
+                                <button class="deleteWaiver btn btn-danger" data-id="@waiver.Id" type="button">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+
+        $(".deleteWaiver").on('click', function(e){
+            e.preventDefault();
+            if (!confirm("Do you want to delete")){
+                return false;
+            }
+            $.ajax({
+                url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Forms/DeleteWaiver',
+                type: 'POST',
+                data: JSON.stringify({id: $(this).data('id')}),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    window.location = window.location;
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+                }
+            });
+        });
+
+    });
+</script>
+

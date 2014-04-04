@@ -1,0 +1,45 @@
+﻿@model RAM.Admin.Controllers.ViewModels.HomeView
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Waivers</h2>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Phone
+            </th>
+            <th>
+                Date Signed
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Waivers)
+        {
+            <tr>
+                <td>
+                    @item.first @item.last
+                </td>
+                <td>
+                    @item.email
+                </td>
+                <td>
+                    @item.phone
+                </td>
+                <td>
+                    @item.datecreated.ToShortDateString()
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table> 

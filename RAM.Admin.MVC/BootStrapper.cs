@@ -22,6 +22,7 @@ using System.Web.Security;
 using ModestoPower.Core.Domain.Programs;
 using ModestoPower.Core.Domain.Pages;
 using ModestoPower.Core.Domain.Settings;
+using ModestoPower.Core.Domain.Forms;
 using RAM.Web.Security;
 using RAM.Repository.Mongo.Repositories;
 using ModestoPower.Core.Domain.Schedule;
@@ -57,6 +58,7 @@ namespace RAM.Admin.MVC
                     For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                     For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
                     For<ISettingsRepository>().Use<RAM.Repository.Mongo.Repositories.SettingsRepository>();
+                    For<IWaiverRepository>().Use<RAM.Repository.Mongo.Repositories.WaiverRepository>();
                 }
 
                 For<IBlogRepository>().Use<BlogRepository>();
@@ -148,6 +150,7 @@ namespace RAM.Admin.MVC
                     x.For<ITagRepository>().Use<TagRepository>();
                     x.For<IScheduleRepository>().Use<ScheduleRepository>();
                     x.For<ISettingsRepository>().Use<SettingsRepository>();
+                    x.For<IWaiverRepository>().Use<WaiverRepository>();
                     ////x.For<ISubscriberRepository>().Use<SubscriberRepository>();
                     //x.For<IProjectRepository>().Use<ProjectRepository>();
                     //x.For<IProjectImageRepository>().Use<ProjectImageRepository>();
@@ -196,6 +199,7 @@ namespace RAM.Admin.MVC
                     x.For<IProgramRepository>().Use<RAM.Repository.Mongo.Repositories.ProgramRepository>();
                     x.For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
                     x.For<ISettingsRepository>().Use<RAM.Repository.Mongo.Repositories.SettingsRepository>();
+                    x.For<IWaiverRepository>().Use<RAM.Repository.Mongo.Repositories.WaiverRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     x.For<IBlogRepository>().Use<BlogRepository>();

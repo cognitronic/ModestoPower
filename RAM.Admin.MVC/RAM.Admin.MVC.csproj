@@ -597,6 +597,9 @@
     <Content Include="Views\Schedule\Index.cshtml" />
     <Content Include="Views\Schedule\_ScheduleList.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
+    <Content Include="Views\Forms\Index.cshtml" />
+    <Content Include="Views\Forms\WaiverList.cshtml" />
+    <Content Include="Views\Forms\Waiver.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Admin.Controllers\RAM.Admin.Controllers.csproj">

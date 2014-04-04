@@ -60,6 +60,7 @@
     <Compile Include="Repositories\SettingsRepository.cs" />
     <Compile Include="Repositories\TagRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\WaiverRepository.cs" />
     <Compile Include="Repositories\WebPageRepository.cs" />
   </ItemGroup>
   <ItemGroup>

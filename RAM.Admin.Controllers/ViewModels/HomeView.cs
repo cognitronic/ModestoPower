@@ -11,6 +11,7 @@ using RAM.Core.Domain.User;
 using ModestoPower.Core.Domain.Pages;
 using ModestoPower.Core.Domain.Schedule;
 using ModestoPower.Core.Domain.Settings;
+using ModestoPower.Core.Domain.Forms;
 
 namespace RAM.Admin.Controllers.ViewModels
 {
@@ -26,6 +27,7 @@ namespace RAM.Admin.Controllers.ViewModels
             WebPages = new List<Pages>();
             ClassList = new List<Schedule>();
             Settings = new List<Settings>();
+            Waivers = new List<Waiver>();
         }
         public NavigationView NavView { get; set; }
         public IList<IBanner> Banners { get; set; }
@@ -43,5 +45,7 @@ namespace RAM.Admin.Controllers.ViewModels
         public IList<Schedule> ClassList { get; set; }
         public bool UsePartialView { get; set; }
         public User SelectedUser { get; set; }
+        public IList<Waiver> Waivers { get; set; }
+        public Waiver SelectedWaiver { get; set; }
     }
 }

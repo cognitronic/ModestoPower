@@ -29,6 +29,7 @@ namespace RAM.Core
         public static string Mongo_Tags_Collection = "tags";
         public static string Mongo_Schedule_Collection = "schedule";
         public static string Mongo_Settings_Collection = "settings";
+        public static string Mongo_Waiver_Collection = "waiver";
         #endregion
     }
 }
