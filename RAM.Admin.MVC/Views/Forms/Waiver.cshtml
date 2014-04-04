@@ -9,67 +9,67 @@
     <div class="row">
         <h2>Waiver</h2>
         <form action="/Forms/SaveWaiver" method="POST" class="form-actions">
-            <div class="col-lg-6">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="form-group">
                     <b>First Name:</b>
-                    <input type="text" name="first" id="first" class="form-control" value="@Model.SelectedWaiver.first" />
+                    <input type="text" name="first" id="first" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Last Name:</b>
-                    <input type="text" name="last" id="last" class="form-control" value="@Model.SelectedWaiver.last" />
+                    <input type="text" name="last" id="last" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Email:</b>
-                    <input type="email" name="email" id="email" class="form-control" value="@Model.SelectedWaiver.email" />
+                    <input type="email" name="email" id="email" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Address:</b>
-                    <input type="text" name="address" id="address" class="form-control" value="@Model.SelectedWaiver.address" />
+                    <input type="text" name="address" id="address" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>City:</b>
-                    <input type="text" name="city" id="city" class="form-control" value="@Model.SelectedWaiver.city" />
+                    <input type="text" name="city" id="city" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Zip:</b>
-                    <input type="text" name="zip" id="zip" class="form-control" value="@Model.SelectedWaiver.zip" />
+                    <input type="text" name="zip" id="zip" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Agreed To Terms:</b>
-                    <input type="checkbox" name="agreedtoterms" id="agreedtoterms" checked="@Model.SelectedWaiver.first" />
+                    <input type="checkbox" name="agreedtoterms" id="agreedtoterms" />
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" >
                 <div class="form-group">
                     <b>Phone:</b>
-                    <input type="text" name="phone" id="phone" class="form-control" value="@Model.SelectedWaiver.phone" />
+                    <input type="text" name="phone" id="phone" class="form-control"/>
                 </div>
                 <div class="form-group">
                     <b>Birthday:</b>
-                    <input type="text" name="birthday" id="birthday" class="form-control" value="@Model.SelectedWaiver.birthday" />
+                    <input type="text" name="birthday" id="birthday" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Class Attending:</b>
-                    <input type="text" name="classattending" id="classattending" class="form-control" value="@Model.SelectedWaiver.classattending" />
+                    <input type="text" name="classattending" id="classattending" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Emergency Name:</b>
-                    <input type="text" name="emergencyname" id="emergencyname" class="form-control" value="@Model.SelectedWaiver.emergencyname" />
+                    <input type="text" name="emergencyname" id="emergencyname" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Emergency Number:</b>
-                    <input type="text" name="emergencynumber" id="emergencynumber" class="form-control" value="@Model.SelectedWaiver.emergencynumber" />
+                    <input type="text" name="emergencynumber" id="emergencynumber" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Parent/Guardian Name:</b>
-                    <input type="text" name="guardianname" id="guardianname" class="form-control" value="@Model.SelectedWaiver.guardianname" />
+                    <input type="text" name="guardianname" id="guardianname" class="form-control" />
                 </div>
                 <div class="form-group">
                     <b>Date Signed: </b>
                     <span id="datecreated" >@Model.SelectedWaiver.datecreated.ToString()</span>
                 </div>
             </div>
-            <input type="hidden" id="hdnId" name="hdnId" value="@Model.SelectedWaiver.Id.ToString()"/>
+            <input type="hidden" id="hdnId" name="hdnId" data-id="@Model.SelectedWaiver.Id.ToString()"/>
         </form>
     </div>
     <div class="row">
@@ -80,25 +80,45 @@
 
 <script>
     $(document).ready(function () {
-        var waiver = {
-            first: $('#first').val(),
-            last: $('#last').val(),
-            phone: $('#phone').val(),
-            email: $('#email').val(),
-            birthday: $('#birthday').val(),
-            address: $('#address').val(),
-            city: $('#city').val(),
-            state: 'CA',
-            zip: $('#zip').val(),
-            classattending: $('#classattending').val(),
-            emergencynumber: $('#emergencynumber').val(),
-            emergencyname: $('#emergencyname').val(),
-            guardianname: $('#guardianname').val(),
-            agreedtoterms: $('#agreedtoterms').prop('checked'),
-            id: $('#hdnId').val()
-        };
+
+        var wvr = @Html.Raw(Json.Encode(Model.SelectedWaiver));
+        if(wvr === null || wvr === 'undefined'){
+            console.log('new waiver');
+        } else{
+            $("#agreedtoterms").prop('checked', wvr.agreedtoterms);
+            $('#first').val(wvr.first);
+            $('#last').val(wvr.last);
+            $('#phone').val(wvr.phone);
+            $('#email').val(wvr.email);
+            $('#birthday').val(wvr.birthday);
+            $('#address').val(wvr.address);
+            $('#city').val(wvr.city);
+            $('#zip').val(wvr.zip);
+            $('#classattending').val(wvr.classattending);
+            $('#emergencynumber').val(wvr.emergencynumber);
+            $('#emergencyname').val(wvr.emergencyname);
+            $('#guardianname').val(wvr.guardianname);
+        }
 
         $("#save").on('click', function (e) {
+            var waiver = {
+                first: $('#first').val(),
+                last: $('#last').val(),
+                phone: $('#phone').val(),
+                email: $('#email').val(),
+                birthday: $('#birthday').val(),
+                address: $('#address').val(),
+                city: $('#city').val(),
+                state: 'CA',
+                zip: $('#zip').val(),
+                classattending: $('#classattending').val(),
+                emergencynumber: $('#emergencynumber').val(),
+                emergencyname: $('#emergencyname').val(),
+                guardianname: $('#guardianname').val(),
+                agreedtoterms: $('#agreedtoterms').prop('checked'),
+                sid: $('#hdnId').data('id')
+            };
+
             e.preventDefault();
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Forms/SaveWaiver',
@@ -110,7 +130,8 @@
                     window.location = window.location;
                 },
                 error: function (x, y, z) {
-                    alert(x + '\n' + y + '\n' + z);
+                    console.log(x + '\n' + y + '\n' + z);
+                    window.location = '/Forms/WaiverList';
                 }
             });
         });

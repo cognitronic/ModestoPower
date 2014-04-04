@@ -14,6 +14,8 @@ namespace ModestoPower.Core.Domain.Forms
         [DataMember]
         public ObjectId Id { get; set; }
         [DataMember]
+        public string sid { get; set; }
+        [DataMember]
         public string first { get; set; }
         [DataMember]
         public string last { get; set; }

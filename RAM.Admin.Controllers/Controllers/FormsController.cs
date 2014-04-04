@@ -59,8 +59,33 @@ namespace RAM.Admin.Controllers.Controllers
         {
             var view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-forms";
-            view.SelectedWaiver = _waiverRepository.Save(waiver);
-            return View(view);
+            var w = new Waiver();
+            if (!string.IsNullOrEmpty(waiver.sid))
+            {
+                w.Id = new MongoDB.Bson.ObjectId(waiver.sid); 
+                w.datecreated = DateTime.Today;
+            }
+            else
+            {
+                w.datecreated = DateTime.Today;
+            }
+            w.address = waiver.address;
+            w.agreedtoterms = waiver.agreedtoterms;
+            w.birthday = waiver.birthday;
+            w.city = waiver.city;
+            w.classattending = waiver.classattending;
+            w.email = waiver.email;
+            w.emergencyname = waiver.emergencyname;
+            w.emergencynumber = waiver.emergencynumber;
+            w.first = waiver.first;
+            w.guardianname = waiver.guardianname;
+            w.last = waiver.last;
+            w.phone = waiver.phone;
+            w.state = waiver.state;
+            w.zip = waiver.zip;
+
+            view.SelectedWaiver = _waiverRepository.Save(w);
+            return View("Waiver", view);
         }
 
         public ActionResult DeleteWaiver(string id)
