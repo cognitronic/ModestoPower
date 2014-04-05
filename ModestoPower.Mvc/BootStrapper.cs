@@ -24,6 +24,8 @@ using RAM.Web.Security;
 using RAM.Repository.NHibernate.Repositories;
 using ModestoPower.Core.Domain.Pages;
 using ModestoPower.Core.Domain.Schedule;
+using ModestoPower.Core.Domain.Client;
+using ModestoPower.Core.Domain.Forms;
 
 namespace ModestoPower.Mvc
 {
@@ -59,6 +61,8 @@ namespace ModestoPower.Mvc
                 For<IBlogRepository>().Use<RAM.Repository.Mongo.Repositories.BlogRepository>();
                 For<ITagRepository>().Use<RAM.Repository.Mongo.Repositories.TagRepository>();
                 For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
+                For<IWaiverRepository>().Use<RAM.Repository.Mongo.Repositories.WaiverRepository>();
+                For<IClientRepository>().Use<RAM.Repository.Mongo.Repositories.ClientRepository>();
                 // For<IBlogTagRepository>().Use<BlogTagRepository>();
                 //// For<ISubscriberRepository>().Use<SubscriberRepository>();
                 // For<IProjectRepository>().Use<ProjectRepository>();
@@ -137,6 +141,8 @@ namespace ModestoPower.Mvc
                     x.For<IUserRepository>().Use<UserRepository>();
                     x.For<IPagesRepository>().Use<RAM.Repository.Mongo.Repositories.WebPageRepository>();
                     x.For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
+                    x.For<IWaiverRepository>().Use<RAM.Repository.Mongo.Repositories.WaiverRepository>();
+                    x.For<IClientRepository>().Use<RAM.Repository.Mongo.Repositories.ClientRepository>();
                     //x.For<IBannerRepository>().Use<BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     x.For<IBlogRepository>().Use<BlogRepository>();
@@ -186,6 +192,8 @@ namespace ModestoPower.Mvc
 
                     x.For<IUserRepository>().Use<RAM.Repository.Mongo.Repositories.UserRepository>();
                     x.For<IScheduleRepository>().Use<RAM.Repository.Mongo.Repositories.ScheduleRepository>();
+                    x.For<IWaiverRepository>().Use<RAM.Repository.Mongo.Repositories.WaiverRepository>();
+                    x.For<IClientRepository>().Use<RAM.Repository.Mongo.Repositories.ClientRepository>();
                     //x.For<IBannerRepository>().Use<RAM.Repository.Mongo.Repositories.BannerRepository>();
                     //x.For<IBlogTagRepository>().Use<BlogTagRepository>();
                     x.For<IBlogRepository>().Use<RAM.Repository.Mongo.Repositories.BlogRepository>();

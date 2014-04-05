@@ -725,6 +725,7 @@
     <Content Include="Views\Blog\_SideBar.cshtml" />
     <Content Include="Views\Blog\_Categories.cshtml" />
     <Content Include="Views\Blog\Post.cshtml" />
+    <Content Include="Views\About\Waiver.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Controllers\RAM.Controllers.csproj">

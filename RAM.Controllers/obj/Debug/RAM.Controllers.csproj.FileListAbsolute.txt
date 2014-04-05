@@ -235,3 +235,7 @@ C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\MongoDB.Driver.dll
 C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\MongoDB.Bson.dll
 C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\MongoDB.Driver.xml
 C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\MongoDB.Bson.xml
+C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\MongoDB.Web.dll
+C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\RAM.Repository.Mongo.dll
+C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\RAM.Repository.Mongo.pdb
+C:\Projects\ModestoPower\RAM.Controllers\bin\Debug\MongoDB.Web.pdb

@@ -443,10 +443,13 @@
         });
     };
 
+    
+
 
     $.fn.stFormValid = function () {
         function emailValid(email) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            console.log(re.test(email));
             return re.test(email);
         }
 
@@ -472,9 +475,11 @@
                 // email field
                 if (field.hasClass('email')) {
                     if (!emailValid(value)) {
+                        console.log('hi email');
                         field.addClass('error');
                     }
                     else {
+                        
                         field.removeClass('error');
                         valid = true;
                     }
@@ -504,7 +509,8 @@
 
                     // default field
                 else {
-                    field.removeClass('error');
+                    console.log('hi ' + field.name);
+                    //field.removeClass('error');
                     valid = true;
                 }
 
@@ -515,7 +521,7 @@
             formValid = !valid ? false : formValid;
 
         });
-
+        console.log(form)
         return formValid;
 
     };
@@ -524,7 +530,6 @@
     $('#contact-form').each(function () {
         $(this).stContactForm();
     });
-
 
 
     /*=================================

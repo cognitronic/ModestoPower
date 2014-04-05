@@ -8,6 +8,7 @@ using RAM.Core.Domain.Project;
 using RAM.Core.Domain.Blog;
 using ModestoPower.Core.Domain.Pages;
 using ModestoPower.Core.Domain.Schedule;
+using ModestoPower.Core.Domain.Forms;
 
 namespace RAM.Controllers.ViewModels
 {
@@ -30,6 +31,7 @@ namespace RAM.Controllers.ViewModels
 
         public IPages SelectedPage { get; set; }
 
+        public Waiver SelectedWaiver { get; set; }
         public IList<Blog> Posts { get; set; }
 
         public IBlog SelectedPost { get; set; }

@@ -65,6 +65,8 @@
     <Compile Include="Domain\Blog\ITag.cs" />
     <Compile Include="Domain\Blog\ITagRepository.cs" />
     <Compile Include="Domain\Blog\Tag.cs" />
+    <Compile Include="Domain\Client\Client.cs" />
+    <Compile Include="Domain\Client\IClientRepository.cs" />
     <Compile Include="Domain\Forms\IWaiverRepository.cs" />
     <Compile Include="Domain\Forms\Waiver.cs" />
     <Compile Include="Domain\Schedule\ISchedule.cs" />

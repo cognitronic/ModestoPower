@@ -1,0 +1,215 @@
+﻿@model RAM.Controllers.ViewModels.HomeView
+
+@{
+    ViewBag.Title = "Modesto Power Waiver of Liability Form";
+}
+
+<section id="promo" class="parallax-one parallax">
+    <div class="container">
+        <h5>push yourself to</h5>
+        <h1>the next level</h1>
+    </div>
+</section>
+
+
+<div class="container">
+    <div class="row">
+        <br />
+        <h2>Waiver of Liability Form</h2>
+        <br />
+        <div>
+            <p>
+                I/We hereby understand and acknowledge that the training, programs and events held by Modesto Power may expose me to many inherent risks, including accidents, injury, illness, or even death.  I/We assume all risk of injuries associated with participation including, but not limited to, falls, contact with other participants, the effects of the weather, including high heat and/or humidity, and all other such risks being known and appreciated by me.
+            </p>
+            <p>
+                I/We hereby acknowledge my responsibility in communicating any physical and psychological concerns that might conflict with participation in activity.  I/We acknowledge that I am physically fit and mentally capable of performing the physical activity I choose to participate in.
+            </p>
+            <p>
+                After having read this waiver and knowing these facts, and in consideration of acceptance of my participation and Modesto Power furnishing services to me, I agree, for myself and anyone entitled to act on my behalf, to <b>HOLD HARMLESS, WAIVE AND RELEASE</b> Modesto Power, its officers, agents, employees, organizers, representatives, and successors from any responsibility, liabilities, demands, or claims of any kind arising out of my participation in the Modesto Power training, programs and/or events.
+            </p>
+            <p>
+                By checking the I agree box I/We indicate that I/We have read and understand this Waiver of Liability.  I am aware that this is a waiver and a release of liability and I voluntarily agree to its terms.
+            </p>
+            <p>
+                I hereby grant Modesto Power permission to use my likeness in a photograph/video, without payment or any other compensation.
+            </p>
+        </div>
+        <hr />
+        <form action="/Forms/SaveWaiver" method="POST" id="waiver-form" class="default-form validate">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <!-- FORM VALIDATION ERROR MESSAGE : begin -->
+                <p class="alert-message warning validation" style="display: none;"><i class="ico fa fa-exclamation-circle"></i><strong>Fields with (*) are required!</strong><br>All required fields must be filled correctly.</p>
+                <!-- FORM VALIDATION ERROR MESSAGE : end -->
+                <!-- SENDING REQUEST ERROR MESSAGE : begin -->
+                <p class="alert-message warning request" style="display: none;"><i class="ico fa fa-exclamation-circle"></i><strong>Form not sent!</strong><br>There was a connection problem. Try again later.</p>
+                <!-- SENDING REQUEST ERROR MESSAGE : end -->
+
+                <div class="form-group">
+                    <b>I agree to the terms above:</b>
+                    <input class="required" type="checkbox" name="agreedtoterms" id="agreedtoterms" />
+                </div>
+                <div class="form-group">
+                    <b>First Name:</b>
+                    <input type="text" name="first" id="first" placeholder="Enter first name" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Last Name:</b>
+                    <input type="text" name="last" id="last" placeholder="Enter last name" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Email:</b>
+                    <input type="email" name="email" id="email" placeholder="Enter email" class="form-control required email" />
+                </div>
+                <div class="form-group">
+                    <b>Address:</b>
+                    <input type="text" name="address" id="address" placeholder="Enter address" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>City:</b>
+                    <input type="text" name="city" id="city" placeholder="Enter city" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Zip:</b>
+                    <input type="text" name="zip" id="zip" placeholder="Enter zip" class="form-control required" />
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    &nbsp;
+                </div>
+                <div class="form-group">
+                    <b>Phone:</b>
+                    <input type="text" name="phone" id="phone" placeholder="Enter phone" class="form-control required tel" />
+                </div>
+                <div class="form-group">
+                    <b>Birthday:</b> <small>mm/dd/yyyy</small>
+                    <input type="text" name="birthday" id="birthday" placeholder="Enter birthday " class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Class Attending:</b>
+                    <input type="text" name="classattending" id="classattending" placeholder="Enter class attending" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Emergency Name:</b>
+                    <input type="text" name="emergencyname" id="emergencyname" placeholder="Enter emergency name" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Emergency Number:</b>
+                    <input type="text" name="emergencynumber" id="emergencynumber" placeholder="Enter emergency number" class="form-control required" />
+                </div>
+                <div class="form-group">
+                    <b>Parent/Guardian Name:</b>
+                    <input type="text" name="guardianname" id="guardianname" placeholder="Enter parent or guardian name" class="form-control" />
+                </div>
+            </div>
+            <input type="hidden" id="hdnId" name="hdnId" data-id="@Model.SelectedWaiver.Id.ToString()" />
+        </form>
+    </div>
+    <div class="row">
+        <button id="save" type="button" class="submit btn btn-primary">Save</button>
+        <button type="button" class="btn btn-danger" id="delete">Clear</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $("#save").on('click', function (e) {
+            e.preventDefault();
+            var form = $('#waiver-form'),
+                submit_btn = form.find('.submit');
+            if($('#waiver-form').stFormValid()){
+                var waiver = {
+                    first: $('#first').val(),
+                    last: $('#last').val(),
+                    phone: $('#phone').val(),
+                    email: $('#email').val(),
+                    birthday: $('#birthday').val(),
+                    address: $('#address').val(),
+                    city: $('#city').val(),
+                    state: 'CA',
+                    zip: $('#zip').val(),
+                    classattending: $('#classattending').val(),
+                    emergencynumber: $('#emergencynumber').val(),
+                    emergencyname: $('#emergencyname').val(),
+                    guardianname: $('#guardianname').val(),
+                    agreedtoterms: $('#agreedtoterms').prop('checked'),
+                    sid: $('#hdnId').data('id')
+                };
+                $.ajax({
+                    url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/About/SaveWaiver',
+                    type: 'POST',
+                    data: JSON.stringify(waiver),
+                    dataType: "json",
+                    contentType: "application/json;charset=utf-8",
+                    success: function (data) {
+                        window.location = window.location;
+                        $('#first').val('');
+                        $('#last').val('');
+                        $('#phone').val('');
+                        $('#email').val('');
+                        $('#birthday').val('');
+                        $('#address').val('');
+                        $('#city').val('');
+                        $('#zip').val('');
+                        $('#classattending').val('');
+                        $('#emergencynumber').val('');
+                        $('#emergencyname').val('');
+                        $('#guardianname').val('');
+                        alert('Thank you and enjoy your workout!!!!');
+                    },
+                    error: function (x, y, z) {
+                        console.log(x + '\n' + y + '\n' + z);
+                        $('#first').val('');
+                        $('#last').val('');
+                        $('#phone').val('');
+                        $('#email').val('');
+                        $('#birthday').val('');
+                        $('#address').val('');
+                        $('#city').val('');
+                        $('#zip').val('');
+                        $('#classattending').val('');
+                        $('#emergencynumber').val('');
+                        $('#emergencyname').val('');
+                        $('#guardianname').val('');
+                        //window.location = '/Forms/WaiverList';
+                    }
+                });
+
+                form.find('.alert-message.validation').hide();
+                form.prepend('<h3>Thank you and enjoy your workout!!!!</h3>');
+                form.find('.alert-message.success, .alert-message.phpvalidation').slideDown(300);
+                submit_btn.removeClass('loading');
+                submit_btn.text(submit_btn.attr('data-label'));
+            } else {
+               form.find('p.alert-message.warning.validation').slideDown(300);
+                return false;
+            }
+        });
+    });
+
+    $('.delete').on('click', function(){
+        $('#first').val('');
+        $('#last').val('');
+        $('#phone').val('');
+        $('#email').val('');
+        $('#birthday').val('');
+        $('#address').val('');
+        $('#city').val('');
+        $('#zip').val('');
+        $('#classattending').val('');
+        $('#emergencynumber').val('');
+        $('#emergencyname').val('');
+        $('#guardianname').val('');
+    });
+
+    (function () {
+        setTimeout(function () {
+            $('#sticktop-sticky-wrapper').hide();
+            $('#internalnav').show();
+            $('#nav-about').addClass('active');
+        }, 500);
+        
+    })();
+</script>
+
