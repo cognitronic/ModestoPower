@@ -35,6 +35,10 @@ namespace RAM.Admin.Controllers.Controllers
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-schedule";
             view.ClassList = _scheduleRepository.GetAll().OrderBy(o => o.name).ThenBy(o => o.day).ToList();
+            //foreach (var c in view.ClassList) {
+            //    c.sid = c.Id.ToString();
+            //    _scheduleRepository.Save(c);
+            //}
             return View(view);
 
         }
@@ -45,7 +49,12 @@ namespace RAM.Admin.Controllers.Controllers
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-schedule";
             view.ClassList = _scheduleRepository.GetAll().OrderBy(o => o.name).ThenBy(o => o.day).ToList();
-            return PartialView("_ScheduleList", view);
+            return Json(new
+            {
+                Message = "schedule saved!",
+                Status = "success",
+                Classes = view.ClassList
+            }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SaveClass(Schedule schedule)
@@ -60,6 +69,8 @@ namespace RAM.Admin.Controllers.Controllers
                 s.instructor = schedule.instructor;
                 s.name = schedule.name.ToLower();
                 s.times = schedule.times;
+                _scheduleRepository.Save(s);
+                s.sid = s.Id.ToString();
                 _scheduleRepository.Save(s);
             }
             else
@@ -81,9 +92,9 @@ namespace RAM.Admin.Controllers.Controllers
             });
         }
 
-        public ActionResult DeleteClass(string id)
+        public ActionResult DeleteClass(Schedule classId)
         {
-            _scheduleRepository.Delete(_scheduleRepository.GetById(new MongoDB.Bson.ObjectId(id)));
+            _scheduleRepository.Delete(_scheduleRepository.GetById(new MongoDB.Bson.ObjectId(classId.sid)));
             return Json(new
             {
                 Message = "schedule deleted!",

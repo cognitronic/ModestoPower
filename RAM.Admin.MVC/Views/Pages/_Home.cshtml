@@ -19,20 +19,14 @@
             <textarea id="seoDescription" class="form-control" rows="6" placeholder="Enter SEO Description">@Model.SelectedPage.seodescription</textarea><br />
             <b>Content Body:</b><br />
             <textarea id="contentbody" class="form-control" rows="6" placeholder="Enter Content"></textarea><br />
-            @if (Model.SelectedPage != null)
-            {
-                <span><b>Click To Manage Pictures:</b></span><br />
-                if (Model.SelectedPage.bannerimage.Count > 0)
-                {
-                    <a href="#pageModal" class="editPageModal" data-toggle="modal" data-id="@Model.SelectedPage.Id.ToString()">
-                        <img id="postimage" src="@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]@Model.SelectedPage.bannerimage[0]" alt="@Model.SelectedPage.title" class="img-thumbnail" style="height: 200px; width: 300px;" />
-                    </a>
-                }
-            }
-            <br /><br />
-            <button class="savePage btn btn-success" role="button">Save Page</button>
-            <a href="/Pages" class="btn btn-info" role="button">Back To List</a>
-        </div>
+            <div id="imagesList">
+                @Html.Partial("_ImagesList")
+            </div>
+               
+                <br /><br />
+                <button class="savePage btn btn-success" role="button">Save Page</button>
+                <a href="/Pages" class="btn btn-info" role="button">Back To List</a>
+            </div>
     </div>
 </div>
 <div id="pageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -127,13 +121,17 @@
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function(data){
-                    bgImages = data.Images;
-                    buildImages(dropZoneInstance(), bgImages, $("#hdnPageID").val());
+                    //bgImages = data.Images;
+                    //buildImages(dropZoneInstance(), bgImages, $("#hdnPageID").val());
                 },
                 error: function(x,y,z){
 
                 }
             });
+        });
+
+        $('.deleteImage').on('click', function () {
+            DeleteFileFromServer($(this).data('name'), $(this).data('id'));
         });
 
         function buildImages(dz, imgs, id) {
@@ -169,12 +167,12 @@
             dz.options.maxFiles = dz.options.maxFiles - existingFileCount;
         }
 
-        function DeleteFileFromServer(file) {
-            console.log(file);
+        function DeleteFileFromServer(name, id) {
+            console.log(name + ' ' + id);
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Pages/DeleteImage',
                 type: 'POST',
-                data: JSON.stringify({ id: file.id, name: file.name}),
+                data: JSON.stringify({ id: id, name: name}),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
@@ -193,7 +191,7 @@
             //prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
             maxFiles: 5,
-            maxFilesize: 3,
+            maxFilesize: 50,
             addRemoveLinks: true,
             parallelUploads: 5,
 

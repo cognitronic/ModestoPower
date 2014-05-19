@@ -1,66 +1,63 @@
 ﻿
 @model RAM.Admin.Controllers.ViewModels.HomeView
 
-
-<table class="table table-hover table-striped">
-    <thead>
-        <tr>
-            <th class="col-sm-2">
-                Class
-            </th>
-            <th class="col-sm-4">
-                Description
-            </th>
-            <th class="col-sm-2">
-                Instructor
-            </th>
-            <th class="col-sm-1">
-                Day
-            </th>
-            <th class="col-sm-1">
-                Time
-            </th>
-            <th style="text-align: right;" class="col-sm-2">
-                Actions
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var schedule in Model.ClassList)
-        {
+<div>
+    <div>
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <input class="form-control " type="text" ng-model="criteria_name" placeholder="Search by class" />
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <input class="form-control" type="text" ng-model="criteria_day" placeholder="Search by day" />
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <input class="form-control" type="text" ng-model="criteria_times" placeholder="Search by times" />
+        </div>
+    </div>
+    <table class="table table-hover table-striped">
+        <thead>
             <tr>
-                <td>
-                    <span id="class_@schedule.Id">
-                        @schedule.name
-                    </span>
-                </td>
-                <td>
-                    <span id="description_@schedule.Id">
-                        @schedule.description
-                    </span>
-                </td>
-                <td>
-                    <span id="instructor_@schedule.Id">
-                        @schedule.instructor
-                    </span>
-                </td>
-                <td>
-                    <span id="day_@schedule.Id">
-                        @schedule.day
-                    </span>
-                </td>
-                <td>
-                    <span id="time_@schedule.Id">
-                        @schedule.times
-                    </span>
-                </td>
+                <th class="col-sm-2">
+                    Class
+                </th>
+                <th class="col-sm-4">
+                    Description
+                </th>
+                <th class="col-sm-2">
+                    Instructor
+                </th>
+                <th class="col-sm-1">
+                    Day
+                </th>
+                <th class="col-sm-1">
+                    Time
+                </th>
+                <th style="text-align: right;" class="col-sm-2">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="class in classes|
+            filter:{name: criteria_name, day : criteria_day, times: criteria_times} |
+            startFrom: pagination.page * pagination.perPage |
+            limitTo: pagination.perPage ">
+                <td>{{class.name}}</td>
+                <td>{{class.description}}</td>
+                <td>{{class.instructor}}</td>
+                <td>{{class.day}}</td>
+                <td>{{class.times}}</td>
                 <td style="text-align: right;">
-                    <a id="scheduleEdit_@schedule.Id" href="#scheduleModal" class="editModal btn btn-info" role="button" data-toggle="modal" data-id="@schedule.Id">Edit</a>
-                    <button class="deleteschedule btn btn-danger" data-id="@schedule.Id.ToString()" type="button">Delete</button>
+                    <a id="scheduleEdit_{{class.Id}}" href="#scheduleModal" ng-click="editItem(class)" class=" btn btn-info" role="button" data-toggle="modal" data-id="class.Id">Edit</a>
+                    <button class="deleteschedule btn btn-danger" ng-click="deleteClass(class)" data-id="class.Id" type="button">Delete</button>
                 </td>
             </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
+</div>
+<button class="btn btn-primary" ng-hide="pagination.page == 0" ng-click="pagination.prevPage()">Previous</button>
+<span ng-repeat="n in [] | range: pagination.numPages">
+    <button class="btn btn-default" ng-class="{active: n == pagination.page}" ng-click="pagination.toPageId(n)">{{n + 1}}</button>
+</span>
+<button class="btn btn-primary" ng-hide="pagination.page + 1 >= pagination.numPages" ng-click="pagination.nextPage()">Next</button>
 

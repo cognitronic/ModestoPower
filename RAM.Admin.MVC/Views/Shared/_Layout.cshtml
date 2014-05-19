@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html ng-app="">
+<html ng-app="mp">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
     <script src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
     @RenderSection("scripts", required: false)
 </head>
-<body>
+<body ng-controller="MainController">
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -56,6 +56,10 @@
                     $("#" + item).addClass("active");
                 }
     </script>
-    
+    <script src="~/Scripts/app.js"></script>
+    <script src="~/Scripts/shared/main-controller.js"></script>
+    <script src="~/Scripts/schedule/schedule-controller.js"></script>
+    <script src="~/Scripts/schedule/schedule-service.js"></script>
+    <script src="~/Scripts/shared/paginator-service.js"></script>
 </body>
 </html>

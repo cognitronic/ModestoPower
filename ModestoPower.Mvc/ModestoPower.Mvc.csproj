@@ -399,6 +399,7 @@
     <Content Include="Scripts\angular-touch.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\app.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="fonts\nlicons\nlicons.eot" />
@@ -685,9 +686,11 @@
     <Content Include="Scripts\nlform.js" />
     <Content Include="Scripts\odometer.min.js" />
     <Content Include="Scripts\owl.carousel.min.js" />
+    <Content Include="Scripts\pages\page-service.js" />
     <Content Include="Scripts\parallax.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\shared\main-controller.js" />
     <Content Include="Scripts\swfobject.js" />
     <Content Include="Scripts\tweetable.jquery.min.js" />
     <Content Include="Scripts\_references.js" />

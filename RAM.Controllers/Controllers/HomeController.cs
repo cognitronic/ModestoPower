@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using RAM.Core.Domain.Banner;
 using RAM.Core.Domain.Project;
 using RAM.Core.Domain.Blog;
+using ModestoPower.Core.Domain.Pages;
 
 namespace RAM.Controllers.Controllers
 {
@@ -19,16 +20,18 @@ namespace RAM.Controllers.Controllers
         //private readonly IBannerService _bannerService;
         //private readonly IProjectService _projectService;
         private readonly IBlogRepository _blogRepository;
+        private readonly IPagesRepository _pageRepository;
         public HomeController(ILocalAuthenticationService authenticationService,
             IUserService userService,
             IBlogRepository blogRepository,
+            IPagesRepository pageRepository,
             IExternalAuthenticationService externalAuthenticationService,
             IFormsAuthentication formsAuthentication,
             IActionArguments actionArguments)
             : base(authenticationService, userService, externalAuthenticationService, actionArguments)
         {
             //_bannerService = bannerService;
-            //_projectService = projectService;
+            _pageRepository = pageRepository;
             _blogRepository = blogRepository;
         }
 
@@ -49,6 +52,17 @@ namespace RAM.Controllers.Controllers
             accountView.NavView.SelectedMenuItem = "nav-home";
             return PartialView("TopNavigation", accountView);
 
+        }
+
+        public ActionResult GetPage(Pages page)
+        {
+            var p = _pageRepository.GetByTitle(page.title);
+            return Json(new
+            {
+                Message = "Page Grabbed",
+                Status = "success",
+                Page = p
+            }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Banners()

@@ -538,6 +538,10 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\schedule\schedule-controller.js" />
+    <Content Include="Scripts\schedule\schedule-service.js" />
+    <Content Include="Scripts\shared\main-controller.js" />
+    <Content Include="Scripts\shared\paginator-service.js" />
     <Content Include="Scripts\tag-it.js" />
     <Content Include="Scripts\tag-it.min.js" />
     <Content Include="Scripts\_references.js" />
@@ -600,6 +604,8 @@
     <Content Include="Views\Forms\Index.cshtml" />
     <Content Include="Views\Forms\WaiverList.cshtml" />
     <Content Include="Views\Forms\Waiver.cshtml" />
+    <Content Include="Views\Pages\_ImagesList.cshtml" />
+    <Content Include="Views\Pages\_Blog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RAM.Admin.Controllers\RAM.Admin.Controllers.csproj">

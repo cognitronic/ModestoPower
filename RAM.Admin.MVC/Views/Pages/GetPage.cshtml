@@ -28,16 +28,9 @@ else
             <textarea id="seoDescription" class="form-control" rows="6" placeholder="Enter SEO Description">@Model.SelectedPage.seodescription</textarea><br />
             <b>Content Body:</b><br />
             <textarea id="contentbody" class="form-control" rows="6" placeholder="Enter Content">@Model.SelectedPage.maincontent</textarea><br />
-            @if (Model.SelectedPage != null)
-            {
-                <span><b>Click To Manage Pictures:</b></span><br />
-                if (Model.SelectedPage.bannerimage.Count > 0)
-                {
-                    <a href="#pageModal" class="editPageModal" data-toggle="modal" data-id="@Model.SelectedPage.Id.ToString()">
-                        <img id="postimage" src="@System.Configuration.ConfigurationManager.AppSettings["PublicSiteUrl"]@Model.SelectedPage.bannerimage[0]" alt="@Model.SelectedPage.title" class="img-thumbnail" style="height: 200px; width: 300px;" />
-                    </a>
-                }
-            }
+            <div id="imagesList">
+                @Html.Partial("_ImagesList")
+            </div>
             <br /><br />
             <button class="savePage btn btn-success" role="button">Save Page</button>
             <a href="/Pages" class="btn btn-info" role="button">Back To List</a>
@@ -127,14 +120,14 @@ else
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Pages/GetPageImages',
                 type: 'POST',
-                data: JSON.stringify({id : $(this).data('id')}),
+                data: JSON.stringify({ id: $(this).data('id') }),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
-                success: function(data){
-                    bgImages = data.Images;
-                    buildImages(dropZoneInstance(), bgImages, $("#hdnPageID").val());
+                success: function (data) {
+                    //bgImages = data.Images;
+                    //buildImages(dropZoneInstance(), bgImages, $("#hdnPageID").val());
                 },
-                error: function(x,y,z){
+                error: function (x, y, z) {
 
                 }
             });
@@ -142,7 +135,7 @@ else
 
         function buildImages(dz, imgs, id) {
             for (var i = 0; i < imgs.length; i++) {
-                var mockFile = { name: imgs[i], size: 12345, id: id};
+                var mockFile = { name: imgs[i], size: 12345, id: id };
 
                 // Call the default addedfile event handler
                 dz.emit("addedfile", mockFile);
@@ -173,12 +166,16 @@ else
             dz.options.maxFiles = dz.options.maxFiles - existingFileCount;
         }
 
-        function DeleteFileFromServer(file) {
-            console.log(file);
+        $('.deleteImage').on('click', function () {
+            DeleteFileFromServer($(this).data('name'), $(this).data('id'));
+        });
+
+        function DeleteFileFromServer(name, id) {
+            console.log(name + ' ' + id);
             $.ajax({
                 url: '@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]' + '/Pages/DeleteImage',
                 type: 'POST',
-                data: JSON.stringify({ id: file.id, name: file.name}),
+                data: JSON.stringify({ id: id, name: name}),
                 dataType: "json",
                 contentType: "application/json;charset=utf-8",
                 success: function (data) {
@@ -244,9 +241,9 @@ else
                     this.removeFile(file);
                 });
 
-                this.on("removedfile", function (file) {
-                    DeleteFileFromServer(file);
-                });
+                //this.on("removedfile", function (file) {
+                //    DeleteFileFromServer(file);
+                //});
 
                 this.on("drop", function (event) {
                     filesadded = true;

@@ -665,7 +665,7 @@ a.navbar-brand img {
 .parallax {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
-	background-position: 50% 0;
+	/*background-position: 50% 0;*/
 	/*background-size: cover;*/
 	color: #fff;
 	height: 100%;
@@ -824,7 +824,7 @@ a.navbar-brand img {
 
 
 .parallax-one {
-	background-image: url(../images/BG/2.jpg);
+	background-image: url(../images/BG/bjjIMG_0726.jpg);
 }
 #promo h1:after {
 	content: '';
@@ -1171,7 +1171,7 @@ a.navbar-brand img {
 }
 
 .parallax-customer {
-	background-image: url(../images/BG/customer_px.png);
+	background-image: url(../images/BG/IMG_0081.jpg);
 }
 
 #customer h3 {
@@ -2038,7 +2038,7 @@ a.client-ref span {
 	color: #ed1c24;
 }
 .testimonial-parallax {
-	background-image: url(../images/BG/testimonials_px.png);
+	background-image: url(../images/BG/ngbjjIMG_0715.jpg);
 	background-repeat: repeat;
 }
 .clients {
@@ -2697,8 +2697,8 @@ a.collapsed {
 	color: #000;
 	text-decoration: none;
 }
-.parallax-two, .parallax-one {
-	background-image: url(../images/BG/IMG_0851.png);
+.parallax-two {
+	background-image: url(../images/BG/IMG_0697.jpg);
 }
 #hire-us h2 {
 	color: #fff;
@@ -3455,7 +3455,7 @@ footer .text-right {
 }
 
 .historyheader {
-	background-image: url(../images/BG/IMG_0851.png);
+	background-image: url(../images/BG/IMG_0623.jpg);
 }
 
 .communityheader {

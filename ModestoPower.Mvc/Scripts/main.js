@@ -180,10 +180,10 @@
 	1-parallax
 	=================================*/
 
-    $('.parallax-one').parallax("50%", 0.4);
-    $('.parallax-two').parallax("50%", 0.4);
-    $('.parallax-customer').parallax("50%", 0.4);
-    $('.hero-parallax').parallax("50%", 0.4);
+    $('.parallax-one').parallax("50%", 0.1);
+    $('.parallax-two').parallax("50%", 0.1);
+    $('.parallax-customer').parallax("50%", 0.1);
+    $('.hero-parallax').parallax("50%", 0.1);
     $('.testimonial-parallax').parallax("50%", 0.3);
     $('.facts-parallax').parallax("50%", 0.3);
     $('.singleFolio-parallax').parallax("50%", 0.3);

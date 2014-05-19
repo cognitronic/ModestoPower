@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app="mp">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
 </head>
-<body data-spy="scroll" data-target="#sticktop" data-offset="100">
+<body data-spy="scroll" data-target="#sticktop" data-offset="100" ng-controller="MainController">
     <!-- Preloader -->
     <div id="preloader">
         <div id="status">
@@ -24,7 +24,7 @@
 
 
     @RenderSection("home", required: false)
-    
+
 
     <!--=================================
     header
@@ -118,7 +118,7 @@
             </div>
         </nav>
     </header>
-        @RenderBody()
+    @RenderBody()
     <hr />
     <footer>
         <div class="container">
@@ -138,7 +138,10 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/angular")
     @Scripts.Render("~/bundles/mp")
-    @RenderSection("scripts", required: false)
+        @RenderSection("scripts", required: false)
+    <script src="~/Scripts/app.js"></script>
+    <script src="~/Scripts/shared/main-controller.js"></script>
+    <script src="~/Scripts/pages/page-service.js"></script>
     <script>
         $(window).load(function () {
             $('#status').fadeOut(); // will first fade out the loading animation

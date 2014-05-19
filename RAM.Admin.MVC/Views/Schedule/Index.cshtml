@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Schedule Management";
 }
-<div class="container">
+<div class="container" ng-controller="ScheduleController">
     <div class="row">
         <h2 class="pull-left">Schedule Mangement</h2>
         <div class="pull-right" style="margin-top: 20px;">
@@ -23,24 +23,25 @@
                     <h3 id="modalLabel">Add/Edit Class</h3>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <b>Instructor:</b><br />
-                            <input id="modalInstructor" type="text" class="form-control" placeholder="Enter Instructors Name" /><br />
-                            <b>Class:</b><br />
-                            <input id="modalClass" type="text" class="form-control" placeholder="Enter Class Name" /><br />
-                            <b>Description:</b><br />
-                            <input id="modalDescription" type="text" class="form-control" placeholder="Enter Description" /><br />
-                            <b>Day:</b><br />
-                            <input id="modalDay" type="text" class="form-control" placeholder="Enter Day of the Week" /><br />
-                            <b>Time:</b><br />
-                            <input id="modalTime" type="text" class="form-control" placeholder="Enter Time Range i.e 4pm-5pm" /><br />
-                            <input name="scheduleID" type="hidden" id="hdnScheduleID" />
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <b>Instructor:</b><br />
+                                <input id="modalInstructor" type="text" class="form-control" ng-model="editing.instructor" placeholder="Enter Instructors Name" /><br />
+                                <b>Class:</b><br />
+                                <input id="modalClass" type="text" class="form-control" ng-model="editing.name" placeholder="Enter Class Name" /><br />
+                                <b>Description:</b><br />
+                                <input id="modalDescription" type="text" class="form-control" ng-model="editing.description" placeholder="Enter Description" /><br />
+                                <b>Day:</b><br />
+                                <input id="modalDay" type="text" class="form-control" ng-model="editing.day" placeholder="Enter Day of the Week" /><br />
+                                <b>Time:</b><br />
+                                <input id="modalTime" type="text" class="form-control" ng-model="editing.times" placeholder="Enter Time Range i.e 4pm-5pm" /><br />
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-                        <button id="submit-all" type="button" class="btn btn-primary">Save</button>
+                        <button ng-click="saveClass()" type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
                     </div>
                 </div>
             </div>
@@ -51,19 +52,19 @@
     $(document).ready(function () {
 
 
-        $(".editModal").on('click', function (e) {
+        @*$(".editModal").on('click', function (e) {
             e.preventDefault();
             @*var banners = @Html.Raw(Json.Encode(Model.Banners));
-            var banner = banners[$(this).data('id') - 1 ];*@
+            var banner = banners[$(this).data('id') - 1 ];
             $("#modalInstructor").val($("#instructor_" + $(this).data('id')).text().trim());
             $("#modalClass").val($("#class_" + $(this).data('id')).text().trim());
             $("#modalDescription").val($("#description_" + $(this).data('id')).text().trim());
             $("#modalDay").val($("#day_" + $(this).data('id')).text().trim());
             $("#modalTime").val($("#time_" + $(this).data('id')).text().trim());
             $("#hdnScheduleID").val($(this).data('id'));
-        });
+        });*@
 
-        $(".deleteClass").on('click', function(e){
+        @*$(".deleteClass").on('click', function(e){
             e.preventDefault();
             if (!confirm("Do you want to delete")){
                 return false;
@@ -84,10 +85,10 @@
                     alert(x + '\n' + y + '\n' + z);
                 }
             });
-        });
+        });*@
 
 
-        $("#submit-all").on('click', function (e) {
+        @*$("#submit-all").on('click', function (e) {
             e.preventDefault();
             var s = {
                 instructor: $("#modalInstructor").val(),
@@ -114,7 +115,7 @@
                     alert(x + '\n' + y + '\n' + z);
                 }
             });
-        });
+        });*@
 
 
 
