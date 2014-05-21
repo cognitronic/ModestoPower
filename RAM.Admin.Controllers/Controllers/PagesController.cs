@@ -133,6 +133,7 @@ namespace RAM.Admin.Controllers.Controllers
             {
                 p.isonline = page.isonline;
                 p.title = page.title;
+                p.headertext = page.headertext;
                 p.seodescription = page.seodescription;
                 p.seokeywords = page.seokeywords;
                 p.maincontent = page.maincontent;
