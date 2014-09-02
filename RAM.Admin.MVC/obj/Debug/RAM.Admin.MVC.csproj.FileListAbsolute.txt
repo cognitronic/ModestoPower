@@ -156,3 +156,4 @@ C:\Projects\ModestoPower\RAM.Admin.MVC\obj\Debug\RAM.Admin.MVC.dll
 C:\Projects\ModestoPower\RAM.Admin.MVC\obj\Debug\RAM.Admin.MVC.pdb
 C:\Projects\ModestoPower\RAM.Admin.MVC\bin\RAM.Repository.Mongo.dll
 C:\Projects\ModestoPower\RAM.Admin.MVC\bin\RAM.Repository.Mongo.pdb
+C:\Projects\ModestoPower\RAM.Admin.MVC\bin\Telerik.Web.UI.xml

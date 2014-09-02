@@ -55,7 +55,7 @@ h4 {
 p {
 	font-size: 18px;
 	line-height: 36px;
-	color: #999999;
+	color: #333333;
 	font-weight: 300;
 }
 a.btn {
@@ -278,7 +278,7 @@ h2:after {
 	width: 100%;
 	left: 0;
 	z-index: 9999;
-	position: relative;
+	position: fixed;
 }
 .ny_nav {
 	background: #ed1c24;

@@ -7,11 +7,10 @@ using Telerik.Web.UI;
 using RAM.Core.Domain.Blog;
 using RAM.Services.Interfaces;
 using StructureMap;
-using IdeaSeed.Web.UI;
 
 namespace RAM.Web.Controls
 {
-    public class BlogCategoryDDL : DropDownList
+    public class BlogCategoryDDL : Telerik.Web.UI.RadComboBox
     {
         
 

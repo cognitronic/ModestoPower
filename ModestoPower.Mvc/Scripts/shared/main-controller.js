@@ -13,5 +13,5 @@
             }
         });
     }
-    //$scope.loadHomePage();
+    console.log(bowser);
 });

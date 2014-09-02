@@ -47,7 +47,7 @@ namespace RAM.Services.Providers
 
         public override void Initialize(string name, NameValueCollection config)
         {
-            this.mongoCollection = new MongoClient(config["mongoConnectionString"] ?? "mongodb://localhost").GetServer().GetDatabase(config["mongoDatabase"] ?? "ASPNETDB").GetCollection(config["collection"] ?? "OutputCache");
+            this.mongoCollection = new MongoClient(config["mongoConnectionString"] ?? "mongodb://psp.dannyschreiber.net").GetServer().GetDatabase(config["mongoDatabase"] ?? "ASPNETDB").GetCollection(config["collection"] ?? "OutputCache");
             this.mongoCollection.EnsureIndex("Key");
             base.Initialize(name, config);
         }

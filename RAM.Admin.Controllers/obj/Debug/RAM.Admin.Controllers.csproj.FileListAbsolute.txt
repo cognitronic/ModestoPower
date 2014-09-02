@@ -108,3 +108,4 @@ C:\Projects\ModestoPower\RAM.Admin.Controllers\bin\Debug\IdeaSeed.Core.pdb
 C:\Projects\ModestoPower\RAM.Admin.Controllers\obj\Debug\RAM.Admin.Controllers.csprojResolveAssemblyReference.cache
 C:\Projects\ModestoPower\RAM.Admin.Controllers\obj\Debug\RAM.Admin.Controllers.dll
 C:\Projects\ModestoPower\RAM.Admin.Controllers\obj\Debug\RAM.Admin.Controllers.pdb
+C:\Projects\ModestoPower\RAM.Admin.Controllers\bin\Debug\Telerik.Web.UI.xml

@@ -49,7 +49,7 @@ namespace RAM.Services.Providers
             var configuration = WebConfigurationManager.OpenWebConfiguration(HostingEnvironment.ApplicationVirtualPath);
             this.sessionStateSection = configuration.GetSection("system.web/sessionState") as SessionStateSection;
 
-            this.mongoCollection = new MongoClient(config["connectionString"] ?? "mongodb://localhost").GetServer().GetDatabase(config["database"] ?? "ASPNETDB").GetCollection(config["collection"] ?? "SessionState");
+            this.mongoCollection = new MongoClient(config["connectionString"] ?? "mongodb://psp.dannyschreiber.net").GetServer().GetDatabase(config["database"] ?? "ASPNETDB").GetCollection(config["collection"] ?? "SessionState");
             this.mongoCollection.EnsureIndex("applicationVirtualPath", "id");
             this.mongoCollection.EnsureIndex("applicationVirtualPath", "id", "lockId");
 

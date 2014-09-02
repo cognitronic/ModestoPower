@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RAM.Services.Providers;
+using System.Configuration;
 
 namespace RAM.Services.Cache
 {
@@ -16,7 +17,7 @@ namespace RAM.Services.Cache
             var map = new System.Collections.Specialized.NameValueCollection();
             map.Add("database", "ASPNETDB");
             map.Add("collection", "OutputCache");
-            _instance = new MongoDBOutputCacheProvider("mongodb://localhost", map);
+            _instance = new MongoDBOutputCacheProvider(ConfigurationManager.AppSettings["mongoConnectionString"], map);
         }
 
         public static MongoDBOutputCacheProvider Instance { get { return _instance; } }

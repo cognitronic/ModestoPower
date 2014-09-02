@@ -56,7 +56,6 @@
 
     $.fn.stFlickrFeed = function () {
         
-        console.log('suck ittttt');
         $(this).append('<div class="widget-feed"></div>');
 
         var self = $(this),
@@ -104,7 +103,6 @@
 	------------------------------------------------------------------------- */
 
     $.fn.stInstagramFeed = function () {
-        console.log('suck it');
         if ($.fn.embedagram) {
 
             $(this).append('<div class="widget-feed"></div>');
@@ -654,53 +652,54 @@
 	=========================================*/
 
 
-    $(".ny_nav ul a[href^='#'],.home-nav a[href^='#'],.navmenu-nav a[href^='#'],.scroller").click(function () {
-		$('.navbar-nav li').removeClass('active');
-        $(this).parent().addClass('active');
-        $('html, body').animate({
-            scrollTop: $($.attr(this, 'href')).offset().top - 0
-        }, 1500,'easeInOutExpo');
-        return false;
-    });
+    //$(".ny_nav ul a[href^='#'],.home-nav a[href^='#'],.navmenu-nav a[href^='#'],.scroller").click(function () {
+	//	$('.navbar-nav li').removeClass('active');
+    //    $(this).parent().addClass('active');
+    //    $('html, body').animate({
+    //        scrollTop: $($.attr(this, 'href')).offset().top - 0
+    //    }, 1500,'easeInOutExpo');
+    //    return false;
+    //});
 
-    $('ul.nav li.dropdown').click(
-        function () {
-            $(this).children('.dropdown-menu').slideToggle(400);
-        });
+    //$('ul.nav li.dropdown').click(
+    //    function () {
+    //        $(this).children('.dropdown-menu').slideToggle(400);
+    //    });
 
 
-    $(window).on("resize", function () {
-        if ($(window).width() > 1000 && !$("#sticktop").hasClass('nav-stop')) {
-            $('#home').bind('inview', function (event, visible) {
-                if (visible === false) {
-                    if (!$("#sticktop").hasClass('slideInDown')) {
-                        $("#sticktop").removeClass('animated slideInUpBig').addClass('animated slideInDown');
-                    }
-                } else {
-                    $("#sticktop").removeClass('animated slideInDown').addClass('animated slideInUpBig');
-                }
-            });
-        }
-    }).resize();
+    //$(window).on("resize", function () {
+    //    if ($(window).width() > 1000 && !$("#sticktop").hasClass('nav-stop')) {
+    //        $('#home').bind('inview', function (event, visible) {
+    //            if (visible === false) {
+    //                if (!$("#sticktop").hasClass('slideInDown')) {
+    //                    $("#sticktop").removeClass('animated slideInUpBig').addClass('animated slideInDown');
+    //                }
+    //            } else {
+    //                $("#sticktop").removeClass('animated slideInDown').addClass('animated slideInUpBig');
+    //            }
+    //        });
+    //    }
+    //}).resize();
 	
-	if(!$("#sticktop").hasClass('nav-stop')){
-		$("#sticktop").sticky({
-			topSpacing: 0
-		});
-	}
+	//if(!$("#sticktop").hasClass('nav-stop')){
+	//	$("#sticktop").sticky({
+	//		topSpacing: 0
+	//	});
+	//}
 
-    $(".navbar-nav a[href^='#']").click(function () {
-		if($(this).parents('.navbar-collapse').hasClass('in'))
-		{
-			$(this).parents('.navbar-collapse').removeClass('in').addClass('collapse');
-		}
-        $('.navbar-nav li').removeClass('active');
-        $(this).parent().addClass('active');
-        $('html, body').animate({
-            scrollTop: $($.attr(this, 'href')).offset().top - 0
-        }, 1500,'easeInOutExpo');
-        return false;
-    });
+	//$(".navbar-nav a[href^='#']").click(function () {
+	//    console.log($(this));
+	//	if($(this).parents('.navbar-collapse').hasClass('in'))
+	//	{
+	//		$(this).parents('.navbar-collapse').removeClass('in').addClass('collapse');
+	//	}
+    //    $('.navbar-nav li').removeClass('active');
+    //    $(this).parent().addClass('active');
+    //    //$('html, body').animate({
+    //    //    scrollTop: $($.attr(this, 'href')).offset().top - 0
+    //    //}, 1500,'easeInOutExpo');
+    //    return false;
+    //});
 
 
     /*=======================================

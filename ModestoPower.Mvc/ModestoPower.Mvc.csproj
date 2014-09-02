@@ -686,6 +686,7 @@
     <Content Include="Scripts\nlform.js" />
     <Content Include="Scripts\odometer.min.js" />
     <Content Include="Scripts\owl.carousel.min.js" />
+    <Content Include="Scripts\pages\bowser.js" />
     <Content Include="Scripts\pages\page-service.js" />
     <Content Include="Scripts\parallax.js" />
     <Content Include="Scripts\respond.js" />

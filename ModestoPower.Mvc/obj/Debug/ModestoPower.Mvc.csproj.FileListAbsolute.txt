@@ -82,3 +82,4 @@ C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Web.dll
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Bson.xml
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Driver.xml
 C:\Projects\ModestoPower\ModestoPower.Mvc\bin\MongoDB.Web.pdb
+C:\Projects\ModestoPower\ModestoPower.Mvc\bin\Telerik.Web.UI.xml
