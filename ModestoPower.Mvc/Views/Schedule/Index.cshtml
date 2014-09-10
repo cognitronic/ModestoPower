@@ -15,38 +15,45 @@
     <br />
     <div class="container">
         <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                <b style="color:#0094ff">Filter By Class: </b><select class="input-lg" id="classddl"></select>
-                
-                <button style="vertical-align: top;" type="button" class="btn btn-lg btn-danger" id="submitfilter">Search</button>
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 about-inner">
+                <div class="row">
+                    <div>
+                        <b style="color:#0094ff">Filter By Class: </b><select class="input-lg" id="classddl"></select>
+
+                        <button style="vertical-align: top;" type="button" class="btn btn-lg btn-danger" id="submitfilter">Search</button>
+                    </div>
+                </div><hr />
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 about-inner">
+                        <h2>Monday</h2>
+                        <ul class="schedulelist" id="Monday"></ul>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <h2>Tuesday</h2>
+                        <ul class="schedulelist" id="Tuesday"></ul>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <h2>Wednesday</h2>
+                        <ul class="schedulelist" id="Wednesday"></ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 about-inner">
+                        <h2>Thursday</h2>
+                        <ul class="schedulelist" id="Thursday"></ul>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <h2>Friday</h2>
+                        <ul class="schedulelist" id="Friday"></ul>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <h2>Saturday</h2>
+                        <ul class="schedulelist" id="Saturday"></ul>
+                    </div>
+                </div>
             </div>
-        </div><hr />
-        <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 about-inner">
-                <h2>Monday</h2>
-                <ul class="schedulelist" id="Monday"></ul>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                <h2>Tuesday</h2>
-                <ul class="schedulelist" id="Tuesday"></ul>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                <h2>Wednesday</h2>
-                <ul class="schedulelist" id="Wednesday"></ul>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 about-inner">
-                <h2>Thursday</h2>
-                <ul class="schedulelist" id="Thursday"></ul>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                <h2>Friday</h2>
-                <ul class="schedulelist" id="Friday"></ul>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                <h2>Saturday</h2>
-                <ul class="schedulelist" id="Saturday"></ul>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                @Html.Action("Sidebar", "Blog")
             </div>
         </div>
     </div>

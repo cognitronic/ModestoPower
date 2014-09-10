@@ -26,10 +26,13 @@
     <br />
     <div class="container">
         <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 about-inner">
+            <div class="content-container col-lg-9 col-md-9 col-sm-7 col-xs-12 about-inner">
                 <h2>@Model.SelectedPage.title</h2>
                 <h3>@Model.SelectedPage.headertext</h3>
                 @Html.Raw(Model.SelectedPage.maincontent)
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-5 col-xs-12">
+                @Html.Action("Sidebar", "Blog")
             </div>
         </div>
     </div>
