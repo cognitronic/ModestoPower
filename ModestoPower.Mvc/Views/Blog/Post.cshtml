@@ -1,19 +1,19 @@
 ﻿@model RAM.Controllers.ViewModels.HomeView
 
 @{
-    ViewBag.Title = "Modesto Power | Blog";
+    ViewBag.Title = "Modesto Power | " + Model.SelectedPost.title;
 }
 <section id="promo" class="historyheader parallax">
     <div class="container">
-        <h5>Here is some statement about</h5>
-        <h1>The Schedule</h1>
+        <h5></h5>
+        <h1></h1>
     </div>
 </section>
 <section id="aboutcontent">
     <br />
     <div class="container">
         <div class="row">
-            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 about-inner">
+            <div class="col-lg-9 col-md-9 col-sm-7 col-xs-12 about-inner">
                 <article class="blog-post">
                     <header class="post-header">
                         <h2 class="post-title"><a href="/blog/@Model.SelectedPost.title.Replace(" ", "-")">@Model.SelectedPost.title</a> </h2>
@@ -52,7 +52,7 @@
                 </article>
 
             </div>
-            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+            <div class="col-lg-3 col-md-3 col-sm-5 col-xs-12">
                 <!-- MENU WIDGET : begin -->
                 @Html.Partial("_Categories")
                 <!-- MENU WIDGET : end -->

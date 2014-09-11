@@ -132,7 +132,7 @@ namespace RAM.Admin.Controllers.Controllers
             if (p != null)
             {
                 p.isonline = page.isonline;
-                p.title = page.title;
+                p.bannertext = page.bannertext;
                 p.headertext = page.headertext;
                 p.seodescription = page.seodescription;
                 p.seokeywords = page.seokeywords;
