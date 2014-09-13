@@ -16,6 +16,7 @@ using System.Configuration;
 using RAM.Services.Messaging.Blog;
 using RAM.Core;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace RAM.Admin.Controllers.Controllers
 {
@@ -148,9 +149,35 @@ namespace RAM.Admin.Controllers.Controllers
             {
                 try
                 {
+
                     var file = Request.Files[fileName];
+
+                    FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://www.ravenartmedia.com/%2F/ModestoPower/images/blog/" + file.FileName);
+                    request.UseBinary = true;
+                    request.Method = WebRequestMethods.Ftp.UploadFile;
+
+                    // This example assumes the FTP site uses anonymous logon.
+                    request.Credentials = new NetworkCredential("cognitronic", "R@mpimp1n");
+
+
+                    // Copy the contents of the file to the request stream.
+                    Stream stream = file.InputStream;
+                    byte[] fileContents = new Byte[file.ContentLength];
+                    stream.Read(fileContents, 0, fileContents.Length);
+                    stream.Close();
+                    stream = null;
+
+
+                    Stream requestStream = request.GetRequestStream();
+                    requestStream.Write(fileContents, 0, fileContents.Length);
+                    requestStream.Close();
+
+                    FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                    Console.WriteLine("Upload File Complete, status {0}", response.StatusDescription);
+
+                    response.Close();
                     post.imagepath = ConfigurationSettings.AppSettings["BlogImageURL"] + file.FileName;
-                    file.SaveAs(ConfigurationSettings.AppSettings["BlogImageDir"] + file.FileName);
                 }
                 catch (Exception fileException)
                 {

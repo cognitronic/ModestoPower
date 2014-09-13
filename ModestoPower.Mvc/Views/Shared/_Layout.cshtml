@@ -32,9 +32,9 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="#home">Home</a></li>
+                    <li><a href="/">Home</a></li>
                     <li class="dropdown">
-                        <a href="#about">About</a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">About</a>
                         <ul class="dropdown-menu">
                             <li><a href="/About/Our-History">Our History</a></li>
                             <li><a href="/About/Membership-Info">Membership Info</a></li>
@@ -42,7 +42,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#programs">Programs</a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Programs</a>
                         <ul class="dropdown-menu">
                             <li><a href="/Programs/Brazilian-Jiu-Jitsu">Brazilian Jiu Jitsu</a></li>
                             <li><a href="/Programs/Muay-Thai">Muay Thai</a></li>
@@ -62,14 +62,14 @@
                         </ul>
                     </li>
                     <li><a href="/blog">Blog</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="/Contact">Contact</a></li>
 
                 </ul>
             </div>
         </nav>
     </header>
 
-    <header id="internalnav" style="display: none;">
+    @*<header id="internalnav" style="display: none;">
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
@@ -79,7 +79,7 @@
                 <ul class="nav navbar-nav">
                     <li id="nav-home"><a href="/">Home</a></li>
                     <li id="nav-about" class="dropdown">
-                        <a href="#">About</a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">About</a>
                         <ul class="dropdown-menu">
                             <li><a href="/About/Our-History">Our History</a></li>
                             <li><a href="/About/Membership-Info">Membership Info</a></li>
@@ -87,7 +87,7 @@
                         </ul>
                     </li>
                     <li id="nav-programs">
-                        <a>Programs</a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Programs</a>
                         <ul class="dropdown-menu">
                             <li><a href="/Programs/Brazilian-Jiu-Jitsu">Brazilian Jiu Jitsu</a></li>
                             <li><a href="/Programs/Muay-Thai">Muay Thai</a></li>
@@ -112,7 +112,7 @@
                 </ul>
             </div>
         </nav>
-    </header>
+    </header>*@
     @RenderBody()
     <hr />
     <footer>
