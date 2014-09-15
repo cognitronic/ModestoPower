@@ -20,5 +20,5 @@
 
     })
     .constant('APP_SETTINGS', {
-        apiUrl: 'http://mp.localhost/'
+        apiUrl: 'http://www.teammodestopower.com/'
     });

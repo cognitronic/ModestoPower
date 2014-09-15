@@ -32,6 +32,7 @@
         console.log($scope.editing);
         ScheduleService.saveSchedule($scope.editing).then(function (data) {
             $scope.loadClasses();
+            $scope.editing = null;
         });
     }
 });
