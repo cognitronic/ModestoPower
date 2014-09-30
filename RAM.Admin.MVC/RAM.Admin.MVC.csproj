@@ -214,6 +214,8 @@
     <Content Include="Scripts\angular-sanitize.js" />
     <Content Include="Scripts\angular-sanitize.min.js" />
     <Content Include="Scripts\angular-scenario.js" />
+    <Content Include="Scripts\angular-strap.js" />
+    <Content Include="Scripts\angular-strap.tpl.js" />
     <Content Include="Scripts\angular-touch.js" />
     <Content Include="Scripts\angular-touch.min.js" />
     <Content Include="Scripts\angular.js" />
@@ -544,7 +546,9 @@
     <Content Include="Scripts\shared\paginator-service.js" />
     <Content Include="Scripts\tag-it.js" />
     <Content Include="Scripts\tag-it.min.js" />
+    <Content Include="Scripts\ui-bootstrap-tpls-0.10.0.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="Views\Schedule\timepicker.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

@@ -30,7 +30,7 @@ namespace RAM.Controllers.Controllers
         public ActionResult Index()
         {
             var view = new HomeView();
-            view.Schedules = _scheduleRepository.GetAll();
+            view.Schedules = _scheduleRepository.GetAll().OrderBy(o => o.times).ThenBy(o => o.day).ToList();
             return View(view);
         }
 

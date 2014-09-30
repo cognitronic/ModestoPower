@@ -399,6 +399,9 @@
                 if (!form.stFormValid()) {
                     form.find('p.alert-message.warning.validation').slideDown(300);
                     return false;
+                } else if(document.getElementById('address').value != "")
+                {
+                    console.log('ah ahh');
                 }
                     // form valid
                 else {

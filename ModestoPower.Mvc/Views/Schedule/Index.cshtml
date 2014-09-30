@@ -14,7 +14,7 @@
             <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 about-inner">
                 <div class="row">
                     <div>
-                        <b style="color:#0094ff">Filter By Class: </b><select class="input-lg" id="classddl"></select>
+                        <select class="input-lg" id="classddl"></select>
 
                         <button style="vertical-align: top;" type="button" class="btn btn-lg btn-danger" id="submitfilter">Search</button>
                     </div>
@@ -68,7 +68,7 @@
     })();
 
     $(document).ready(function() {
-        var schedule = @Html.Raw(Json.Encode(Model.Schedules.OrderBy( o => o.name)));
+        var schedule = @Html.Raw(Json.Encode(Model.Schedules.OrderBy( o => o.starttime).ThenBy(d => d.day)));
 
         var list = [];
 
@@ -97,7 +97,7 @@
             var temp = [];
             $.each(schedule, function(idx, text){
                 if(idx == 0){
-                    $('#classddl').append($('<option></option').val("").html("-- Select --"));
+                    $('#classddl').append($('<option></option').val("").html("-- Filter By Class --"));
                 }
                 if(temp === null || temp === 'undefined' ){
                     temp.push(text.name);

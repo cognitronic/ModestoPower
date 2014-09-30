@@ -17,7 +17,8 @@ namespace RAM.Admin.MVC
 
             bundles.Add(new ScriptBundle("~/bundles/angular").Include(
                        "~/Scripts/angular.js",
-                       "~/Scripts/angular-route.js"));
+                       "~/Scripts/angular-route.js",
+                       "~/Scripts/ui-bootstrap-tpls-0.10.0.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/dropzone").Include(
                         "~/Scripts/dropzone.js"));
@@ -28,8 +29,7 @@ namespace RAM.Admin.MVC
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.js",
-                      "~/Scripts/respond.js",
-                      "~/Scripts/bootstrap-datepicker.js"));
+                      "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
@@ -37,8 +37,6 @@ namespace RAM.Admin.MVC
                        "~/Content/dropzone.css",
                       "~/Content/site.css",
                       "~/Content/bootstrap-responsive.css",
-                      "~/Content/datepicker.css",
-                      "~/Content/datepicker3.css",
                       "~/Content/tagit.ui-zendesk.css",
                       "~/Content/jquery.tagit.css"));
         }

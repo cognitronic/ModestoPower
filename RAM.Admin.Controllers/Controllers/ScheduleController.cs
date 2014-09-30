@@ -48,7 +48,7 @@ namespace RAM.Admin.Controllers.Controllers
         {
             HomeView view = new HomeView();
             view.NavView.SelectedMenuItem = "nav-schedule";
-            view.ClassList = _scheduleRepository.GetAll().OrderBy(o => o.name).ThenBy(o => o.day).ToList();
+            view.ClassList = _scheduleRepository.GetAll().OrderBy(o => o.starttime).ThenBy(o => o.day).ToList();
             return Json(new
             {
                 Message = "schedule saved!",
@@ -71,6 +71,8 @@ namespace RAM.Admin.Controllers.Controllers
                 s.times = schedule.times;
                 _scheduleRepository.Save(s);
                 s.sid = s.Id.ToString();
+                s.starttime = schedule.starttime;
+                s.endtime = schedule.endtime;
                 _scheduleRepository.Save(s);
             }
             else
@@ -81,6 +83,8 @@ namespace RAM.Admin.Controllers.Controllers
                 s.instructor = schedule.instructor;
                 s.name = schedule.name.ToLower();
                 s.times = schedule.times;
+                s.starttime = schedule.starttime;
+                s.endtime = schedule.endtime;
                 _scheduleRepository.Save(s);
             }
 

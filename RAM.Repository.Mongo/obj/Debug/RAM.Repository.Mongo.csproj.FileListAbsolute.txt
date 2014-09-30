@@ -40,3 +40,4 @@ C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\AutoMapper.xml
 C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\Enyim.Caching.pdb
 C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\Enyim.Caching.xml
 C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\System.Net.Http.Formatting.xml
+C:\Projects\ModestoPower\RAM.Repository.Mongo\bin\Debug\Newtonsoft.Json.xml

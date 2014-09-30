@@ -1,4 +1,4 @@
-﻿var app = angular.module('mp', ['ngRoute', 'service.schedule'])
+﻿var app = angular.module('mp', ['ngRoute', 'service.schedule', 'ui.bootstrap'])
     .config(function ($routeProvider, $httpProvider) {
 
 
@@ -20,5 +20,5 @@
 
     })
     .constant('APP_SETTINGS', {
-        apiUrl: 'http://mpadmin.localhost/'
+        apiUrl: 'http://mpadmin.team/'
     });

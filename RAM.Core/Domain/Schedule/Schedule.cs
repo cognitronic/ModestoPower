@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using MongoDB.Driver.Wrappers;
 using System.Runtime.Serialization;
 
 namespace ModestoPower.Core.Domain.Schedule
@@ -28,6 +29,11 @@ namespace ModestoPower.Core.Domain.Schedule
 
         [DataMember]
         public string times { get; set; }
+        [DataMember]
+        
+        public DateTime starttime { get; set; }
+        [DataMember]
+        public DateTime endtime { get; set; }
         
         [DataMember]
         public string sid { get; set; }

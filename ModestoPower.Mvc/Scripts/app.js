@@ -1,7 +1,6 @@
 ﻿var app = angular.module('mp', ['ngRoute', 'service.page'])
     .config(function ($routeProvider, $httpProvider) {
 
-
         //This transformRequest is a global override for $http.post that transforms the body to the same param format used by  jQuery's $.post call
         $httpProvider.defaults.transformRequest = function (data) {
             if (data === undefined) {
